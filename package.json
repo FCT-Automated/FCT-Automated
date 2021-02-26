@@ -11,6 +11,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "electron": "^11.1.1"
+    "@fortawesome/fontawesome-free": "^5.15.2",
+    "bootstrap": "^4.6.0",
+    "bootstrap-table": "^1.18.2",
+    "electron": "^11.1.1",
+    "jquery": "^3.5.1",
+    "js-datepicker": "^5.18.0",
+    "puppeteer": "^5.5.0",
+    "request": "^2.88.2",
+    "websocket": "^1.0.33",
+    "ws": "^7.4.2"
   }
 }

@@ -5,20 +5,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Electron</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="css/mystyle.css"> -->
+    <script src="bower_components/jquery/dist/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="js/myjs.js"></script>
+    <title>FCT</title>
 </head>
 
+
+
+
+
 <body>
-    <h1>Hello Electron</h1>
-    <p>Node Version:
-        <script>document.write(process.versions.node)</script>
-    </p>
-    <p>Chrome Version:
-        <script>document.write(process.versions.chrome)</script>
-    </p>
-    <p>Electron Version:
-        <script>document.write(process.versions.electron)</script>
-    </p>
+  <div class="container">
+    <script type="text/javascript" src="nav.js"></script>
+    <div class="row" style="position: relative; top: 65px;">
+      <div class="col">
+        <form>
+          <div class="form-group">
+            <label for="API">API:</label>
+            <select class="form-control" id="API">
+              <option value="Login">Login</option>
+              <option value="SetPoints">SetPoints</option>
+              <option value="KickOut">KickOut</option>
+            </select>
+          </div>
+          <div id="apiForm">
+            <script type="text/javascript" src="apiForm.js"></script>
+          </div>
+        </form>
+        <button type="Button" id="SendApi" class="btn btn-primary">送出</button>
+        <div><span id="result">123</span></div>
+      </div>
+    </div>
+    
+    
+  </div>
+  <script src="renderer.js"></script>
+    
 </body>
 
 </html>
