@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/mystyle.css">
+    <script src="bower_components/jquery/dist/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="js/myjs.js"></script>
+    <title>FCT-Api</title>
+</head>
+
+<body>
+  <div class="container">
+    <script type="text/javascript" src="nav.js"></script>
+    <div class="row" style="position: relative; top: 65px;">
+      <div class="col">
+        <form>
+          <div class="form-group">
+            <label for="API">API:</label>
+            <select class="form-control" id="API">
+              <option value="Login">Login</option>
+              <option value="SetPoints">SetPoints</option>
+              <option value="KickOut">KickOut</option>
+            </select>
+          </div>
+          <div class="form-group field_Login"> 
+            <label for="LanguageID">語系:</label> 
+            <select class="form-control" id="LanguageID"> 
+            <option>簡中:2</option> 
+            <option>英文:1</option> 
+            <option>泰文:4</option> 
+            </select> 
+          </div> 
+          <div class="form-group"> 
+            <label for="Currency">幣別:</label> 
+            <select class="form-control" id="Currency"> 
+            <option>CNY</option> 
+            </select> 
+          </div> 
+          <div class="form-group field_Login"> 
+            <label for="GameID">遊戲名稱:</label> 
+            <select class="form-control" id="GameID"> 
+            <option>三隻小豬:22017</option> 
+            </select> 
+          </div> 
+          <div class="form-group"> 
+            <label for="AgentCode">商戶代碼:</label> 
+            <select class="form-control" id="AgentCode"> 
+            <option>FCT</option> 
+            </select> 
+          </div> 
+          <div class="form-group"> 
+            <label for="MemberAccount">帳號:</label> 
+            <input class="form-control" id="MemberAccount"> 
+          </div>
+          <div class="form-group field_Login"> 
+            <label for="Event">活動:</label> 
+            <input class="form-control" id="Event"> 
+          </div>
+          <div class="form-group field_SetPoints"> 
+            <label for="MoneyBag">錢包:</label> 
+            <select class="form-control" id="MoneyBag"> 
+              <option>單一錢包</option>
+              <option>轉帳錢包</option>
+            </select>
+          </div>
+          <div class="form-group field_SetPoints"> 
+            <label for="Points">點數:</label> 
+            <input class="form-control" id="Points"> 
+          </div>
+        </form>
+        <button type="Button" id="SendApi" class="btn btn-primary">送出</button>
+        <div><span id="result">123</span></div>
+      </div>
+    </div>
+    
+    
+  </div>
+  <script src="renderer.js"></script>
+    
+</body>
+
+</html>

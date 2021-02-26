@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="css/mystyle.css"> -->
+    <script src="bower_components/jquery/dist/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <!-- <script src="js/myjs.js"></script> -->
+    <title>FCT-Setting</title>
+</head>
+
+<body>
+  <div class="container">
+    <!--navbar-->
+    <script type="text/javascript" src="nav.js"></script>
+    <!--content-->
+    <div class="accordion" id="SettingCollapse" style="position: relative; top: 65px;">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+            <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                chrome路徑
+                </button>
+            </h2>
+            </div>
+        
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#SettingCollapse">
+            <div class="card-body">
+                <label for="ChromePath">路徑位置:</label>
+                <input id="ChromePath">
+                <button type="button" class="btn btn-primary">更新</button>
+                <span id="chromePathUpdate"></span>
+            </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingTwo">
+            <h2 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                API相關設定
+                </button>
+            </h2>
+            </div>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#SettingCollapse">
+            <div class="card-body">
+                <div class="form-group field_Login"> 
+                    <label for="Currency">幣別:</label> 
+                    <select class="form-control" id="Currency"> 
+                    <option>三隻小豬:22017</option> 
+                    </select> 
+                  </div> 
+            </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingThree">
+            <h2 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                基本流程自動化清單
+                </button>
+            </h2>
+            </div>
+            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#SettingCollapse">
+            <div class="card-body">
+                test
+            </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingFourth">
+            <h2 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFourth" aria-expanded="false" aria-controls="collapseFourth">
+                腳本清單
+                </button>
+            </h2>
+            </div>
+            <div id="collapseFourth" class="collapse" aria-labelledby="headingFourth" data-parent="#SettingCollapse">
+            <div class="card-body">
+                test
+            </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  
+    
+</body>
+
+</html>

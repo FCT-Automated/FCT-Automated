@@ -2,13 +2,22 @@ $(function() {
     var selectElement = document.getElementById('API')
     selectElement.addEventListener('change', (event) => {
         changeAPIForm(document.getElementById('API').value)
-    //   const result = document.querySelector('.result')
-    //   result.textContent = `You like ${event.target.value}`
     })
     function changeAPIForm(curAPI){
-        const removeElement = document.getElementById('apiForm').querySelectorAll('.form-group')
-        removeElement.forEach(element => {element.remove()})
-        window.location.reload()
+        switch (curAPI) {
+            case 'Login':
+                $('.field_Login').show()
+                $('.field_SetPoints').hide()
+                break
+            case 'SetPoints':
+                $('.field_SetPoints').show()
+                $('.field_Login').hide()
+                break
+            case 'KickOut':
+                $('.field_SetPoints').hide()
+                $('.field_Login').hide()
+                break
+        }
         
     }
     
