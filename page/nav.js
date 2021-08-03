@@ -1,0 +1,13 @@
+document.write( '<nav class=\"navbar navbar-expand-lg navbar-dark bg-dark fixed-top\">\n' );
+document.write( '<button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarNavAltMarkup\" aria-controls=\"navbarNavAltMarkup\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n' );
+document.write( '<span class=\"navbar-toggler-icon\"></span>\n' );
+document.write( '</button>\n' );
+document.write( '<div class=\"collapse navbar-collapse\" id=\"navbarNavAltMarkup\">\n' );
+document.write( '<div class=\"navbar-nav\">\n' );
+document.write( '<a class=\"nav-item nav-link\" href=\"apiPage.html\">API</a>\n' );
+document.write( '<a class=\"nav-item nav-link\" href=\"preference_script.html\">基本流程自動化</a>\n' );
+document.write( '<a class=\"nav-item nav-link\" href=\"autoPage.html\">掛機</a>\n' );
+document.write( '<a class=\"nav-item nav-link\" href=\"settingPage.html\">設定</a>\n' );
+document.write( '</div>\n' );
+document.write( '</div>\n' );
+document.write( '</nav>' );

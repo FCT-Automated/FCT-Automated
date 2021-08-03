@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="text/javascript" src="head.js"></script>
+    <script src="../js/apiPage.js"></script>
+    <title>FCT-Api</title>
+</head>
+
+<body>
+  <div class="container">
+    <script type="text/javascript" src="nav.js"></script>
+    <div class="row" style="position: relative; top: 65px;">
+      <div class="col">
+        <form>
+          <div class="form-group">
+            <label for="API">API:</label>
+            <select class="form-control" id="API">
+              <option value="Login">Login</option>
+              <option value="SetPoints">SetPoints</option>
+              <option value="KickOut">KickOut</option>
+            </select>
+          </div>
+          <div class="form-group field_Login "> 
+            <label for="LanguageID">語系:</label> 
+            <select class="form-control LanguageID" id="LanguageID"> 
+            </select> 
+          </div> 
+          <div class="form-group"> 
+            <label for="Currency">幣別:</label> 
+            <select class="form-control Currency" id="Currency"> 
+            </select> 
+          </div> 
+          <div class="form-group field_Login"> 
+            <label for="GameID">遊戲名稱:</label> 
+            <select class="form-control GameID" id="GameID"> 
+            </select> 
+          </div> 
+          <div class="form-group"> 
+            <label for="AgentCode">商戶代碼:</label> 
+            <input class="form-control" id="AgentCode"> 
+          </div> 
+          
+          <div class="form-group"> 
+            <label for="MemberAccount">帳號:</label> 
+            <input class="form-control" id="MemberAccount"> 
+          </div>
+
+          <div class="form-group field_Login"> 
+            <label for="Event">活動:</label> 
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="optionEvent" id="notattend" value="notattend" checked>
+              <label class="form-check-label" for="notattend">
+                不參加
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="optionEvent" id="attend" value="attend">
+              <label class="form-check-label" for="attend">
+                參加
+              </label>
+              <select class="form-control" id="Event" disabled="disabled"> 
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group field_SetPoints" style="display: none;"> 
+            <label for="Wallet">錢包:</label> 
+            <select class="form-control" id="Wallet"> 
+              <option id="seamlessWallet">單一錢包</option>
+              <option id="transferWallet">轉帳錢包</option>
+            </select>
+          </div>
+
+          <div class="form-group field_SetPoints" style="display: none;"> 
+            <label for="Points">點數:</label> 
+            <input class="form-control" id="Points"> 
+          </div>
+
+        </form>
+        <button type="Button" id="SendApiBtn" class="btn btn-primary">送出</button>
+        <div><span id="result"></span></div>
+      </div>
+    </div>
+    
+    
+  </div>
+</body>
+
+</html>

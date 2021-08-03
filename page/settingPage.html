@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="text/javascript" src="head.js"></script>
+    <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
+    <script src="../bower_components/bootstrap-table/dist/bootstrap-table.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+    <script src="../js/settingPage.js"></script>
+    <title>FCT-Setting</title>
+    <script>
+        function createdModal(){
+            const datadict = {'語系': 'LanguageID', '幣別': 'Currency', '遊戲名稱': 'GameID'}
+            //-----------write modal------------
+            for (const [key, value] of Object.entries(datadict)) {
+                document.write( '<div class=\"form-group\">' );
+                document.write( '<label for=\"'+value+'\">'+key+':</label> \n' );
+                document.write( '<span id=\"'+value+'\"> \n' );
+                document.write( '</span> \n' );
+                document.write( '<button type=\"button\" class=\"btn btn-primary\" data-toggle=\"modal\" data-target=\"#'+value+'Modal\" id=\"'+value+'Edit\">編輯</button>' );
+                document.write( '<div class=\"modal fade\" id=\"'+value+'Modal\" tabindex=\"-1\" role=\"dialog\" aria-hidden=\"true\">\n' );
+                document.write( '<div class=\"modal-dialog modal-dialog-centered\" >\n' );
+                document.write( '<div class=\"modal-content\">\n' );
+                document.write( '<div class=\"modal-header\">\n' );
+                document.write( '<h5 class=\"modal-title\">'+key+'</h5>\n' );
+                document.write( '<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n' );
+                document.write( '<span aria-hidden=\"true\">×</span>\n' );
+                document.write( '</button>\n' );
+                document.write( '</div>\n' );
+                document.write( '<input class=\"modal-body\" id=\"'+value+'body\">\n' );
+                document.write( '<div class=\"modal-footer\">\n' );
+                document.write( '<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Close</button>\n' );
+                document.write( '<button type=\"button\" class=\"btn btn-primary\" id=\"'+value+'Update\">Update</button>\n' );
+                document.write( '</div>\n' );
+                document.write( '</div>\n' );
+                document.write( '</div>\n' );
+                document.write( '</div>' );
+                document.write( '</div>' );
+            }
+        }
+    </script>
+</head>
+
+<body>
+  <div class="container">
+    <!--navbar-->
+    <script type="text/javascript" src="nav.js"></script>
+    <!--content-->
+    <div class="accordion" id="SettingCollapse" style="position: relative; top: 65px;">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+            <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                chrome路徑
+                </button>
+            </h2>
+            </div>
+        
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#SettingCollapse">
+            <div class="card-body">
+                <label for="ChromePath">路徑位置:</label>
+                <input id="chromePathbody">
+                <button type="button" class="btn btn-primary" id="chromePathUpdate">更新</button>
+                <span id="chromePathUpdateMes"></span>
+            </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingTwo">
+            <h2 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                API相關設定
+                </button>
+            </h2>
+            </div>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#SettingCollapse">
+            <div class="card-body">
+                <script>createdModal()</script>
+            </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingThree">
+            <h2 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                基本流程自動化清單
+                </button>
+            </h2>
+            </div>
+            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#SettingCollapse">
+            <div class="card-body">
+                test
+            </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="headingFourth">
+            <h2 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFourth" aria-expanded="false" aria-controls="collapseFourth">
+                腳本清單
+                </button>
+            </h2>
+            </div>
+            <div id="collapseFourth" class="collapse" aria-labelledby="headingFourth" data-parent="#SettingCollapse">
+            <div class="card-body">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addScriptModal">
+                    新增腳本
+                </button>
+                
+                <!-- addModal -->
+                <div class="modal fade" id="addScriptModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title">新增腳本</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group"> 
+                                <label for="GameID">Demo:</label> 
+                                <select class="form-control GameID" id="addDemoGameID"></select> 
+                                <button type="Button" class="add btn btn-primary OpenDemoBtn">開啟</button>
+                            </div>
+                            <span>腳本名稱:</span><input type="text" id="scriptName">
+                            <button id="addBtn" class="btn btn-dark" type="button">
+                            <span class="fas fa-plus"></span>新增動作
+                            </button>
+                            <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center; vertical-align: middle;" id='id'>動作順序</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='action'>動作</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='actiontext'>內容</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='delBtn'>刪除</th>
+                                </tr>
+                            </thead>
+                            <tbody id="addTable">
+
+                            </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="button" class="btn btn-primary" id='scriptSave'>確定新增</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- editModal -->
+                <div class="modal fade" id="editScriptModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title">編輯腳本</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group"> 
+                                <label for="GameID">Demo:</label> 
+                                <select class="form-control GameID" id="editDemoGameID"></select> 
+                                <button type="Button" class="edit btn btn-primary OpenDemoBtn">開啟</button>
+                            </div>
+                            <span>腳本名稱:</span><input type="text" id="editScriptName">
+                            <button id="editAddBtn" class="btn btn-dark" type="button">
+                            <span class="fas fa-plus"></span>新增動作
+                            </button>
+                            <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center; vertical-align: middle;" id='id'>動作順序</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='action'>動作</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='actiontext'>內容</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='delBtn'>刪除</th>
+                                </tr>
+                            </thead>
+                            <tbody id="editTable">
+
+                            </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="button" class="btn btn-primary" id='scriptUpdate'>確定修改</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; vertical-align: middle;" id='scriptName'>腳本名稱</th>
+                            <th style="text-align: center; vertical-align: middle;" id='scriptEdit'>編輯</th>
+                            <th style="text-align: center; vertical-align: middle;" id='scriptDel'>刪除</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scriptlist">
+
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+
+</body>
+
+</html>
