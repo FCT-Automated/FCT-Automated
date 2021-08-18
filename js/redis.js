@@ -1,5 +1,4 @@
-
-//------redis連線---------
+//------redis connect---------
 function connectRedis(db){
     const redis = require('redis')
     var redis_config = {
@@ -9,15 +8,72 @@ function connectRedis(db){
     }
     const client = redis.createClient(redis_config)
     // Connect Redis db:db
-    client.on('connect',()=>{
-        console.log('Redis client connected')
-    })
+    // client.on('connect',()=>{
+    //     console.log('Redis-'+ toString(db) +' successfully connected')
+    // });
     return client
 }
 
-//------redis連線---------
+
+function getCurrencyList(){
+    return new Promise((resv, rej) => {
+        var client = connectRedis(15)
+        client.hgetall('CurrencyList', (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                console.log(error)
+            }
+        });
+    });
+}
+
+function getGameList(){
+    return new Promise((resv, rej) => {
+        var client = connectRedis(15)
+        client.hgetall('GameList', (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                console.log(error)
+            }
+        });
+    });
+    
+}
+
+function getLanguageList(){
+    return new Promise((resv, rej) => {
+        var client = connectRedis(15)
+        client.hgetall('LanguageList', (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                console.log(error)
+            }
+        });
+    });
+    
+}
+
+function getChromePath(){
+    return new Promise((resv, rej) => {
+        var client = connectRedis(15)
+        client.hget('PathList','Chrome', (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                console.log(error)
+            }
+        });
+    });
+    
+}
 
 
+
+
+//--
 function dataEdit(element,client){
     client.hgetall(element, (error, result) => {
         if (!error) {
@@ -31,9 +87,7 @@ function dataEdit(element,client){
 
 }
 
-async function updatePath(key,value){
-    var myDataBase = await connectSqlite();
-
+function updatePath(key,value){
     var sql = 'DELETE FROM path WHERE key = ?';
     myDataBase.run(sql,key, function(err) {
         if (err) {
@@ -43,11 +97,10 @@ async function updatePath(key,value){
         myDataBase.run(sql,[key,value]);
     });
     myDataBase.close();
+    getPath(key);
 }
 
-async function getPath(key){
-    var path;
-    var myDataBase = await connectSqlite();
+function getPath(key){
     myDataBase.serialize(function(){
         myDataBase.run("CREATE TABLE IF NOT EXISTS path (key TEXT,value TEXT)");
     });
@@ -56,46 +109,28 @@ async function getPath(key){
         if(err){
             console.log(err); 
         }else{
-            path = row.value;
+            document.getElementById('chromePathbody').value = row.value;
         }
     });
     myDataBase.close();
-    return path
-        
 }
 
 function scriptSave(tableName,data,client){
-    //var scriptListFile = "./db/scriptList.db"
-    //var scriptListdb = new sqlite3.Database(scriptListFile);
-    debugger
-    sqlite.scriptListDb.serialize(function(){
-        sqlite.scriptListDb.run("CREATE TABLE IF NOT EXISTS " +tableName+ " (key TEXT,value TEXT)");
-        var sql = sqlite.scriptListDb.prepare("INSERT INTO " +tableName+ " VALUES (?,?)");
-
-        for (const [key,value] of Object.entries(data)){
-            debugger
-            sql.run([key,value]);
-        }
-        sql.finalize();
-    });
-    
-    //sqlite.scriptListDb.close();
-
-    // try {
-    //     client.del(tableName)
-    //     client.hmset(tableName,data,function(error){
-    //         if (!error){
-    //             console.log("新增/修改成功")
-    //             getScriptList(client)
+    try {
+        client.del(tableName)
+        client.hmset(tableName,data,function(error){
+            if (!error){
+                console.log("新增/修改成功")
+                getScriptList(client)
                 
-    //         }else{
-    //             console.log(error)
-    //         }
-    //     })
-    // }
-    // catch{
-    //     console.log('格式有誤')
-    // }
+            }else{
+                console.log(error)
+            }
+        })
+    }
+    catch{
+        console.log('格式有誤')
+    }
 }
 
 function getScriptList(client){
@@ -122,15 +157,12 @@ function delscriptlistRow(key,client){
     client.del(key.split("_")[1])
 }
 
-function connectSqlite(){
-    return new Promise((resv, rej) => {
-        var fs = require("fs");
-        var myDataBasePath = './db/myDataBase.db'
-        var sqlite3 = require("sqlite3").verbose();
-        resv(new sqlite3.Database(myDataBasePath));
-           
-    })
-}
+
+module.exports.getCurrencyList = getCurrencyList;
+module.exports.getGameList = getGameList;
+module.exports.getLanguageList = getLanguageList;
+module.exports.getChromePath = getChromePath;
+
 
 
 module.exports.connectRedis = connectRedis;

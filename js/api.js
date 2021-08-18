@@ -24,7 +24,12 @@ function connectMongoDB(code){
                         console.log(err);
                     } 
                     db.close();
-                    resv(result['key']);
+                    if (result != null){
+                        resv(result['key']);
+                    }else{
+                        resv("");
+                    }
+                    
                 });
             }else{
                 console.log(err);
@@ -137,8 +142,7 @@ async function requestAPI(args) {
     let getKey = await doRequest(keyOptions)
     //-----second request-----
     let apisOptions = await setApiTools(getKey,args['API'],args['AgentCode'],args['Currency'])
-    let result = await doRequest(apisOptions)
-    return result
+    return doRequest(apisOptions)
 }
 
 async function requestSeamlessAPI(args) {
@@ -148,8 +152,7 @@ async function requestSeamlessAPI(args) {
         Points : args['Points']
     })
     //-----request-----
-    let result = await apiSeamlessRequest(args['API'],arg)
-    return result
+    return apiSeamlessRequest(args['API'],arg)
 }
 
 module.exports.requestAPI = requestAPI;

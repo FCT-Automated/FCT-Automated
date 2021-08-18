@@ -3,6 +3,8 @@ const {app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const url = require('url')
 let win
+const { fork } = require('child_process')
+const ps = fork(`${__dirname}\\server.js`)
 
 app.on('ready', createWindow)
 
@@ -25,7 +27,8 @@ function createWindow() {
         width: 1010, 
         height: 840,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            enableRemoteModule: true
         }
     })
     electron.Menu.setApplicationMenu(null);

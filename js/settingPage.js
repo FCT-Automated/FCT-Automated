@@ -1,18 +1,18 @@
 $(async function() {
-    var sqlite = require('../js/sqlite')
+    var redis = require('../js/redis')
     //------redis連線---------
-    const client = sqlite.connectRedis(15)
-    const client2 = sqlite.connectRedis(14)
+    const client = redis.connectRedis(15) //設定擋資料
+    const client2 = redis.connectRedis(14) //腳本資料
     //取得redis 'LanguageID','Currency','GameID' 資料 並監聽btn
     const datalist = ['LanguageID','Currency','GameID']
     datalist.forEach(function(element){
         let btnEdit = document.getElementById(element+'Edit')
         let btnUpdate = document.getElementById(element+'Update')
         btnEdit.addEventListener("click",async () =>{ 
-            sqlite.dataEdit(element,client)
+            redis.dataEdit(element,client)
         })
         btnUpdate.addEventListener("click",async () =>{ 
-            sqlite.updatePath(element,'json',client)
+            redis.updatePath(element,'json',client)
         })
         
         client.hgetall(element, (error, result) => {
@@ -40,16 +40,13 @@ $(async function() {
     })
 
     //chromePathUpdate
-    var path;
-    var PathbtnUpdate = document.getElementById('chromePathUpdate');
-    PathbtnUpdate.addEventListener("click",async () =>{ 
-        sqlite.updatePath('chromePath',document.getElementById('chromePathbody').value);
-        path = await sqlite.getPath('chromePath');
-        document.getElementById('chromePathbody').value = path;
-        document.getElementById('chromePathUpdateMes').innerHTML = '更新成功' ;
-    });
-    path = await sqlite.getPath('chromePath');
-    document.getElementById('chromePathbody').value = path;
+    // var path;
+    // var PathbtnUpdate = document.getElementById('chromePathUpdate');
+    // PathbtnUpdate.addEventListener("click",async () =>{ 
+    //     sqlite.updatePath('chromePath',document.getElementById('chromePathbody').value);
+    //     document.getElementById('chromePathUpdateMes').innerHTML = '更新成功' ;
+    // });
+    // sqlite.getPath('chromePath');
 
     //取得redis腳本清單 並監聽btn
     updateTable()
@@ -167,7 +164,7 @@ $(async function() {
                 scriptdata[key] = value
             }
             //儲存至redis
-            sqlite.scriptSave(scriptName,scriptdata,client2)
+            redis.scriptSave(scriptName,scriptdata,client2)
             updateTable()
         }else{
             console.log("至少新增一列且腳本名稱必填!!")
@@ -188,7 +185,7 @@ $(async function() {
                 scriptdata[key] = value
             }
             //儲存至redis
-            sqlite.scriptSave(scriptName,scriptdata,client2)
+            redis.scriptSave(scriptName,scriptdata,client2)
             updateTable()
         }else{
             console.log("至少新增一列且腳本名稱必填!!")
@@ -199,7 +196,7 @@ $(async function() {
     async function updateTable(){
         let scriptlist = document.getElementById('scriptlist')
         scriptlist.innerHTML = ""
-        let keys = await sqlite.getScriptList(client2)
+        let keys = await redis.getScriptList(client2)
         keys.forEach(function(name,ind){
             let row = scriptlist.insertRow(0)
             let id = row.insertCell(0)
@@ -219,7 +216,7 @@ $(async function() {
             edit.appendChild(btn)
             btn.onclick = async function(){
                 document.getElementById('editScriptName').value = name
-                let datas = await sqlite.getScriptListData(btn.id.split("_")[1],client2)
+                let datas = await redis.getScriptListData(btn.id.split("_")[1],client2)
                 editTable.innerHTML = ""
                 for (let key in datas){
                     let rows = editTable.rows.length
@@ -239,7 +236,7 @@ $(async function() {
             btn2.appendChild(btnicon2)
             del.appendChild(btn2)
             btn2.onclick = async function(){
-                await sqlite.delscriptlistRow(btn2.id,client2)
+                await redis.delscriptlistRow(btn2.id,client2)
                 updateTable()
             } 
         
