@@ -37,9 +37,6 @@ $(async function() {
         select.appendChild(opt)
     }
 
-    
-
-    
     selectElement.addEventListener('change', function(){
         changeAPIForm(document.getElementById('API').value)
     })
@@ -60,7 +57,6 @@ $(async function() {
         }
     }
 
-    
     attend.addEventListener('change',async function(){
         if (this.checked){
             eventlist.disabled=false
@@ -71,7 +67,6 @@ $(async function() {
             }
             let Eventresult = await apiJs.requestAPI(args)
             if (Eventresult['Data'] != null){
-                console.log(Eventresult['Data'])
                 Eventresult['Data'].forEach(function(datas){
                     let opt = document.createElement('option')
                     opt.value = datas['eventID']
@@ -87,17 +82,12 @@ $(async function() {
             }
         }
     })
-    //待處理remove options
     notAttend.addEventListener('change',function(){
-        if(eventlist.childNodes.length > 0){
-            let options = document.getElementsByClassName('eventOption');
-            for(let option of options){
-                option.remove();
-            }
-        }
+        eventlist.options.length = 0;
         if (this.checked){
             eventlist.disabled=true
         }
+        
     })
 
 
@@ -132,6 +122,7 @@ $(async function() {
         let args
         let response
         let mes
+        let code
         switch (api) {
             case 'Login':
                 args ={
@@ -143,10 +134,15 @@ $(async function() {
                     LanguageID : document.getElementById("LanguageID").value
                 }
                 response = await apiJs.requestAPI(args)
-                mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']
-                await open.openChrome(response.Url,await localhostApi('/getChromePath'),args['GameID'],"Normal")
-                //待處理-訊息可做再開啟那
-                ipcRenderer.send('result',mes+" 登入成功!! ]")
+                code = response.Result;
+                if ( code == 0){
+                    await open.openChrome(response.Url,await localhostApi('/getChromePath'),args['GameID'],"Normal")
+                    mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入成功!! ]"
+                }else{
+                    mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入失敗 - Error Code："+code+"!! ]"
+                }
+                ipcRenderer.send('result',mes)
+                
                 break
 
             case 'SetPoints':
@@ -160,12 +156,11 @@ $(async function() {
                         Points : document.getElementById("Points").value
                     }
                     response = await apiJs.requestSeamlessAPI(args)
-                    mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]
-                    if (response.Result == "0"){
-                        ipcRenderer.send('result',mes+" 轉點成功!! 餘額: "+response.Points+"]")
-                    }else{
-                        ipcRenderer.send('result',mes+" 轉點失敗!! - result:"+response.Result+"]")
+                    code = response.Result;
+                    if ( code == 0){
+                        mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.Points+"]"
                     }
+                    
                 }else{
                     args = {
                         API : api,
@@ -175,15 +170,17 @@ $(async function() {
                         Points : document.getElementById("Points").value
                     }
                     response = await apiJs.requestAPI(args)
-                    mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]
-                    if (response.Result == "0"){
-                        ipcRenderer.send('result',mes+" 轉點成功!! 餘額: "+response.AfterPoint+"]")
-                    }else{
-                        ipcRenderer.send('result',mes+" 轉點失敗!! - result:"+response.Result+"]")
+                    code = response.Result;
+                    if ( code == 0){
+                        mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.AfterPoint+"，BankID："+response.BankID+"]"
                     }
-                }         
+                }
+                if(code !=0){
+                    mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 轉點失敗!! - Error Code："+code+"]"
+                }
+                ipcRenderer.send('result',mes)
                 break
-            //待處理
+
             case 'KickOut':
                 args ={
                     API : api,
@@ -192,7 +189,13 @@ $(async function() {
                     MemberAccount : document.getElementById("MemberAccount").value,
                 }
                 response = await apiJs.requestAPI(args)
-                debugger
+                code = response.Result;
+                if ( code == 0){
+                    mes = "Log:[ KickOut- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 踢出成功!! ]"
+                }else{
+                    mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 踢出失敗 - Error Code："+code+"!! ]"
+                }
+                ipcRenderer.send('result',mes)
                 break
         }        
         
