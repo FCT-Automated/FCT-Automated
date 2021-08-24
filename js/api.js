@@ -17,7 +17,7 @@ function connectMongoDB(code){
 
         mongodbClient.connect('mongodb://'+DATABASEUSERNAME+':'+DATABASEPASSWORD+'@'+DATABASEHOST+':'+DATABASEPORT+'/'+DATABASENAME,function(err,db){
             if(!err) {
-                console.log("successfully connected to the database");
+                console.log("successfully connected to the MongoDataBase");
                 var dbo = db.db("gamesystem");
                 dbo.collection("APIAgentSetting").findOne({code:code},function(err,result){
                     if (err){

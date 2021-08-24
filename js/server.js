@@ -1,7 +1,9 @@
 var http = require('http');
 var redis = require('./redis');
+const { StringDecoder } = require('string_decoder');
 
-var server = http.createServer(async function (req, res) {
+var server = http.createServer(async function(req, res) {
+    const decoder = new StringDecoder('utf-8');
     if(req.url == '/'){
         res.end();
     //db15:Currency
@@ -54,6 +56,23 @@ var server = http.createServer(async function (req, res) {
         res.writeHead(200,{'Content-Type': 'application/json'});
     }else if(req.url=='/getSeamlessApiUrl'){
         res.writeHead(200,{'Content-Type': 'application/json'});
+    }
+    
+    //db14:Script
+    else if(req.url=='/getScriptKeys'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        res.write(JSON.stringify(await redis.getScriptKeys()));
+        res.end();
+    }else if(req.url=='/getScripts'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        //res.write(JSON.stringify(await redis.getScripts(key)));
+        res.end();
+    }else if(req.url=='/addScript'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.addScript(decoder.write(data))));
+        });
+        
     }
 
     else

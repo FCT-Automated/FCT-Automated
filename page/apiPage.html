@@ -4,7 +4,6 @@
 <head>
     <script type="text/javascript" src="head.js"></script>
     <script src="../js/apiPage.js"></script>
-    <!-- <script scr="../js/test.js"></script> -->
     <title>FCT-Api</title>
 </head>
 
@@ -13,7 +12,7 @@
     <script type="text/javascript" src="nav.js"></script>
     <div class="row" style="position: relative; top: 65px;">
       <div class="col">
-        <form>
+        <form id="myForm">
           <div class="form-group">
             <label for="API">API:</label>
             <select class="form-control" id="API">
@@ -39,12 +38,12 @@
           </div> 
           <div class="form-group"> 
             <label for="AgentCode">商戶代碼:</label> 
-            <input class="form-control" id="AgentCode"> 
+            <input class="form-control" id="AgentCode" required>
           </div> 
           
           <div class="form-group"> 
             <label for="MemberAccount">帳號:</label> 
-            <input class="form-control" id="MemberAccount"> 
+            <input class="form-control" id="MemberAccount" required> 
           </div>
 
           <div class="form-group field_Login"> 
@@ -77,14 +76,11 @@
             <label for="Points">點數:</label> 
             <input class="form-control" id="Points"> 
           </div>
-
+          <button type="submit" id="SendApiBtn" class="btn btn-primary">送出</button>
         </form>
-        <button type="Button" id="SendApiBtn" class="btn btn-primary">送出</button>
         <div><span id="result"></span></div>
       </div>
     </div>
-    
-    
   </div>
 </body>
 

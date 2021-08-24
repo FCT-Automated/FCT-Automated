@@ -51,3 +51,7 @@ ipcMain.on('result',(event,arg) =>{
     event.reply('re', arg)
 })
 
+ipcMain.on('addScriptMes',(event,arg) =>{
+    event.reply('addScriptMes', arg)
+})
+

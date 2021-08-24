@@ -6,7 +6,7 @@ document.write( '<div class=\"collapse navbar-collapse\" id=\"navbarNavAltMarkup
 document.write( '<div class=\"navbar-nav\">\n' );
 document.write( '<a class=\"nav-item nav-link\" href=\"apiPage.html\">API</a>\n' );
 //document.write( '<a class=\"nav-item nav-link\" href=\"preference_script.html\">基本流程自動化</a>\n' );
-document.write( '<a class=\"nav-item nav-link\" href=\"autoPage.html\">掛機</a>\n' );
+document.write( '<a class=\"nav-item nav-link\" href=\"scriptPage.html\">掛機</a>\n' );
 //document.write( '<a class=\"nav-item nav-link\" href=\"settingPage.html\">設定</a>\n' );
 document.writeln("<li class=\"nav-item dropdown\">");
 document.writeln("<a class=\"nav-link dropdown-toggle\" href=\"#\" id=\"navbarDropdown\" role=\"button\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">");
@@ -19,7 +19,7 @@ document.writeln("<a class=\"dropdown-item\" href=\"#\">語系</a>");
 document.writeln("<div class=\"dropdown-divider\"></div>");
 document.writeln("<a class=\"dropdown-item\" href=\"#\">腳本</a>");
 document.writeln("<div class=\"dropdown-divider\"></div>");
-document.writeln("<a class=\"dropdown-item\" href=\"#\">Chrom路徑設定</a>");
+document.writeln("<a class=\"dropdown-item\" href=\"#\">路徑設定</a>");
 document.writeln("</div>");
 document.writeln("</li>");
 document.write( '</div>\n' );

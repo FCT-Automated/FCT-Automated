@@ -2,25 +2,19 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="bower_components/fontawesome-free/css/all.min.css">
-    <script src="bower_components/jquery/dist/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="bower_components/bootstrap-table/dist/bootstrap-table.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
-    <script src="js/redisconnect.js"></script>
-    <script src="js/AutoPage.js"></script>
+    <script type="text/javascript" src="head.js"></script>
+    <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
+    <script src="../bower_components/bootstrap-table/dist/bootstrap-table.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+    <script src="../js/scriptPage.js"></script>
     <title>FCT-Auto</title>
 </head>
 
 <body>
   <div class="container">
-    <script type="text/javascript" src="js/nav.js"></script>
+    <script type="text/javascript" src="nav.js"></script>
     <div class="row" style="position: relative; top: 65px;">
       <div class="col">
-        <form>
+        <form id="myForm">
           <div class="form-group">
             <label for="API">API:</label>
             <select class="form-control" id="API">
@@ -44,19 +38,19 @@
           </div> 
           <div class="form-group"> 
             <label for="AgentCode">商戶代碼:</label> 
-            <input class="form-control" id="AgentCode"> 
+            <input class="form-control" id="AgentCode" required> 
           </div> 
           
           <div class="form-group"> 
             <label for="MemberAccount">帳號:</label> 
-            <input class="form-control" id="MemberAccount"> 
+            <input class="form-control" id="MemberAccount" required> 
           </div>
 
           <div class="form-group field_Login"> 
             <label for="Event">活動:</label> 
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="optionEvent" id="notattend" value="notattend" checked>
-              <label class="form-check-label" for="notattend">
+              <input class="form-check-input" type="radio" name="optionEvent" id="notAttend" value="notAttend" checked>
+              <label class="form-check-label" for="notAttend">
                 不參加
               </label>
             </div>
@@ -91,7 +85,7 @@
                             <select class="form-control GameID" id="DemoGameID"></select> 
                             <button type="Button" id="OpenDemoBtn" class="btn btn-primary">開啟</button>
                         </div>
-                        <span>腳本名稱:</span><input type="text" id="scriptName">
+                        <span>腳本名稱:</span><input type="text" id="scriptName" required>
                         <button id="addBtn" class="btn btn-dark" type="button">
                           <span class="fas fa-plus"></span>新增動作
                         </button>
@@ -104,7 +98,7 @@
                                   <th style="text-align: center; vertical-align: middle;" id='delBtn'>刪除</th>
                               </tr>
                           </thead>
-                          <tbody id="addTable">
+                          <tbody id="addScriptTable">
 
                           </tbody>
                         </table>
@@ -112,15 +106,15 @@
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
                       <button type="button" class="btn btn-primary" id='scriptSave'>確定新增</button>
+                      <div><span id="addScriptMes"></span></div>
                     </div>
                   </div>
                 </div>
             </div>
           </div>
-
+          <button type="Button" id="AutoStartBtn" class="btn btn-primary">開始</button>
         </form>
-        <button type="Button" id="AutoStartBtn" class="btn btn-primary">開始</button>
-
+        <div><span id="result"></span></div>
       </div>
     </div>
     

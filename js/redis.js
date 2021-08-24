@@ -5,24 +5,19 @@ function connectRedis(db){
         "host": "127.0.0.1",
         "port": 6379,
         "db":db
-    }
-    const client = redis.createClient(redis_config)
-    // Connect Redis db:db
-    // client.on('connect',()=>{
-    //     console.log('Redis-'+ toString(db) +' successfully connected')
-    // });
-    return client
+    }    
+    return redis.createClient(redis_config)
 }
 
 
 function getCurrencyList(){
     return new Promise((resv, rej) => {
-        var client = connectRedis(15)
+        let client = connectRedis(15);
         client.hgetall('CurrencyList', (error, result) => {
             if (!error){
                 resv(result)  
             }else{
-                console.log(error)
+                rej(error)
             }
         });
     });
@@ -30,12 +25,12 @@ function getCurrencyList(){
 
 function getGameList(){
     return new Promise((resv, rej) => {
-        var client = connectRedis(15)
+        let client = connectRedis(15);
         client.hgetall('GameList', (error, result) => {
             if (!error){
                 resv(result)  
             }else{
-                console.log(error)
+                rej(error)
             }
         });
     });
@@ -44,12 +39,12 @@ function getGameList(){
 
 function getLanguageList(){
     return new Promise((resv, rej) => {
-        var client = connectRedis(15)
+        let client = connectRedis(15);
         client.hgetall('LanguageList', (error, result) => {
             if (!error){
                 resv(result)  
             }else{
-                console.log(error)
+                rej(error)
             }
         });
     });
@@ -58,63 +53,71 @@ function getLanguageList(){
 
 function getChromePath(){
     return new Promise((resv, rej) => {
-        var client = connectRedis(15)
+        let client = connectRedis(15);
         client.hget('PathList','Chrome', (error, result) => {
             if (!error){
                 resv(result)  
             }else{
-                console.log(error)
+                rej(error)
             }
         });
     });
     
 }
 
+function getScriptKeys(){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(14);
+        client.keys('*',(error,keys) => {
+            if(!error){
+                resv(keys)
+            }else{
+                rej(error)
+            }
+                
+        })
+        
+    });
+}
 
+function getScripts(key){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(14);
+        client.hgetall(key, (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                rej(error)
+            }
+        })
+        
+    });
+}
+
+async function addScript(script){
+    var tableNames = await getScriptKeys();    
+    return new Promise((resv, rej) => {
+        let client = connectRedis(14);
+        let jsonObject= JSON.parse(script);
+        let tableName = Object.keys(jsonObject)[0];
+        if (! tableNames.includes(tableName)){
+            try {
+                client.hmset(tableName,jsonObject[tableName]);
+                resv({'returnObject':null})
+            }
+            catch(error){
+                rej(error)
+            }
+        }else{
+            resv({'returnObject':'script name is duplicated'})
+        }
+        
+        
+    });
+}
 
 
 //--
-function dataEdit(element,client){
-    client.hgetall(element, (error, result) => {
-        if (!error) {
-            let ele = document.getElementById(element+'body')
-        if (result!= null){
-            ele.value = JSON.stringify(result)
-        }else{
-            console.log(error)
-        }}
-    })
-
-}
-
-function updatePath(key,value){
-    var sql = 'DELETE FROM path WHERE key = ?';
-    myDataBase.run(sql,key, function(err) {
-        if (err) {
-          console.log(err);
-        }
-        sql = 'INSERT INTO path VALUES (?,?)';
-        myDataBase.run(sql,[key,value]);
-    });
-    myDataBase.close();
-    getPath(key);
-}
-
-function getPath(key){
-    myDataBase.serialize(function(){
-        myDataBase.run("CREATE TABLE IF NOT EXISTS path (key TEXT,value TEXT)");
-    });
-    var sql = 'SELECT value FROM path WHERE key = ?';
-    myDataBase.get(sql, key ,(err,row) => {
-        if(err){
-            console.log(err); 
-        }else{
-            document.getElementById('chromePathbody').value = row.value;
-        }
-    });
-    myDataBase.close();
-}
-
 function scriptSave(tableName,data,client){
     try {
         client.del(tableName)
@@ -133,13 +136,6 @@ function scriptSave(tableName,data,client){
     }
 }
 
-function getScriptList(client){
-    return new Promise((resv, rej) => {
-        client.keys('*',(error,reply) => {
-            resv(reply)       
-        })
-    })
-}
 
 function getScriptListData(key,client){
     return new Promise((resv, rej) => {
@@ -162,14 +158,11 @@ module.exports.getCurrencyList = getCurrencyList;
 module.exports.getGameList = getGameList;
 module.exports.getLanguageList = getLanguageList;
 module.exports.getChromePath = getChromePath;
-
+module.exports.getScriptKeys = getScriptKeys;
+module.exports.getScripts = getScripts;
+module.exports.addScript = addScript;
 
 
 module.exports.connectRedis = connectRedis;
-module.exports.dataEdit = dataEdit;
-module.exports.updatePath = updatePath;
-module.exports.getPath = getPath;
 module.exports.scriptSave = scriptSave;
-module.exports.getScriptList = getScriptList;
-module.exports.getScriptListData = getScriptListData;
 module.exports.delscriptlistRow = delscriptlistRow;
