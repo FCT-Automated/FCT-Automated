@@ -15,7 +15,7 @@ $(async function() {
     var select = document.getElementById("Currency");
     for (let key in obj){
         let opt = document.createElement('option');
-        opt.value = obj[key]
+        opt.value = key
         opt.innerHTML = key+':'+obj[key]
         select.appendChild(opt)
     }
@@ -23,7 +23,7 @@ $(async function() {
     select = document.getElementById("GameID");
     for (let key in obj){
         let opt = document.createElement('option');
-        opt.value = obj[key]
+        opt.value = key
         opt.innerHTML = key+':'+obj[key]
         select.appendChild(opt)
     }
@@ -31,7 +31,7 @@ $(async function() {
     select = document.getElementById("LanguageID");
     for (let key in obj){
         let opt = document.createElement('option');
-        opt.value = obj[key]
+        opt.value = key
         opt.innerHTML = key+':'+obj[key]
         select.appendChild(opt)
     }

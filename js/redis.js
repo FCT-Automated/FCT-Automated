@@ -23,6 +23,57 @@ function getCurrencyList(){
     });
 }
 
+function delCurrency(key){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(key);
+        client.hdel('CurrencyList',jsonObject, (error, result) => {
+            if (!error){
+                resv({'returnObject':null})
+            }else{
+                rej(error)
+            }
+        });
+    });
+    
+}
+
+async function addCurrency(data){
+    var currencyList = Object.keys(await getCurrencyList()); 
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        let currencyID = Object.keys(jsonObject)[0];
+        if (! currencyList.includes(currencyID)){
+            try {
+                client.hmset('CurrencyList',jsonObject);
+                resv({'returnObject':null})
+            }
+            catch(error){
+                rej(error)
+            }
+        }else{
+            resv({'returnObject':'此幣別代號已存在!'})
+        }  
+    });
+}
+
+function updateCurrency(data){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        try {
+            client.hmset('CurrencyList',jsonObject);
+            resv({'returnObject':null})
+        }
+        catch(error){
+            rej(error)
+        }
+  
+    });
+}
+
+
 function getGameList(){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
@@ -35,6 +86,56 @@ function getGameList(){
         });
     });
     
+}
+
+function delGame(key){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(key);
+        client.hdel('GameList',jsonObject, (error, result) => {
+            if (!error){
+                resv({'returnObject':null})
+            }else{
+                rej(error)
+            }
+        });
+    });
+    
+}
+
+async function addGame(data){
+    var gameList = Object.keys(await getGameList()); 
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        let gameID = Object.keys(jsonObject)[0];
+        if (! gameList.includes(gameID)){
+            try {
+                client.hmset('GameList',jsonObject);
+                resv({'returnObject':null})
+            }
+            catch(error){
+                rej(error)
+            }
+        }else{
+            resv({'returnObject':'此遊戲編號已存在!'})
+        }  
+    });
+}
+
+function updateGame(data){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        try {
+            client.hmset('GameList',jsonObject);
+            resv({'returnObject':null})
+        }
+        catch(error){
+            rej(error)
+        }
+  
+    });
 }
 
 function getLanguageList(){
@@ -161,6 +262,12 @@ module.exports.getChromePath = getChromePath;
 module.exports.getScriptKeys = getScriptKeys;
 module.exports.getScripts = getScripts;
 module.exports.addScript = addScript;
+module.exports.delGame = delGame;
+module.exports.addGame = addGame;
+module.exports.updateGame = updateGame;
+module.exports.delCurrency = delCurrency;
+module.exports.addCurrency = addCurrency;
+module.exports.updateCurrency = updateCurrency;
 
 
 module.exports.connectRedis = connectRedis;

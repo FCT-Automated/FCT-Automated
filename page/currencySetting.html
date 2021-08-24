@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="text/javascript" src="head.js"></script>
+    <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
+    <script src="../bower_components/bootstrap-table/dist/bootstrap-table.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+    <script src="../js/currency.js"></script>
+    <title>FCT-CurrencySetting</title>
+</head>
+
+<body>
+  <div class="container">
+    <script type="text/javascript" src="nav.js"></script>
+    <div class="row" style="position: relative; top: 65px;">
+        <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#Modal" id="addCurrencyModal">
+            <span class="fas fa-plus"></span>新增幣別
+        </button>
+
+        <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" >
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">新增幣別</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                          <label for="CurrencyID">幣別代號：</label>
+                          <input type="text" class="form-control" id="CurrencyID" required>
+                        </div>
+                        <div class="form-group">
+                          <label for="CurrencyName">幣別名稱：</label>
+                          <input type="text" class="form-control" id="CurrencyName" required>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="submit" class="btn btn-primary" id='addCurrency'>確定新增</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                  <div><span id="addCurrencyMes"></span></div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <table class="table table-hover" id="currencyTable">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">幣別代號</th>
+                <th scope="col">幣別名稱</th>
+                <th scope="col">編輯</th>
+                <th scope="col">刪除</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div><span id="currencySettingMes"></span></div>
+
+        <div class="modal fade" id="updateCurrencyModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" >
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">編輯遊戲</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label for="updateCurrencyID">遊戲編號：</label>
+                        <span id="updateCurrencyID"></span>
+                        <div class="form-group">
+                          <label for="updateCurrencyName">遊戲名稱：</label>
+                          <input type="text" class="form-control" id="updateCurrencyName" required>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="submit" class="btn btn-primary" id='updateCurrency'>確定新增</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div><span id="updateCurrencyMes"></span></div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+    </div>
+  </div>
+</body>
+
+</html>

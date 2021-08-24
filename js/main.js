@@ -55,3 +55,26 @@ ipcMain.on('addScriptMes',(event,arg) =>{
     event.reply('addScriptMes', arg)
 })
 
+ipcMain.on('addGameMes',(event,arg) =>{
+    event.reply('addGameMes', arg)
+})
+
+ipcMain.on('gameSettingMes',(event,arg) =>{
+    event.reply('gameSettingMes', arg)
+})
+
+ipcMain.on('updateGameMes',(event,arg) =>{
+    event.reply('updateGameMes', arg)
+})
+
+ipcMain.on('addCurrencyMes',(event,arg) =>{
+    event.reply('addCurrencyMes', arg)
+})
+
+ipcMain.on('currencySettingMes',(event,arg) =>{
+    event.reply('currencySettingMes', arg)
+})
+
+ipcMain.on('updateCurrencyMes',(event,arg) =>{
+    event.reply('updateCurrencyMes', arg)
+})

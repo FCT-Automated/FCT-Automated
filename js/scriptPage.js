@@ -2,11 +2,11 @@ $(async function() {
     const electron = require('electron');
     let {ipcRenderer} = require('electron')
     const net = electron.remote.net;
-    var apiJs = require('./api');
+    var apiJs = require('../js/api');
     var attend = document.getElementById('attend');
     var notAttend = document.getElementById('notAttend');
     var eventlist = document.getElementById('Event');
-    var open = require('./openChrome');
+    var open = require('../js/openChrome');
     const addScriptMes = document.getElementById("addScriptMes")
 
     const addBtn = document.getElementById('addBtn');
@@ -15,14 +15,13 @@ $(async function() {
     // const AutoStartBtn = document.getElementById('AutoStartBtn')
     var table = document.getElementById('addScriptTable');
     var DemoGameID = document.getElementById("DemoGameID");    
-
+    
+    //-------init---------------
     var obj = await getLocalhostApi('/getCurrencyList');
     var select = document.getElementById("Currency");
-
-    //-------init---------------
     for (let key in obj){
         let opt = document.createElement('option');
-        opt.value = obj[key]
+        opt.value = key
         opt.innerHTML = key+':'+obj[key]
         select.appendChild(opt)
     }
@@ -30,13 +29,13 @@ $(async function() {
     select = document.getElementById("GameID");
     for (let key in obj){
         let opt = document.createElement('option');
-        opt.value = obj[key]
+        opt.value = key
         opt.innerHTML = key+':'+obj[key]
         select.appendChild(opt)
     }
     for (let key in obj){
         let opt = document.createElement('option');
-        opt.value = obj[key]
+        opt.value = key
         opt.innerHTML = key+':'+obj[key]
         DemoGameID.appendChild(opt)
     }
@@ -44,7 +43,7 @@ $(async function() {
     select = document.getElementById("LanguageID");
     for (let key in obj){
         let opt = document.createElement('option');
-        opt.value = obj[key]
+        opt.value = key
         opt.innerHTML = key+':'+obj[key]
         select.appendChild(opt)
     }
@@ -334,17 +333,4 @@ function delRowFunction(btnHtml){
         }
     })
 }
-
-// function updateScriptList(keys){
-//     let selects = document.getElementById('scriptlist')
-//     if (selects.options.length > 0){
-//         selects.querySelectorAll('option').forEach(o => o.remove())
-//     }
-//     for(let i = 0 ,len = keys.length ; i < len ; i++){
-//         let opt = document.createElement('option')
-//         opt.value = keys[i]
-//         opt.innerHTML = keys[i]
-//         selects.appendChild(opt)
-//     }
-// }
 

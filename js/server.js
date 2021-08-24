@@ -12,11 +12,23 @@ var server = http.createServer(async function(req, res) {
         res.write(JSON.stringify(await redis.getCurrencyList()));
         res.end();
     }else if(req.url=='/addCurrency'){
-        //do somthing
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.addCurrency(decoder.write(data))));
+            res.end();
+        });
     }else if(req.url=='/updateCurrency'){
-        //do somthing
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.updateCurrency(decoder.write(data))));
+            res.end();
+        });
     }else if(req.url=='/delCurrency'){
-        //do somthing
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.delCurrency(decoder.write(data))));
+            res.end();
+        });
     }
 
     //db15:GameID    
@@ -25,11 +37,23 @@ var server = http.createServer(async function(req, res) {
         res.write(JSON.stringify(await redis.getGameList()));
         res.end();
     }else if(req.url=='/addGame'){
-        //do somthing
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.addGame(decoder.write(data))));
+            res.end();
+        });
     }else if(req.url=='/updateGame'){
-        //do somthing
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.updateGame(decoder.write(data))));
+            res.end();
+        });
     }else if(req.url=='/delGame'){
-        //do somthing
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.delGame(decoder.write(data))));
+            res.end();
+        });
     }
     
     //db15:Language   
@@ -71,6 +95,7 @@ var server = http.createServer(async function(req, res) {
         res.writeHead(200,{'Content-Type': 'application/json'});
         req.on('data', async function(data){
             res.write(JSON.stringify(await redis.addScript(decoder.write(data))));
+            res.end();
         });
         
     }
