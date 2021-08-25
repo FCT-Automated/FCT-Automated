@@ -10,6 +10,7 @@ $(async function() {
     var open = require('../js/openChrome')
     const SendApiBtn = document.getElementById('SendApiBtn')
     const result = document.getElementById("result")
+    var mes = '';
 
     var chromePath = await getLocalhostApi('/getChromePath');
     var apiUrl = await getLocalhostApi('/getApiUrl');
@@ -158,7 +159,6 @@ $(async function() {
             let api = document.getElementById("API").value
             let args
             let response
-            let mes = ''
             let code
             if(chromePath == ''){
                 mes += "chromePaht 不可空白</br>"

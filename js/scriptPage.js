@@ -9,6 +9,7 @@ $(async function() {
     var open = require('../js/openChrome');
     const addScriptMes = document.getElementById("addScriptMes")
 
+    var mes = '';
     var chromePath = await getLocalhostApi('/getChromePath');
     var apiUrl = await getLocalhostApi('/getApiUrl');
     var seamlessApiUrl = await getLocalhostApi('/getSeamlessApiUrl');
