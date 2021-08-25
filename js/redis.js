@@ -9,17 +9,40 @@ function connectRedis(db){
     return redis.createClient(redis_config)
 }
 
-
-function getCurrencyList(){
+function checkThatTheKeyExists(key){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        client.hgetall('CurrencyList', (error, result) => {
+        client.hgetall(key, (error, result) => {
             if (!error){
-                resv(result)  
+                if(result == null){
+                    resv({'returnObject':null})
+                }else{
+                    resv({'returnObject':{}})
+                }
             }else{
                 rej(error)
             }
-        });
+        })
+    });
+}
+
+async function getCurrencyList(){
+    var response = await checkThatTheKeyExists('CurrencyList');
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        if (response['returnObject'] != null){
+            client.hgetall('CurrencyList', (error, result) => {
+                if (!error){
+                    response['returnObject'] = result
+                    resv(response)  
+                }else{
+                    rej(error)
+                }
+            });
+        }else{
+            resv(response)
+        }
+        
     });
 }
 
@@ -74,16 +97,22 @@ function updateCurrency(data){
 }
 
 
-function getGameList(){
+async function getGameList(){
+    var response = await checkThatTheKeyExists('GameList');
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        client.hgetall('GameList', (error, result) => {
-            if (!error){
-                resv(result)  
-            }else{
-                rej(error)
-            }
-        });
+        if (response['returnObject'] != null){
+            client.hgetall('GameList', (error, result) => {
+                if (!error){
+                    response['returnObject'] = result
+                    resv(response)  
+                }else{
+                    rej(error)
+                }
+            });
+        }else{
+            resv(response)
+        }
     });
     
 }
@@ -138,18 +167,73 @@ function updateGame(data){
     });
 }
 
-function getLanguageList(){
+async function getLanguageList(){
+    var response = await checkThatTheKeyExists('LanguageList');
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        client.hgetall('LanguageList', (error, result) => {
+        if (response['returnObject'] != null){
+            client.hgetall('LanguageList', (error, result) => {
+                if (!error){
+                    response['returnObject'] = result
+                    resv(response)  
+                }else{
+                    rej(error)
+                }
+            });
+        }else{
+            resv(response)
+        }
+    });
+}
+
+function delLanguage(key){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(key);
+        client.hdel('LanguageList',jsonObject, (error, result) => {
             if (!error){
-                resv(result)  
+                resv({'returnObject':null})
             }else{
                 rej(error)
             }
         });
     });
     
+}
+
+async function addLanguage(data){
+    var languageList = Object.keys(await getLanguageList()); 
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        let languageID = Object.keys(jsonObject)[0];
+        if (! languageList.includes(languageID)){
+            try {
+                client.hmset('LanguageList',jsonObject);
+                resv({'returnObject':null})
+            }
+            catch(error){
+                rej(error)
+            }
+        }else{
+            resv({'returnObject':'此幣別代號已存在!'})
+        }  
+    });
+}
+
+function updateLanguage(data){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        try {
+            client.hmset('LanguageList',jsonObject);
+            resv({'returnObject':null})
+        }
+        catch(error){
+            rej(error)
+        }
+  
+    });
 }
 
 function getChromePath(){
@@ -181,6 +265,7 @@ function getScriptKeys(){
     });
 }
 
+//還沒用
 function getScripts(key){
     return new Promise((resv, rej) => {
         let client = connectRedis(14);
@@ -268,7 +353,9 @@ module.exports.updateGame = updateGame;
 module.exports.delCurrency = delCurrency;
 module.exports.addCurrency = addCurrency;
 module.exports.updateCurrency = updateCurrency;
-
+module.exports.delLanguage = delLanguage;
+module.exports.addLanguage = addLanguage;
+module.exports.updateLanguage = updateLanguage;
 
 module.exports.connectRedis = connectRedis;
 module.exports.scriptSave = scriptSave;

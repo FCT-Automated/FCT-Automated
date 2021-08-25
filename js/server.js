@@ -62,11 +62,23 @@ var server = http.createServer(async function(req, res) {
         res.write(JSON.stringify(await redis.getLanguageList()));
         res.end();
     }else if(req.url=='/addLanguage'){
-        //do somthing
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.addLanguage(decoder.write(data))));
+            res.end();
+        });
     }else if(req.url=='/updateLanguage'){
-        //do somthing
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.updateLanguage(decoder.write(data))));
+            res.end();
+        });
     }else if(req.url=='/delLanguage'){
-        //do somthing
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.delLanguage(decoder.write(data))));
+            res.end();
+        });
     }
 
     //db15:Path  

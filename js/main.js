@@ -4,7 +4,7 @@ const path = require('path')
 const url = require('url')
 let win
 const { fork } = require('child_process')
-const ps = fork(`${__dirname}\\server.js`)
+const ps = fork(`${__dirname}//server.js`)
 
 app.on('ready', createWindow)
 
@@ -77,4 +77,16 @@ ipcMain.on('currencySettingMes',(event,arg) =>{
 
 ipcMain.on('updateCurrencyMes',(event,arg) =>{
     event.reply('updateCurrencyMes', arg)
+})
+
+ipcMain.on('addLanguageMes',(event,arg) =>{
+    event.reply('addLanguageMes', arg)
+})
+
+ipcMain.on('languageSettingMes',(event,arg) =>{
+    event.reply('languageSettingMes', arg)
+})
+
+ipcMain.on('updateLanguageMes',(event,arg) =>{
+    event.reply('updateLanguageMes', arg)
 })

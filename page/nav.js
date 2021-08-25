@@ -15,7 +15,7 @@ document.writeln("</a>");
 document.writeln("<div class=\"dropdown-menu\" aria-labelledby=\"navbarDropdown\">");
 document.writeln("<a class=\"dropdown-item\" href=\"gameSetting.html\">遊戲</a>");
 document.writeln("<a class=\"dropdown-item\" href=\"currencySetting.html\">幣別</a>");
-document.writeln("<a class=\"dropdown-item\" href=\"#\">語系</a>");
+document.writeln("<a class=\"dropdown-item\" href=\"language.html\">語系</a>");
 document.writeln("<div class=\"dropdown-divider\"></div>");
 document.writeln("<a class=\"dropdown-item\" href=\"#\">腳本</a>");
 document.writeln("<div class=\"dropdown-divider\"></div>");

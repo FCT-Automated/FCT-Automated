@@ -17,36 +17,49 @@ $(async function() {
     var DemoGameID = document.getElementById("DemoGameID");    
     
     //-------init---------------
-    var obj = await getLocalhostApi('/getCurrencyList');
+    var returnObject = await getLocalhostApi('/getCurrencyList');
+    var obj = returnObject['returnObject'];
     var select = document.getElementById("Currency");
-    for (let key in obj){
-        let opt = document.createElement('option');
-        opt.value = key
-        opt.innerHTML = key+':'+obj[key]
-        select.appendChild(opt)
+    if (obj != null){
+        for (let key in obj){
+            let opt = document.createElement('option');
+            opt.value = key
+            opt.innerHTML = key+':'+obj[key]
+            select.appendChild(opt)
+        }
+    }else{
+        select.innerHTML = '<option>查無資料</option>'
     }
-    obj = await getLocalhostApi('/getGameList');
+    
+    
+    returnObject = await getLocalhostApi('/getGameList');
+    obj = returnObject['returnObject'];
     select = document.getElementById("GameID");
-    for (let key in obj){
-        let opt = document.createElement('option');
-        opt.value = key
-        opt.innerHTML = key+':'+obj[key]
-        select.appendChild(opt)
+    if (obj != null){
+        for (let key in obj){
+            let opt = document.createElement('option');
+            opt.value = key
+            opt.innerHTML = key+':'+obj[key]
+            select.appendChild(opt)
+        }
+    }else{
+        select.innerHTML = '<option>查無資料</option>'
     }
-    for (let key in obj){
-        let opt = document.createElement('option');
-        opt.value = key
-        opt.innerHTML = key+':'+obj[key]
-        DemoGameID.appendChild(opt)
-    }
-    obj = await getLocalhostApi('/getLanguageList');
+
+    returnObject = await getLocalhostApi('/getLanguageList');
+    obj = returnObject['returnObject'];
     select = document.getElementById("LanguageID");
-    for (let key in obj){
-        let opt = document.createElement('option');
-        opt.value = key
-        opt.innerHTML = key+':'+obj[key]
-        select.appendChild(opt)
+    if (obj != null){
+        for (let key in obj){
+            let opt = document.createElement('option');
+            opt.value = key
+            opt.innerHTML = key+':'+obj[key]
+            select.appendChild(opt)
+        }
+    }else{
+        select.innerHTML = '<option>查無資料</option>'
     }
+    
     getScriptKeys();
 
     attend.addEventListener('change',async function(){

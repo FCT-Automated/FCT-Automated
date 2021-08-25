@@ -11,56 +11,60 @@ $(async function() {
     var addCurrency = document.getElementById('addCurrency');
     var updateCurrency = document.getElementById('updateCurrency');
 
-    var obj = await getLocalhostApi('/getCurrencyList');
-    var table = document.getElementById("currencyTable");
-    for (let key in obj){
-        let rows = table.rows.length
-        let row = table.insertRow(-1)
-        let id = row.insertCell(0)
-        let currencyID = row.insertCell(1)
-        let currencyName = row.insertCell(2)
-        let update = row.insertCell(3)
-        let del = row.insertCell(4)
-        id.innerHTML = String(rows)
-        
-        let currencyIDSpan = document.createElement('span')
-        currencyIDSpan.id = key
-        currencyIDSpan.innerHTML = key
-        currencyID.appendChild(currencyIDSpan)
+    var returnObject = await getLocalhostApi('/getCurrencyList');
+    var obj = returnObject['returnObject'];
+    if (obj != null){
+        var table = document.getElementById("currencyTable");
+        for (let key in obj){
+            let rows = table.rows.length
+            let row = table.insertRow(-1)
+            let id = row.insertCell(0)
+            let currencyID = row.insertCell(1)
+            let currencyName = row.insertCell(2)
+            let update = row.insertCell(3)
+            let del = row.insertCell(4)
+            id.innerHTML = String(rows)
+            
+            let currencyIDSpan = document.createElement('span')
+            currencyIDSpan.id = key
+            currencyIDSpan.innerHTML = key
+            currencyID.appendChild(currencyIDSpan)
 
-        let currencyNameSpan = document.createElement('span')
-        currencyNameSpan.id = obj[key]
-        currencyNameSpan.innerHTML = obj[key]
-        currencyName.appendChild(currencyNameSpan)
+            let currencyNameSpan = document.createElement('span')
+            currencyNameSpan.id = obj[key]
+            currencyNameSpan.innerHTML = obj[key]
+            currencyName.appendChild(currencyNameSpan)
 
-        //update
-        let updateBtn = document.createElement('Button')
-        let updateBtnIcon = document.createElement('i')
-        updateBtnIcon.className = "fas fa-edit"
-        updateBtn.className = "btn btn-default"
-        updateBtn.type = "button"
-        updateBtn.id = "update"+String(rows)
-        updateBtn.dataset.target="#updateCurrencyModal"
-        updateBtn.dataset.toggle="modal"
-        updateBtn.onclick = function(){
-            document.getElementById('updateCurrencyName').value = '';
-            document.getElementById("updateCurrencyID").innerHTML = key;
-            ipcRenderer.send('updateCurrencyMes', "");
-        } 
-        updateBtn.appendChild(updateBtnIcon)
-        update.appendChild(updateBtn)
+            //update
+            let updateBtn = document.createElement('Button')
+            let updateBtnIcon = document.createElement('i')
+            updateBtnIcon.className = "fas fa-edit"
+            updateBtn.className = "btn btn-default"
+            updateBtn.type = "button"
+            updateBtn.id = "update"+String(rows)
+            updateBtn.dataset.target="#updateCurrencyModal"
+            updateBtn.dataset.toggle="modal"
+            updateBtn.onclick = function(){
+                document.getElementById('updateCurrencyName').value = '';
+                document.getElementById("updateCurrencyID").innerHTML = key;
+                ipcRenderer.send('updateCurrencyMes', "");
+            } 
+            updateBtn.appendChild(updateBtnIcon)
+            update.appendChild(updateBtn)
 
-        //del
-        let delBtn = document.createElement('Button')
-        let delBtnIcon = document.createElement('i')
-        delBtnIcon.className = "fas fa-trash-alt"
-        delBtn.className = "btn btn-default"
-        delBtn.type = "button"
-        delBtn.id = "delBtn"+String(rows)
-        delBtn.onclick = async function(){delRowFunction(key,delBtn)} 
-        delBtn.appendChild(delBtnIcon)
-        del.appendChild(delBtn)
+            //del
+            let delBtn = document.createElement('Button')
+            let delBtnIcon = document.createElement('i')
+            delBtnIcon.className = "fas fa-trash-alt"
+            delBtn.className = "btn btn-default"
+            delBtn.type = "button"
+            delBtn.id = "delBtn"+String(rows)
+            delBtn.onclick = async function(){delRowFunction(key,delBtn)} 
+            delBtn.appendChild(delBtnIcon)
+            del.appendChild(delBtn)
+        }
     }
+    
     
 
     function getLocalhostApi(path){
