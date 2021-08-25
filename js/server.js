@@ -2,6 +2,8 @@ var http = require('http');
 var redis = require('./redis');
 const { StringDecoder } = require('string_decoder');
 
+redis.createPathList();
+
 var server = http.createServer(async function(req, res) {
     const decoder = new StringDecoder('utf-8');
     if(req.url == '/'){
@@ -90,8 +92,12 @@ var server = http.createServer(async function(req, res) {
         //do somthing
     }else if(req.url=='/getApiUrl'){
         res.writeHead(200,{'Content-Type': 'application/json'});
+        res.write(JSON.stringify(await redis.getApiUrl()));
+        res.end();
     }else if(req.url=='/getSeamlessApiUrl'){
         res.writeHead(200,{'Content-Type': 'application/json'});
+        res.write(JSON.stringify(await redis.getSeamlessApiUrl()));
+        res.end();
     }
     
     //db14:Script

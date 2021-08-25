@@ -9,6 +9,35 @@ function connectRedis(db){
     return redis.createClient(redis_config)
 }
 
+function createPathList(){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        var keys = ['chromePath','apiUrl','seamlessApiUrl'];
+        client.hgetall('PathList', (error, result) => {
+            if (!error){
+                if(result == null){
+                    try {
+                        keys.forEach(key => {
+                            client.hmset('PathList',key,'');
+                        });
+                        resv({'returnObject':null})
+                    }
+                    catch(error){
+                        rej(error)
+                    }
+                }else{
+                    keys.filter(function(v){ return Object.keys(result).indexOf(v) == -1 }).forEach(key => {
+                        client.hmset('PathList',key,'');
+                    });
+                    resv({'returnObject':null})
+                }
+            }else{
+                rej(error)
+            }
+        })
+    });
+}
+
 function checkThatTheKeyExists(key){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
@@ -69,7 +98,8 @@ async function addCurrency(data){
         let currencyID = Object.keys(jsonObject)[0];
         if (! currencyList.includes(currencyID)){
             try {
-                client.hmset('CurrencyList',jsonObject);
+                client.hmset('CurrencyList','ChromePath','');
+                client.hmset('CurrencyList','Chrome','');
                 resv({'returnObject':null})
             }
             catch(error){
@@ -239,7 +269,35 @@ function updateLanguage(data){
 function getChromePath(){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        client.hget('PathList','Chrome', (error, result) => {
+        client.hget('PathList','chromePath', (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                rej(error)
+            }
+        });
+    });
+    
+}
+
+function getApiUrl(){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        client.hget('PathList','apiUrl', (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                rej(error)
+            }
+        });
+    });
+    
+}
+
+function getSeamlessApiUrl(){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        client.hget('PathList','seamlessApiUrl', (error, result) => {
             if (!error){
                 resv(result)  
             }else{
@@ -340,10 +398,13 @@ function delscriptlistRow(key,client){
 }
 
 
+module.exports.createPathList = createPathList;
 module.exports.getCurrencyList = getCurrencyList;
 module.exports.getGameList = getGameList;
 module.exports.getLanguageList = getLanguageList;
 module.exports.getChromePath = getChromePath;
+module.exports.getApiUrl = getApiUrl;
+module.exports.getSeamlessApiUrl = getSeamlessApiUrl;
 module.exports.getScriptKeys = getScriptKeys;
 module.exports.getScripts = getScripts;
 module.exports.addScript = addScript;

@@ -11,6 +11,10 @@ $(async function() {
     const SendApiBtn = document.getElementById('SendApiBtn')
     const result = document.getElementById("result")
 
+    var chromePath = await getLocalhostApi('/getChromePath');
+    var apiUrl = await getLocalhostApi('/getApiUrl');
+    var seamlessApiUrl = await getLocalhostApi('/getSeamlessApiUrl');
+
     var returnObject = await getLocalhostApi('/getCurrencyList');
     var obj = returnObject['returnObject'];
     var select = document.getElementById("Currency");
@@ -109,21 +113,35 @@ $(async function() {
                 Currency : document.getElementById("Currency").value,
                 AgentCode : document.getElementById("AgentCode").value,
             }
-            let Eventresult = await apiJs.requestAPI(args)
-            if (Eventresult['Data'] != null){
-                Eventresult['Data'].forEach(function(datas){
-                    let opt = document.createElement('option')
-                    opt.value = datas['eventID']
-                    opt.className = 'eventOption'
-                    opt.innerHTML = datas['eventID']
-                    eventlist.appendChild(opt)
-                })
-            }else{
-                let opt = document.createElement('option')
-                opt.className = 'eventOption'
-                opt.innerHTML = '查無活動'
-                eventlist.appendChild(opt)
+            if(chromePath == ''){
+                mes += "chromePaht 不可空白</br>"
             }
+            if(apiUrl == ''){
+                mes += "apiUrl 不可空白</br>"
+            }
+            if(seamlessApiUrl == ''){
+                mes += "seamlessApiUrl 不可空白</br>"
+            }
+            if(chromePath == '' | apiUrl == '' | seamlessApiUrl == ''){
+                ipcRenderer.send('result',mes)
+            }else{
+                let Eventresult = await apiJs.requestAPI(args,apiUrl)
+                if (Eventresult['Data'] != null){
+                    Eventresult['Data'].forEach(function(datas){
+                        let opt = document.createElement('option')
+                        opt.value = datas['eventID']
+                        opt.className = 'eventOption'
+                        opt.innerHTML = datas['eventID']
+                        eventlist.appendChild(opt)
+                    })
+                }else{
+                    let opt = document.createElement('option')
+                    opt.className = 'eventOption'
+                    opt.innerHTML = '查無活動'
+                    eventlist.appendChild(opt)
+                }
+            }
+            
         }
     })
     notAttend.addEventListener('change',function(){
@@ -140,83 +158,96 @@ $(async function() {
             let api = document.getElementById("API").value
             let args
             let response
-            let mes
+            let mes = ''
             let code
-            switch (api) {
-                case 'Login':
-                    args ={
-                        API : api,
-                        Currency : document.getElementById("Currency").value,
-                        GameID : document.getElementById("GameID").value,
-                        AgentCode : document.getElementById("AgentCode").value,
-                        MemberAccount : document.getElementById("MemberAccount").value,
-                        LanguageID : document.getElementById("LanguageID").value
-                    }
-                    response = await apiJs.requestAPI(args)
-                    code = response.Result;
-                    if ( code == 0){
-                        await open.openChrome(response.Url,await getLocalhostApi('/getChromePath'),args['GameID'],"Normal")
-                        mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入成功!! ]"
-                    }else{
-                        mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入失敗 - Error Code："+code+"!! ]"
-                    }
-                    ipcRenderer.send('result',mes)
-                    
-                    break
-
-                case 'SetPoints':
-                    let wallet = document.getElementById("Wallet")
-                    if (wallet.options[wallet.selectedIndex].id == "seamlessWallet"){
-                        args = {
-                            API : 'SetJson',
+            if(chromePath == ''){
+                mes += "chromePaht 不可空白</br>"
+            }
+            if(apiUrl == ''){
+                mes += "apiUrl 不可空白</br>"
+            }
+            if(seamlessApiUrl == ''){
+                mes += "seamlessApiUrl 不可空白</br>"
+            }
+            if(chromePath == '' | apiUrl == '' | seamlessApiUrl == ''){
+                ipcRenderer.send('result',mes)
+            }else{
+                switch (api) {
+                    case 'Login':
+                        args ={
+                            API : api,
                             Currency : document.getElementById("Currency").value,
+                            GameID : document.getElementById("GameID").value,
                             AgentCode : document.getElementById("AgentCode").value,
                             MemberAccount : document.getElementById("MemberAccount").value,
-                            Points : document.getElementById("Points").value
+                            LanguageID : document.getElementById("LanguageID").value
                         }
-                        response = await apiJs.requestSeamlessAPI(args)
+                        response = await apiJs.requestAPI(args,apiUrl)
                         code = response.Result;
                         if ( code == 0){
-                            mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.Points+"]"
+                            await open.openChrome(response.Url,chromePath,args['GameID'],"Normal")
+                            mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入成功!! ]"
+                        }else{
+                            mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入失敗 - Error Code："+code+"!! ]"
                         }
-                        
-                    }else{
-                        args = {
+                        ipcRenderer.send('result',mes)
+                        break
+    
+                    case 'SetPoints':
+                        let wallet = document.getElementById("Wallet")
+                        if (wallet.options[wallet.selectedIndex].id == "seamlessWallet"){
+                            args = {
+                                API : 'SetJson',
+                                Currency : document.getElementById("Currency").value,
+                                AgentCode : document.getElementById("AgentCode").value,
+                                MemberAccount : document.getElementById("MemberAccount").value,
+                                Points : document.getElementById("Points").value
+                            }
+                            response = await apiJs.requestSeamlessAPI(args,seamlessApiUrl)
+                            code = response.Result;
+                            if ( code == 0){
+                                mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.Points+"]"
+                            }
+                            
+                        }else{
+                            args = {
+                                API : api,
+                                Currency : document.getElementById("Currency").value,
+                                AgentCode : document.getElementById("AgentCode").value,
+                                MemberAccount : document.getElementById("MemberAccount").value,
+                                Points : document.getElementById("Points").value
+                            }
+                            response = await apiJs.requestAPI(args,apiUrl)
+                            code = response.Result;
+                            if ( code == 0){
+                                mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.AfterPoint+"，BankID："+response.BankID+"]"
+                            }
+                        }
+                        if(code !=0){
+                            mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 轉點失敗!! - Error Code："+code+"]"
+                        }
+                        ipcRenderer.send('result',mes)
+                        break
+    
+                    case 'KickOut':
+                        args ={
                             API : api,
                             Currency : document.getElementById("Currency").value,
                             AgentCode : document.getElementById("AgentCode").value,
                             MemberAccount : document.getElementById("MemberAccount").value,
-                            Points : document.getElementById("Points").value
                         }
-                        response = await apiJs.requestAPI(args)
+                        response = await apiJs.requestAPI(args,apiUrl)
                         code = response.Result;
                         if ( code == 0){
-                            mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.AfterPoint+"，BankID："+response.BankID+"]"
+                            mes = "Log:[ KickOut- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 踢出成功!! ]"
+                        }else{
+                            mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 踢出失敗 - Error Code："+code+"!! ]"
                         }
-                    }
-                    if(code !=0){
-                        mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 轉點失敗!! - Error Code："+code+"]"
-                    }
-                    ipcRenderer.send('result',mes)
-                    break
-
-                case 'KickOut':
-                    args ={
-                        API : api,
-                        Currency : document.getElementById("Currency").value,
-                        AgentCode : document.getElementById("AgentCode").value,
-                        MemberAccount : document.getElementById("MemberAccount").value,
-                    }
-                    response = await apiJs.requestAPI(args)
-                    code = response.Result;
-                    if ( code == 0){
-                        mes = "Log:[ KickOut- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 踢出成功!! ]"
-                    }else{
-                        mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 踢出失敗 - Error Code："+code+"!! ]"
-                    }
-                    ipcRenderer.send('result',mes)
-                    break
-            }    
+                        ipcRenderer.send('result',mes)
+                        break
+                }
+            }
+                
         }else{
             ipcRenderer.send('result',"有欄位未填寫!");
         }        

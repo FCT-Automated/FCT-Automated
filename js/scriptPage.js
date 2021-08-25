@@ -9,6 +9,10 @@ $(async function() {
     var open = require('../js/openChrome');
     const addScriptMes = document.getElementById("addScriptMes")
 
+    var chromePath = await getLocalhostApi('/getChromePath');
+    var apiUrl = await getLocalhostApi('/getApiUrl');
+    var seamlessApiUrl = await getLocalhostApi('/getSeamlessApiUrl');
+
     const addBtn = document.getElementById('addBtn');
     const saveScriptBtn = document.getElementById('scriptSave');
     const openDemoBtn = document.getElementById('OpenDemoBtn');
@@ -70,20 +74,33 @@ $(async function() {
                 Currency : document.getElementById("Currency").value,
                 AgentCode : document.getElementById("AgentCode").value,
             }
-            let Eventresult = await apiJs.requestAPI(args)
-            if (Eventresult['Data'] != null){
-                Eventresult['Data'].forEach(function(datas){
-                    let opt = document.createElement('option')
-                    opt.value = datas['eventID']
-                    opt.className = 'eventOption'
-                    opt.innerHTML = datas['eventID']
-                    eventlist.appendChild(opt)
-                })
+            if(chromePath == ''){
+                mes += "chromePaht 不可空白</br>"
+            }
+            if(apiUrl == ''){
+                mes += "apiUrl 不可空白</br>"
+            }
+            if(seamlessApiUrl == ''){
+                mes += "seamlessApiUrl 不可空白</br>"
+            }
+            if(chromePath == '' | apiUrl == '' | seamlessApiUrl == ''){
+                ipcRenderer.send('result',mes)
             }else{
-                let opt = document.createElement('option')
-                opt.className = 'eventOption'
-                opt.innerHTML = '查無活動'
-                eventlist.appendChild(opt)
+                let Eventresult = await apiJs.requestAPI(args,apiUrl)
+                if (Eventresult['Data'] != null){
+                    Eventresult['Data'].forEach(function(datas){
+                        let opt = document.createElement('option')
+                        opt.value = datas['eventID']
+                        opt.className = 'eventOption'
+                        opt.innerHTML = datas['eventID']
+                        eventlist.appendChild(opt)
+                    })
+                }else{
+                    let opt = document.createElement('option')
+                    opt.className = 'eventOption'
+                    opt.innerHTML = '查無活動'
+                    eventlist.appendChild(opt)
+                }
             }
         }
     })
@@ -209,9 +226,23 @@ $(async function() {
             GameID : DemoGameID.value,
             LanguageID : 2,
             AgentCode : "FCT"
-            }
-        response = await apiJs.requestAPI(args)
-        await open.openChrome(response.Url,await getLocalhostApi('/getChromePath'),args['GameID'],"Demo")
+        }
+        if(chromePath == ''){
+            mes += "chromePaht 不可空白</br>"
+        }
+        if(apiUrl == ''){
+            mes += "apiUrl 不可空白</br>"
+        }
+        if(seamlessApiUrl == ''){
+            mes += "seamlessApiUrl 不可空白</br>"
+        }
+        if(chromePath == '' | apiUrl == '' | seamlessApiUrl == ''){
+            ipcRenderer.send('result',mes)
+        }else{
+            response = await apiJs.requestAPI(args,apiUrl)
+            await open.openChrome(response.Url,chromePath,args['GameID'],"Demo")
+        }
+        
         
     })
 

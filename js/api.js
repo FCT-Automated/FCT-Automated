@@ -3,8 +3,6 @@ var request = require('request')
 var mongodbClient = require('mongodb').MongoClient;
 
 var apiUrl
-var commonApiUrl = 'api.mearhh.com'
-var seamlessApiUrl = 'rdapi2.mearhh.com'
 var homeUrl = 'https://www.mearhh.com'
 
 function connectMongoDB(code){
@@ -103,9 +101,9 @@ function doRequest(postOptions) {
     })
 }
  
-async function requestAPI(args) {
+async function requestAPI(args,apiUrl) {
+    apiUrl = apiUrl
     var arg
-    apiUrl = commonApiUrl
     switch (args['API']){
         case 'Login':
             arg = JSON.stringify({
@@ -145,8 +143,8 @@ async function requestAPI(args) {
     return doRequest(apisOptions)
 }
 
-async function requestSeamlessAPI(args) {
-    apiUrl = seamlessApiUrl
+async function requestSeamlessAPI(args,apiUrl) {
+    apiUrl = apiUrl
     var arg = JSON.stringify({
         MemberAccount : args['MemberAccount'],
         Points : args['Points']
