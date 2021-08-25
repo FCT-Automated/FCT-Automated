@@ -156,7 +156,7 @@ $(async function() {
                 ipcRenderer.send('addCurrencyMes',response['returnObject']);
             }
         }else{
-            ipcRenderer.send('addCurrencyMes', "遊戲編號或遊戲名稱不可空白!");
+            ipcRenderer.send('addCurrencyMes', "幣別代號或幣別名稱不可空白!");
         }
     })
 
@@ -175,7 +175,7 @@ $(async function() {
                 ipcRenderer.send('updateCurrencyMes',response['returnObject']);
             }
         }else{
-            ipcRenderer.send('updateCurrencyMes', "遊戲名稱不可空白!");
+            ipcRenderer.send('updateCurrencyMes', "幣別名稱不可空白!");
         }
     })
 

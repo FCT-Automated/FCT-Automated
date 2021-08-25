@@ -83,13 +83,15 @@ var server = http.createServer(async function(req, res) {
         });
     }
 
-    //db15:Path  
-    else if(req.url=='/getChromePath'){
+    //db15:Path
+    else if(req.url=='/getPathList'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        res.write(JSON.stringify(await redis.getPathList()));
+        res.end();
+    }else if(req.url=='/getChromePath'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         res.write(JSON.stringify(await redis.getChromePath()));
         res.end();
-    }else if(req.url=='/updateChromePath'){
-        //do somthing
     }else if(req.url=='/getApiUrl'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         res.write(JSON.stringify(await redis.getApiUrl()));
@@ -98,8 +100,14 @@ var server = http.createServer(async function(req, res) {
         res.writeHead(200,{'Content-Type': 'application/json'});
         res.write(JSON.stringify(await redis.getSeamlessApiUrl()));
         res.end();
+    }else if(req.url=='/updatePath'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.updatePath(decoder.write(data))));
+            res.end();
+        });
     }
-    
+
     //db14:Script
     else if(req.url=='/getScriptKeys'){
         res.writeHead(200,{'Content-Type': 'application/json'});

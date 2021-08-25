@@ -90,3 +90,7 @@ ipcMain.on('languageSettingMes',(event,arg) =>{
 ipcMain.on('updateLanguageMes',(event,arg) =>{
     event.reply('updateLanguageMes', arg)
 })
+
+ipcMain.on('updatePathMes',(event,arg) =>{
+    event.reply('updatePathMes', arg)
+})

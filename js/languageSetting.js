@@ -3,7 +3,7 @@ $(async function() {
     let {ipcRenderer} = require('electron');
     const net = electron.remote.net;
     const addLanguageMes = document.getElementById("addLanguageMes");
-    const LanguageSettingMes = document.getElementById("LanguageSettingMes");
+    const languageSettingMes = document.getElementById("languageSettingMes");
     const updateLanguageMes = document.getElementById("updateLanguageMes");
     const addLanguageModal = document.getElementById("addLanguageModal");
     
@@ -14,26 +14,26 @@ $(async function() {
     var returnObject = await getLocalhostApi('/getLanguageList');
     var obj = returnObject['returnObject'];
     if (obj != null){
-        var table = document.getElementById("LanguageTable");
+        var table = document.getElementById("languageTable");
         for (let key in obj){
             let rows = table.rows.length
             let row = table.insertRow(-1)
             let id = row.insertCell(0)
-            let LanguageID = row.insertCell(1)
-            let LanguageName = row.insertCell(2)
+            let languageID = row.insertCell(1)
+            let languageName = row.insertCell(2)
             let update = row.insertCell(3)
             let del = row.insertCell(4)
             id.innerHTML = String(rows)
             
-            let LanguageIDSpan = document.createElement('span')
-            LanguageIDSpan.id = key
-            LanguageIDSpan.innerHTML = key
-            LanguageID.appendChild(LanguageIDSpan)
+            let languageIDSpan = document.createElement('span')
+            languageIDSpan.id = key
+            languageIDSpan.innerHTML = key
+            languageID.appendChild(languageIDSpan)
 
-            let LanguageNameSpan = document.createElement('span')
-            LanguageNameSpan.id = obj[key]
-            LanguageNameSpan.innerHTML = obj[key]
-            LanguageName.appendChild(LanguageNameSpan)
+            let languageNameSpan = document.createElement('span')
+            languageNameSpan.id = obj[key]
+            languageNameSpan.innerHTML = obj[key]
+            languageName.appendChild(languageNameSpan)
 
             //update
             let updateBtn = document.createElement('Button')
@@ -137,17 +137,17 @@ $(async function() {
                 }                
                 
             })
-            ipcRenderer.send('LanguageSettingMes', key+"刪除成功!");
+            ipcRenderer.send('languageSettingMes', key+"刪除成功!");
         }
     }
 
     addLanguage.addEventListener('click',async function(event){
         event.preventDefault();
-        let LanguageID = document.getElementById('LanguageID');
-        let LanguageName = document.getElementById('LanguageName');
-        if(LanguageID.checkValidity() && LanguageName.checkValidity()){
+        let languageID = document.getElementById('LanguageID');
+        let languageName = document.getElementById('LanguageName');
+        if(languageID.checkValidity() && languageName.checkValidity()){
             let data = {};
-            data[LanguageID.value] = LanguageName.value
+            data[languageID.value] = languageName.value
             let response = await psotLocalhostApi('/addLanguage',data);
             if (response['returnObject'] == null){
                 $(this).prev().click();
@@ -156,17 +156,17 @@ $(async function() {
                 ipcRenderer.send('addLanguageMes',response['returnObject']);
             }
         }else{
-            ipcRenderer.send('addLanguageMes', "遊戲編號或遊戲名稱不可空白!");
+            ipcRenderer.send('addLanguageMes', "語系代號或語系名稱不可空白!");
         }
     })
 
     updateLanguage.addEventListener('click',async function(event){
         event.preventDefault();
-        let LanguageID = document.getElementById('updateLanguageID');
-        let LanguageName = document.getElementById('updateLanguageName');
-        if(LanguageName.checkValidity()){
+        let languageID = document.getElementById('updateLanguageID');
+        let languageName = document.getElementById('updateLanguageName');
+        if(languageName.checkValidity()){
             let data = {};
-            data[LanguageID.textContent] = LanguageName.value
+            data[languageID.textContent] = languageName.value
             let response = await psotLocalhostApi('/updateLanguage',data);
             if (response['returnObject'] == null){
                 $(this).prev().click();
@@ -175,7 +175,7 @@ $(async function() {
                 ipcRenderer.send('updateLanguageMes',response['returnObject']);
             }
         }else{
-            ipcRenderer.send('updateLanguageMes', "遊戲名稱不可空白!");
+            ipcRenderer.send('updateLanguageMes', "語系名稱不可空白!");
         }
     })
 
@@ -190,8 +190,8 @@ $(async function() {
         addLanguageMes.innerHTML = arg
     });
 
-    ipcRenderer.on('LanguageSettingMes', (event, arg) => {
-        LanguageSettingMes.innerHTML = arg
+    ipcRenderer.on('languageSettingMes', (event, arg) => {
+        languageSettingMes.innerHTML = arg
     });
 
     ipcRenderer.on('updateLanguageMes', (event, arg) => {

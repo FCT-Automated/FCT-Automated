@@ -266,6 +266,20 @@ function updateLanguage(data){
     });
 }
 
+function getPathList(){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        client.hgetall('PathList', (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                rej(error)
+            }
+        });
+        
+    });
+}
+
 function getChromePath(){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
@@ -278,6 +292,22 @@ function getChromePath(){
         });
     });
     
+}
+
+function updatePath(data){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        console.log(jsonObject)
+        try {
+            client.hmset('PathList',jsonObject);
+            resv({'returnObject':null})
+        }
+        catch(error){
+            rej(error)
+        }
+  
+    });
 }
 
 function getApiUrl(){
@@ -417,6 +447,9 @@ module.exports.updateCurrency = updateCurrency;
 module.exports.delLanguage = delLanguage;
 module.exports.addLanguage = addLanguage;
 module.exports.updateLanguage = updateLanguage;
+module.exports.getPathList = getPathList;
+module.exports.updatePath = updatePath;
+
 
 module.exports.connectRedis = connectRedis;
 module.exports.scriptSave = scriptSave;
