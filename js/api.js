@@ -101,8 +101,8 @@ function doRequest(postOptions) {
     })
 }
  
-async function requestAPI(args,apiUrl) {
-    apiUrl = apiUrl
+async function requestAPI(args,url) {
+    apiUrl = url
     var arg
     switch (args['API']){
         case 'Login':
@@ -143,8 +143,8 @@ async function requestAPI(args,apiUrl) {
     return doRequest(apisOptions)
 }
 
-async function requestSeamlessAPI(args,apiUrl) {
-    apiUrl = apiUrl
+async function requestSeamlessAPI(args,url) {
+    apiUrl = url
     var arg = JSON.stringify({
         MemberAccount : args['MemberAccount'],
         Points : args['Points']
