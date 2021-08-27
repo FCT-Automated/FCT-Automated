@@ -298,7 +298,6 @@ function updatePath(data){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
         let jsonObject= JSON.parse(data);
-        console.log(jsonObject)
         try {
             client.hmset('PathList',jsonObject);
             resv({'returnObject':null})
@@ -429,26 +428,37 @@ function updateScript(script){
 }
 
 module.exports.createPathList = createPathList;
-module.exports.getCurrencyList = getCurrencyList;
-module.exports.getGameList = getGameList;
-module.exports.getLanguageList = getLanguageList;
+
+module.exports.updatePath = updatePath;
+module.exports.getPathList = getPathList;
 module.exports.getChromePath = getChromePath;
 module.exports.getApiUrl = getApiUrl;
 module.exports.getSeamlessApiUrl = getSeamlessApiUrl;
-module.exports.getScriptKeys = getScriptKeys;
-module.exports.getScript = getScript;
-module.exports.addScript = addScript;
-module.exports.delGame = delGame;
-module.exports.addGame = addGame;
-module.exports.updateGame = updateGame;
-module.exports.delCurrency = delCurrency;
+
 module.exports.addCurrency = addCurrency;
+module.exports.delCurrency = delCurrency;
 module.exports.updateCurrency = updateCurrency;
-module.exports.delLanguage = delLanguage;
+module.exports.getCurrencyList = getCurrencyList;
+
+module.exports.addGame = addGame;
+module.exports.delGame = delGame;
+module.exports.updateGame = updateGame;
+module.exports.getGameList = getGameList;
+
 module.exports.addLanguage = addLanguage;
+module.exports.delLanguage = delLanguage;
 module.exports.updateLanguage = updateLanguage;
-module.exports.getPathList = getPathList;
-module.exports.updatePath = updatePath;
+module.exports.getLanguageList = getLanguageList;
+
+module.exports.addScript = addScript;
 module.exports.delScript = delScript;
 module.exports.updateScript = updateScript;
+module.exports.getScriptKeys = getScriptKeys;
+module.exports.getScript = getScript;
+
+
+
+
+
+
 

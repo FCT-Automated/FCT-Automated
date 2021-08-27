@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer')
 
-async function openChrome(url,chromePath,gameId,script) {
+async function openChrome(url,chromePath,gameId,data) {
   var gamesize = {
     width : 500,
     height : 962
@@ -16,6 +16,9 @@ async function openChrome(url,chromePath,gameId,script) {
     windowsize.height = 498
 
   }
+  
+  var isStart = true;
+  var apiJs = require('../js/api');
 
   //chrome設定
   const browser = await puppeteer.launch({
@@ -55,60 +58,70 @@ async function openChrome(url,chromePath,gameId,script) {
     }
   )
 
-  page.on("console", msg => {
-    if (msg.text()=="loadComplete"){
-      console.log(msg.text())
-    }
-  })
-
   //進入遊戲
   await page.goto(url)
   //調整遊戲視窗
   await page.setViewport({width: gamesize.width,height: gamesize.height})
 
-  //以下前端之後會拔掉，無法在console查前端狀態
-  // await page.evaluate(()=>{
-  //   var loaging = setInterval(loadComplete,5000)
-  //   setInterval(stopBroadcast,5000)
-  //   function loadComplete(){
-  //     if (core.data.loadComplete){
-  //       console.log("loadComplete")
-  //       clearInterval(loaging)
-  //     }
-  //   }
-  //   function stopBroadcast(){
-  //     console.log(slot.data._stopBroadcast)
-  //   }
-  // })
 
   //監聽點擊位置
-  if(script == 'Demo'){
+  if(data == 'Demo'){
     await page.evaluate(()=>{
       document.addEventListener("click", function(e){
-        var coordinates ="{x:" + e.clientX +",y:" + e.clientY+"}";
+        var coordinates ="{\"x\":" + e.clientX +",\"y\":" + e.clientY+"}";
         console.log(coordinates)
       })
     })
-  }else if(typeof(script) == "object"){
-    while(page._closed == false){
-      for (var action in script){
-        console.log("ready:"+script[action])
-        switch (action.split("_")[1]){
-          case "wait":
-            await wait(parseInt(script[action])*1000);
-            break
-          case "click":
-            var postion = JSON.parse(script[action])
-            await page.mouse.move(postion["x"], postion["y"])
-            await page.mouse.down()
-            await page.mouse.up()
-            await wait(500);
-            break
+  }else if(data != 'Normal'){
+    page.on("console", async function(msg) {
+        if(msg.text() == 'start' && isStart){
+          isStart = false;
+          while(!isStart){
+            try{
+              await runScript()
+            }catch{
+              break
+            }
+          }
         }
-        console.log("done")
-        
+        if(msg.text() == 'end'){
+          isStart = true;
+        }
+    })
+  }
+
+  async function runScript(){
+    let script = data['returnObject'];
+    let user = data['user'];
+    user['API'] = 'SetPoints';
+    let seamlessApiUrl = data['seamlessApiUrl'];
+    let apiUrl = data['apiUrl'];
+    for (let action in script){
+      console.log("ready:"+action+" => "+script[action])
+      switch (action.split("_")[1]){
+        case "wait":
+          await wait(parseInt(script[action])*1000);
+          break
+        case "click":
+          let postion = JSON.parse(script[action])
+          await page.mouse.move(postion["x"], postion["y"])
+          await page.mouse.down()
+          await page.mouse.up()
+          break
+        case "setpoints-normal":
+          user['Points'] = script[action];
+          await apiJs.requestAPI(user,apiUrl);
+          break
+        case "setpoints-seamless":
+          user['Points'] = script[action];
+          await apiJs.requestSeamlessAPI(user,seamlessApiUrl);
+          break
+        case "refresh":
+          await page.reload();
+          break
       }
     }
+    console.log("done")
   }
     
     //await wait(15000);
@@ -125,11 +138,11 @@ function wait(ms){
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-function getRandomInt(min, max) {  
-    return Math.floor(
-        Math.random() * (max - min + 1) + min
-    )
-}
+// function getRandomInt(min, max) {  
+//     return Math.floor(
+//         Math.random() * (max - min + 1) + min
+//     )
+// }
 
 module.exports.openChrome = openChrome;
 

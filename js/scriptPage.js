@@ -19,7 +19,7 @@ $(async function() {
     const addScriptListRow = document.getElementById('addScriptListRow');
     const addScriptBtn = document.getElementById('addScript');
     const openDemoBtn = document.getElementById('OpenDemoBtn');
-    // const AutoStartBtn = document.getElementById('AutoStartBtn')
+    const autoStartBtn = document.getElementById('autoStartBtn')
     var table = document.getElementById('addScriptTable');
     var DemoGameID = document.getElementById("DemoGameID");    
     
@@ -258,28 +258,45 @@ $(async function() {
     })
 
 
-//     //開始跑自動腳本
-//     AutoStartBtn.addEventListener('click', async function(event){
-        //event.preventDefault();
-//         let args ={
-//             API : document.getElementById("API").value,
-//             Currency : document.getElementById("Currency").value,
-//             GameID : document.getElementById("GameID").value,
-//             AgentCode : document.getElementById("AgentCode").value,
-//             MemberAccount : document.getElementById("MemberAccount").value,
-//             LanguageID : document.getElementById("LanguageID").value
-//         }
-        
-//         let url = await api.requestAPI(args)
-//         client.get('chromePath', async function(err,path){
-//             if (!err) {
-//                 let datas = await getScriptListData(document.getElementById('scriptlist').value,client2)
-//                 await open.openChrome(url.Url,path,args['GameID'],datas)
-//             }else{
-//                 console.log(err)
-//             }
-//         })  
-//     })
+//  開始跑自動腳本
+    autoStartBtn.addEventListener('click', async function(event){
+        event.preventDefault();
+        if ($("#AgentCode")[0].checkValidity() && $("#MemberAccount")[0].checkValidity()){
+            let response;
+            let data;
+            let scriptName = $("#scriptlist option:selected").text();
+            let args ={
+                API : document.getElementById("API").value,
+                Currency : document.getElementById("Currency").value,
+                GameID : document.getElementById("GameID").value,
+                AgentCode : document.getElementById("AgentCode").value,
+                MemberAccount : document.getElementById("MemberAccount").value,
+                LanguageID : document.getElementById("LanguageID").value
+            }
+            
+            if(chromePath == ''){
+                mes += "chromePaht 不可空白</br>"
+            }
+            if(apiUrl == ''){
+                mes += "apiUrl 不可空白</br>"
+            }
+            if(seamlessApiUrl == ''){
+                mes += "seamlessApiUrl 不可空白</br>"
+            }
+            if(chromePath == '' | apiUrl == '' | seamlessApiUrl == ''){
+                ipcRenderer.send('scriptPageMes',mes)
+            }else{
+                response = await apiJs.requestAPI(args,apiUrl);
+                data = await psotLocalhostApi('/getScript',scriptName);
+                data['user'] = args
+                data['apiUrl'] = apiUrl
+                data['seamlessApiUrl'] = seamlessApiUrl
+                await open.openChrome(response.Url,chromePath,args['GameID'],data);
+            } 
+        }else{
+            ipcRenderer.send('scriptPageMes',"有欄位未填寫!");
+        }
+    })
 
 
 
