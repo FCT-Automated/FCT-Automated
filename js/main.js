@@ -44,11 +44,16 @@ function createWindow() {
 
     win.on('closed', () => {
         win = null
+        ps.kill();
     })
 }
 
 ipcMain.on('result',(event,arg) =>{
     event.reply('re', arg)
+})
+
+ipcMain.on('scriptPageMes',(event,arg) =>{
+    event.reply('scriptPageMes', arg)
 })
 
 ipcMain.on('addScriptMes',(event,arg) =>{
@@ -93,4 +98,12 @@ ipcMain.on('updateLanguageMes',(event,arg) =>{
 
 ipcMain.on('updatePathMes',(event,arg) =>{
     event.reply('updatePathMes', arg)
+})
+
+ipcMain.on('scriptListMes',(event,arg) =>{
+    event.reply('scriptListMes', arg)
+})
+
+ipcMain.on('scriptSettingMes',(event,arg) =>{
+    event.reply('scriptSettingMes', arg)
 })

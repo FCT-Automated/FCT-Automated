@@ -67,7 +67,7 @@
             <label for="scriptlist">腳本:</label> 
             <select class="form-control" id="scriptlist"></select>
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addScriptModal">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addScriptModal" onclick='$("#addScriptTable tr").remove();'>
                 新增腳本
             </button>
             
@@ -85,7 +85,7 @@
                             <button type="Button" id="OpenDemoBtn" class="btn btn-primary">開啟</button>
                         </div>
                         <span>腳本名稱:</span><input type="text" id="scriptName" required>
-                        <button id="addBtn" class="btn btn-dark" type="button">
+                        <button id="addScriptListRow" class="btn btn-dark" type="button">
                           <span class="fas fa-plus"></span>新增動作
                         </button>
                         <table class="table table-bordered">
@@ -104,7 +104,7 @@
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
-                      <button type="button" class="btn btn-primary" id='scriptSave'>確定新增</button>
+                      <button type="button" class="btn btn-primary" id='addScript'>確定新增</button>
                       <div><span id="addScriptMes"></span></div>
                     </div>
                   </div>
@@ -112,8 +112,8 @@
             </div>
           </div>
           <button type="Button" id="AutoStartBtn" class="btn btn-primary">開始</button>
+          <div><span id="scriptPageMes"></span></div>
         </form>
-        <div><span id="result"></span></div>
       </div>
     </div>
   </div>

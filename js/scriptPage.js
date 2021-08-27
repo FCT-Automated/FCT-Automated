@@ -7,15 +7,17 @@ $(async function() {
     var notAttend = document.getElementById('notAttend');
     var eventlist = document.getElementById('Event');
     var open = require('../js/openChrome');
-    const addScriptMes = document.getElementById("addScriptMes")
+    const addScriptMes = document.getElementById("addScriptMes");
+    const scriptPageMes = document.getElementById("scriptPageMes");
+    
 
     var mes = '';
     var chromePath = await getLocalhostApi('/getChromePath');
     var apiUrl = await getLocalhostApi('/getApiUrl');
     var seamlessApiUrl = await getLocalhostApi('/getSeamlessApiUrl');
 
-    const addBtn = document.getElementById('addBtn');
-    const saveScriptBtn = document.getElementById('scriptSave');
+    const addScriptListRow = document.getElementById('addScriptListRow');
+    const addScriptBtn = document.getElementById('addScript');
     const openDemoBtn = document.getElementById('OpenDemoBtn');
     // const AutoStartBtn = document.getElementById('AutoStartBtn')
     var table = document.getElementById('addScriptTable');
@@ -49,6 +51,16 @@ $(async function() {
         }
     }else{
         select.innerHTML = '<option>查無資料</option>'
+    }
+    if (obj != null){
+        for (let key in obj){
+            let opt = document.createElement('option');
+            opt.value = key
+            opt.innerHTML = key+':'+obj[key]
+            DemoGameID.appendChild(opt)
+        }
+    }else{
+        DemoGameID.innerHTML = '<option>查無資料</option>'
     }
 
     returnObject = await getLocalhostApi('/getLanguageList');
@@ -85,7 +97,7 @@ $(async function() {
                 mes += "seamlessApiUrl 不可空白</br>"
             }
             if(chromePath == '' | apiUrl == '' | seamlessApiUrl == ''){
-                ipcRenderer.send('result',mes)
+                ipcRenderer.send('scriptPageMes',mes)
             }else{
                 let Eventresult = await apiJs.requestAPI(args,apiUrl)
                 if (Eventresult['Data'] != null){
@@ -172,11 +184,8 @@ $(async function() {
 
     //--------------------
     //掛機腳本設定
-    addBtn.addEventListener('click',function(){
+    addScriptListRow.addEventListener('click',function(){
         let rows = table.rows.length
-        addRowFunction(rows)
-    })
-    function addRowFunction(rows){
         let row = table.insertRow(-1)
         let id = row.insertCell(0)
         let action = row.insertCell(1)
@@ -217,7 +226,8 @@ $(async function() {
         btnicon.className = "fas fa-trash-alt"
         btn.appendChild(btnicon)
         delBtn.appendChild(btn)
-    }
+    })
+ 
     //開啟demo帳號按鈕
     openDemoBtn.addEventListener('click', async function(){
         let response;
@@ -238,7 +248,7 @@ $(async function() {
             mes += "seamlessApiUrl 不可空白</br>"
         }
         if(chromePath == '' | apiUrl == '' | seamlessApiUrl == ''){
-            ipcRenderer.send('result',mes)
+            ipcRenderer.send('scriptPageMes',mes)
         }else{
             response = await apiJs.requestAPI(args,apiUrl)
             await open.openChrome(response.Url,chromePath,args['GameID'],"Demo")
@@ -275,7 +285,7 @@ $(async function() {
 
     //--------------------
     //確定新增按鈕
-    saveScriptBtn.addEventListener('click',async function(event){
+    addScriptBtn.addEventListener('click',async function(event){
         event.preventDefault();
         let rowLength = table.rows.length
         let eleScriptName = document.getElementById('scriptName');
@@ -298,11 +308,9 @@ $(async function() {
                 if (Object.keys(scriptdata[scriptName]).length == rowLength){
                     let response = await psotLocalhostApi('/addScript',scriptdata)
                     if (response['returnObject'] == null){
-                        console.log("新增成功");
+                        ipcRenderer.send('scriptPageMes',scriptName+"新增成功!");
                         getScriptKeys();
                         $(this).prev().click()
-                        eleScriptName.value = "";
-                        $("#addScriptTable tr").remove();
                     }else{
                         ipcRenderer.send('addScriptMes',response['returnObject']);
                     }
@@ -330,52 +338,61 @@ $(async function() {
             select.appendChild(opt)
         }
     }
+
+    function delRowFunction(btnHtml){
+        let targetRow = parseInt(btnHtml.id.split('delBtn')[1])-1
+        table.deleteRow(targetRow)
+        table.rows.forEach(function(ele,ind){
+            let target = ele.getElementsByTagName('td')[0]
+            if (target.innerHTML != String(ind+1)){
+                document.getElementById("actionList"+String(target.innerHTML)).id = "actionList"+String(ind+1)
+                document.getElementById("actionText"+String(target.innerHTML)).id = "actionText"+String(ind+1)
+                document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind+1)
+                target.innerHTML = String(ind+1)
+            }
+        })
+    }
+
+    function actionListFunction(selectHtml){
+        let target = selectHtml.parentElement.parentElement.getElementsByTagName('td')[2].firstElementChild
+        target.disabled = false
+        target.value = "";
+        switch (selectHtml.value){
+            case 'click':
+                target.setAttribute('required',"")
+                target.placeholder = "請輸入座標位置：{x: ,y: }"
+                break
+            case 'wait':
+                target.setAttribute('required',"")
+                target.placeholder = "請輸入等待時間(秒)：5"
+                break
+            case 'setpoints-normal':
+                target.setAttribute('required',"")
+                target.placeholder = "請輸入點數：10000"
+                break
+            case 'setpoints-seamless':
+                target.setAttribute('required',"")
+                target.placeholder = "請輸入點數：10000"
+                break
+            case 'refresh':
+                target.placeholder = ""
+                target.disabled = true
+                target.removeAttribute('required')
+                break
+        }
+    }
+
     ipcRenderer.on('addScriptMes', (event, arg) => {
         addScriptMes.innerHTML = arg
     })
+
+    ipcRenderer.on('scriptPageMes', (event, arg) => {
+        scriptPageMes.innerHTML = arg
+    })
+
 })
 
-function actionListFunction(selectHtml){
-    let target = selectHtml.parentElement.parentElement.getElementsByTagName('td')[2].firstElementChild
-    target.disabled = false
-    target.value = "";
-    switch (selectHtml.value){
-        case 'click':
-            target.setAttribute('required',"")
-            target.placeholder = "請輸入座標位置：{x: ,y: }"
-            break
-        case 'wait':
-            target.setAttribute('required',"")
-            target.placeholder = "請輸入等待時間(秒)：5"
-            break
-        case 'setpoints-normal':
-            target.setAttribute('required',"")
-            target.placeholder = "請輸入點數：10000"
-            break
-        case 'setpoints-seamless':
-            target.setAttribute('required',"")
-            target.placeholder = "請輸入點數：10000"
-            break
-        case 'refresh':
-            target.placeholder = ""
-            target.disabled = true
-            target.removeAttribute('required')
-            break
-    }
-}
 
-function delRowFunction(btnHtml){
-    let targetRow = parseInt(btnHtml.id.split('delBtn')[1])-1
-    let table = document.getElementById("addScriptTable")
-    table.deleteRow(targetRow)
-    table.rows.forEach(function(ele,ind){
-        let target = ele.getElementsByTagName('td')[0]
-        if (target.innerHTML != String(ind+1)){
-            document.getElementById("actionList"+String(target.innerHTML)).id = "actionList"+String(ind+1)
-            document.getElementById("actionText"+String(target.innerHTML)).id = "actionText"+String(ind+1)
-            document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind+1)
-            target.innerHTML = String(ind+1)
-        }
-    })
-}
+
+
 

@@ -98,8 +98,7 @@ async function addCurrency(data){
         let currencyID = Object.keys(jsonObject)[0];
         if (! currencyList.includes(currencyID)){
             try {
-                client.hmset('CurrencyList','ChromePath','');
-                client.hmset('CurrencyList','Chrome','');
+                client.hmset('CurrencyList',jsonObject);
                 resv({'returnObject':null})
             }
             catch(error){
@@ -171,6 +170,7 @@ async function addGame(data){
         if (! gameList.includes(gameID)){
             try {
                 client.hmset('GameList',jsonObject);
+                client.hmset('GameList','test','test');
                 resv({'returnObject':null})
             }
             catch(error){
@@ -353,17 +353,19 @@ function getScriptKeys(){
     });
 }
 
-//還沒用
-function getScripts(key){
+function getScript(key){
     return new Promise((resv, rej) => {
+        let response = {'returnObject':{}}
+        let jsonObject= JSON.parse(key);
         let client = connectRedis(14);
-        client.hgetall(key, (error, result) => {
+        client.hgetall(jsonObject, (error, result) => {
             if (!error){
-                resv(result)  
+                response['returnObject'] = result
+                resv(response)  
             }else{
                 rej(error)
             }
-        })
+        });
         
     });
 }
@@ -390,43 +392,41 @@ async function addScript(script){
     });
 }
 
-
-//--
-function scriptSave(tableName,data,client){
-    try {
-        client.del(tableName)
-        client.hmset(tableName,data,function(error){
-            if (!error){
-                console.log("新增/修改成功")
-                getScriptList(client)
-                
-            }else{
-                console.log(error)
-            }
-        })
-    }
-    catch{
-        console.log('格式有誤')
-    }
-}
-
-
-function getScriptListData(key,client){
+function delScript(key){
     return new Promise((resv, rej) => {
-        client.hgetall(key, (error, result) => {
+        let client = connectRedis(14);
+        let jsonObject= JSON.parse(key);
+        client.del(jsonObject, (error, result) => {
             if (!error){
-                resv(result)  
+                resv({'returnObject':null})
             }else{
-                console.log(error)
+                rej(error)
             }
-        })
-    })
+        });
+    });
+    
 }
 
-function delscriptlistRow(key,client){
-    client.del(key.split("_")[1])
+function updateScript(script){
+    return new Promise((resv, rej) => {
+        let jsonObject= JSON.parse(script);
+        let tableName = Object.keys(jsonObject)[0];
+        let client = connectRedis(14);
+        client.del(tableName, (error, result) => {
+            if (!error){
+                try {
+                    client.hmset(tableName,jsonObject[tableName]);
+                    resv({'returnObject':null})
+                }
+                catch(error){
+                    rej(error)
+                }
+            }else{
+                rej(error)
+            }
+        });
+    });
 }
-
 
 module.exports.createPathList = createPathList;
 module.exports.getCurrencyList = getCurrencyList;
@@ -436,7 +436,7 @@ module.exports.getChromePath = getChromePath;
 module.exports.getApiUrl = getApiUrl;
 module.exports.getSeamlessApiUrl = getSeamlessApiUrl;
 module.exports.getScriptKeys = getScriptKeys;
-module.exports.getScripts = getScripts;
+module.exports.getScript = getScript;
 module.exports.addScript = addScript;
 module.exports.delGame = delGame;
 module.exports.addGame = addGame;
@@ -449,8 +449,6 @@ module.exports.addLanguage = addLanguage;
 module.exports.updateLanguage = updateLanguage;
 module.exports.getPathList = getPathList;
 module.exports.updatePath = updatePath;
+module.exports.delScript = delScript;
+module.exports.updateScript = updateScript;
 
-
-module.exports.connectRedis = connectRedis;
-module.exports.scriptSave = scriptSave;
-module.exports.delscriptlistRow = delscriptlistRow;

@@ -59,7 +59,7 @@ $(async function() {
             delBtn.className = "btn btn-default"
             delBtn.type = "button"
             delBtn.id = "delBtn"+String(rows)
-            delBtn.onclick = async function(){delRowFunction(key,delBtn)} 
+            delBtn.onclick = async function(){delFunction(key,delBtn)} 
             delBtn.appendChild(delBtnIcon)
             del.appendChild(delBtn)
         }
@@ -123,7 +123,7 @@ $(async function() {
 
     }
 
-    async function delRowFunction(key,delBtn){
+    async function delFunction(key,delBtn){
         let response = await psotLocalhostApi('/delCurrency',key)
         if (response['returnObject'] == null){
             let targetRow = parseInt(delBtn.id.split('delBtn')[1])
