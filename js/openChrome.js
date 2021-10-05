@@ -97,7 +97,7 @@ async function openChrome(url,chromePath,gameId,data) {
     let seamlessApiUrl = data['seamlessApiUrl'];
     let apiUrl = data['apiUrl'];
     for (let action in script){
-      console.log("ready:"+action+" => "+script[action])
+      //console.log("ready:"+action+" => "+script[action])
       switch (action.split("_")[1]){
         case "wait":
           await wait(parseInt(script[action])*1000);
@@ -121,7 +121,7 @@ async function openChrome(url,chromePath,gameId,data) {
           break
       }
     }
-    console.log("done")
+    //console.log("done")
   }
     
     //await wait(15000);
