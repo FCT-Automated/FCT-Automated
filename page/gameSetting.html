@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="text/javascript" src="head.js"></script>
+    <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
+    <script src="../bower_components/bootstrap-table/dist/bootstrap-table.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+    <script src="../js/gameSetting.js"></script>
+    <title>FCT-GameSetting</title>
+</head>
+
+<body>
+  <div class="container">
+    <script type="text/javascript" src="nav.js"></script>
+    <div class="row" style="position: relative; top: 65px;">
+        <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#Modal" id="addGameModal">
+            <span class="fas fa-plus"></span>新增遊戲
+        </button>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+        
+        <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" >
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">新增遊戲</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                          <label for="GameID">遊戲編號：</label>
+                          <input type="text" class="form-control" id="GameID" required>
+                        </div>
+                        <div class="form-group">
+                          <label for="GameName">遊戲名稱：</label>
+                          <input type="text" class="form-control" id="GameName" required>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="submit" class="btn btn-primary" id='addGame'>確定新增</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                  <div><span id="addGameMes"></span></div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <table class="table table-hover" id="gameTable">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">遊戲編號</th>
+                <th scope="col">遊戲名稱</th>
+                <th scope="col">編輯</th>
+                <th scope="col">刪除</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div><span id="gameSettingMes"></span></div>
+
+        <div class="modal fade" id="updateGameModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" >
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">編輯遊戲</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label for="updateGameID">遊戲編號：</label>
+                        <span id="updateGameID"></span>
+                        <div class="form-group">
+                          <label for="updateGameName">遊戲名稱：</label>
+                          <input type="text" class="form-control" id="updateGameName" required>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="submit" class="btn btn-primary" id='updateGame'>確定修改</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div><span id="updateGameMes"></span></div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+    </div>
+  </div>
+</body>
+
+</html>

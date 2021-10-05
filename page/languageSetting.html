@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="text/javascript" src="head.js"></script>
+    <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
+    <script src="../bower_components/bootstrap-table/dist/bootstrap-table.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+    <script src="../js/languageSetting.js"></script>
+    <title>FCT-LanguageSetting</title>
+</head>
+
+<body>
+  <div class="container">
+    <script type="text/javascript" src="nav.js"></script>
+    <div class="row" style="position: relative; top: 65px;">
+        <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#Modal" id="addLanguageModal">
+            <span class="fas fa-plus"></span>新增語系
+        </button>
+
+        <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" >
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">新增語系</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                          <label for="LanguageID">語系代號：</label>
+                          <input type="text" class="form-control" id="LanguageID" required>
+                        </div>
+                        <div class="form-group">
+                          <label for="LanguageName">語系名稱：</label>
+                          <input type="text" class="form-control" id="LanguageName" required>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="submit" class="btn btn-primary" id='addLanguage'>確定新增</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                  <div><span id="addLanguageMes"></span></div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <table class="table table-hover" id="languageTable">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">語系代號</th>
+                <th scope="col">語系名稱</th>
+                <th scope="col">編輯</th>
+                <th scope="col">刪除</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div><span id="languageSettingMes"></span></div>
+
+        <div class="modal fade" id="updateLanguageModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" >
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">編輯語系</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label for="updateLanguageID">語系代號：</label>
+                        <span id="updateLanguageID"></span>
+                        <div class="form-group">
+                          <label for="updateLanguageName">語系名稱：</label>
+                          <input type="text" class="form-control" id="updateLanguageName" required>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="submit" class="btn btn-primary" id='updateLanguage'>確定修改</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div><span id="updateLanguageMes"></span></div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+    </div>
+  </div>
+</body>
+
+</html>
