@@ -33,7 +33,7 @@ var server = http.createServer(async function(req, res) {
         });
     }
 
-    //db15:GameID    
+    //db15:Game
     else if(req.url=='/getGameList'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         res.write(JSON.stringify(await redis.getGameList()));
@@ -54,6 +54,12 @@ var server = http.createServer(async function(req, res) {
         res.writeHead(200,{'Content-Type': 'application/json'});
         req.on('data', async function(data){
             res.write(JSON.stringify(await redis.delGame(decoder.write(data))));
+            res.end();
+        });
+    }else if(req.url=='/batchImportGameList'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.batchImportGameList(decoder.write(data))));
             res.end();
         });
     }

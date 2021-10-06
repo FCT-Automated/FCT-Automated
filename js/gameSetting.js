@@ -1,13 +1,17 @@
 $(async function() {
     const electron = require('electron');
-    let {ipcRenderer} = require('electron');
+    const {ipcRenderer} = require('electron');
+    const { saveAs } = require('file-saver');
+
     const net = electron.remote.net;
     const addGameMes = document.getElementById("addGameMes");
     const gameSettingMes = document.getElementById("gameSettingMes");
     const updateGameMes = document.getElementById("updateGameMes");
     const addGameModal = document.getElementById("addGameModal");
-    
-    
+    const exportBtn = document.getElementById("export");
+    const importBtn = document.getElementById("import");
+    const files = document.getElementById("files");
+
     var addGame = document.getElementById('addGame');
     var updateGame = document.getElementById('updateGame');
 
@@ -91,7 +95,7 @@ $(async function() {
                 console.log(`ERROR: ${JSON.stringify(error)}`)
             });
             request.end();
-        })
+        });
 
     }
 
@@ -120,7 +124,7 @@ $(async function() {
             });
             request.write(body, 'utf-8');
             request.end();
-        })
+        });
 
     }
 
@@ -137,7 +141,7 @@ $(async function() {
                     target.innerHTML = String(ind)
                 }                
                 
-            })
+            });
             ipcRenderer.send('gameSettingMes', key+"刪除成功!");
         }
     }
@@ -159,7 +163,7 @@ $(async function() {
         }else{
             ipcRenderer.send('addGameMes', "遊戲編號或遊戲名稱不可空白!");
         }
-    })
+    });
 
     updateGame.addEventListener('click',async function(event){
         event.preventDefault();
@@ -178,14 +182,44 @@ $(async function() {
         }else{
             ipcRenderer.send('updateGameMes', "遊戲名稱不可空白!");
         }
+    });
+
+    exportBtn.addEventListener('click', async function(){
+        returnObject = await getLocalhostApi('/getGameList');
+        obj = returnObject['returnObject'];
+        let blob = new Blob([JSON.stringify(obj)], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "gameList.json");
+    });
+
+    importBtn.addEventListener('click',function(){
+        $("#files").click();
+        files.addEventListener('change',function(){
+            let selectedFile = files.files[0];
+            let reader = new FileReader();
+            reader.readAsText(selectedFile);
+            reader.onload = async function(){
+                console.log();
+                let gameList = JSON.parse(this.result);
+                response = await psotLocalhostApi('/batchImportGameList',gameList);
+                if (response['returnObject'] == null){
+                    $(this).prev().click();
+                    location.reload();
+                }else{
+                    ipcRenderer.send('updateGameMes',response);
+                }
+            };
+        })
     })
+
+    
+
 
     addGameModal.addEventListener('click',function(){
         document.getElementById('GameID').value = "";
         document.getElementById('GameName').value = "";
         ipcRenderer.send('addGameMes', "");
 
-    })
+    });
 
     ipcRenderer.on('addGameMes', (event, arg) => {
         addGameMes.innerHTML = arg

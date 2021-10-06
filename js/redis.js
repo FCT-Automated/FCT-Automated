@@ -125,6 +125,29 @@ function updateCurrency(data){
     });
 }
 
+async function batchImportGameList(data){
+    var gameList = await getGameList();  
+    if (gameList['returnObject'] != null){
+        gameList = Object.keys(gameList['returnObject']);  
+    }else{
+        gameList = [];
+    }
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        gameList.forEach(function(gameId){
+            delete jsonObject[gameId]
+        })
+        try {
+            client.hmset('GameList',jsonObject);
+            resv({'returnObject':null})
+        }
+        catch(error){
+            rej(error)
+        }
+      
+    });
+}
 
 async function getGameList(){
     var response = await checkThatTheKeyExists('GameList');
@@ -162,7 +185,8 @@ function delGame(key){
 }
 
 async function addGame(data){
-    var gameList = Object.keys(await getGameList()); 
+    var gameList = await getGameList();
+    gameList = Object.keys(gameList['returnObject']);
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
         let jsonObject= JSON.parse(data);
@@ -170,7 +194,6 @@ async function addGame(data){
         if (! gameList.includes(gameID)){
             try {
                 client.hmset('GameList',jsonObject);
-                client.hmset('GameList','test','test');
                 resv({'returnObject':null})
             }
             catch(error){
@@ -444,6 +467,7 @@ module.exports.addGame = addGame;
 module.exports.delGame = delGame;
 module.exports.updateGame = updateGame;
 module.exports.getGameList = getGameList;
+module.exports.batchImportGameList = batchImportGameList;
 
 module.exports.addLanguage = addLanguage;
 module.exports.delLanguage = delLanguage;

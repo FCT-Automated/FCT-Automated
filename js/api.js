@@ -13,7 +13,9 @@ function connectMongoDB(code){
         const DATABASEPORT = "27017";
         const DATABASENAME = "gamesystem";
 
-        mongodbClient.connect('mongodb://'+DATABASEUSERNAME+':'+DATABASEPASSWORD+'@'+DATABASEHOST+':'+DATABASEPORT+'/'+DATABASENAME,function(err,db){
+        mongodbClient.connect('mongodb://'+DATABASEUSERNAME+':'+DATABASEPASSWORD+'@'+DATABASEHOST+':'+DATABASEPORT+'/'+DATABASENAME,
+        { useNewUrlParser: true , useUnifiedTopology: true},
+        function(err,db){
             if(!err) {
                 console.log("successfully connected to the MongoDataBase");
                 var dbo = db.db("gamesystem");
@@ -48,7 +50,10 @@ function setApiKey(params,agentKey){
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             url: 'https://'+apiUrl+'/Key',
             method: 'POST',
-            body: formData 
+            body: formData ,
+            agentOptions: {
+                rejectUnauthorized: false
+            }
         }
         resolve(postOptions)
     })
@@ -67,15 +72,17 @@ function setApiTools(getKey,apis,agentCode,currency){
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             url: 'https://'+apiUrl+'/'+apis,
             method: 'POST',
-            body: formData 
+            body: formData ,
+            agentOptions: {
+                rejectUnauthorized: false
+            }
         }
         resolve(postOptions)
     })
 }
 
 function apiSeamlessRequest(apis,params){
-    return new Promise(function(resolve,reject){
-        let form = {
+    return new Promise(function(resolve,reject){        let form = {
             Params:params,
         }
         let formData = querystring.stringify(form)
@@ -83,7 +90,10 @@ function apiSeamlessRequest(apis,params){
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             url: 'https://'+apiUrl+'/'+apis,
             method: 'POST',
-            body: formData 
+            body: formData ,
+            agentOptions: {
+                rejectUnauthorized: false
+            }
         }
         resolve(doRequest(postOptions))
     })
@@ -95,7 +105,7 @@ function doRequest(postOptions) {
             if (!error && response.statusCode == 200) {
                 resolve(JSON.parse(body))
             }else{
-                reject(response.statusCode)
+                reject(error)
             }
         })
     })

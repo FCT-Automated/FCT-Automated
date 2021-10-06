@@ -22,7 +22,7 @@ async function openChrome(url,chromePath,gameId,data) {
 
   //chrome設定
   const browser = await puppeteer.launch({
-    // executablePath: chromePath+'\\chrome.exe',
+    executablePath: chromePath+'\\chrome.exe', // windows
     headless: false, // 是否在背景運行瀏覽器
     args: [`--window-size=${windowsize.width},${windowsize.height}`,'--no-default-browser-check','--no-sandbox'],
     ignoreDefaultArgs: ['--enable-automation'],

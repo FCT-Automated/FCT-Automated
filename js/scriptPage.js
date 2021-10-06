@@ -291,7 +291,7 @@ $(async function() {
                 data['user'] = args
                 data['apiUrl'] = apiUrl
                 data['seamlessApiUrl'] = seamlessApiUrl
-                await open.openChrome(response.Url+"&version=b42b1c5",chromePath,args['GameID'],data);
+                await open.openChrome(response.Url,chromePath,args['GameID'],data);
             } 
         }else{
             ipcRenderer.send('scriptPageMes',"有欄位未填寫!");
