@@ -12,11 +12,34 @@
 <body>
   <div class="container">
     <script type="text/javascript" src="nav.js"></script>
-    <div class="row" style="position: relative; top: 65px;">
+    <ul class="nav" style="position: relative; top: 65px; float: left;">
+      <li class="nav-item">
         <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#Modal" id="addCurrencyModal">
-            <span class="fas fa-plus"></span>新增幣別
+          <span class="fas fa-plus"></span>新增幣別
         </button>
+      </li>
+      <li class="nav-item" style="margin-top: 10px;">
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </li>
+    </ul>
+    <ul class="nav justify-content-end" style="position: relative; top: 65px;">
+      <li class="nav-item">
+        <input type="file" id="files" style="display:none"/>
+        <button type="button" class="btn btn-primary" style="margin: 10px" id="import">
+          Import
+        </button>
+      </li>
+      <li class="nav-item">
+        <button type="button" class="btn btn-primary" style="margin: 10px" id="export">
+          Export
+        </button>
+      </li>
+    </ul>
 
+    <div class="row" style="position: relative; top: 65px;">
         <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" >
               <div class="modal-content">

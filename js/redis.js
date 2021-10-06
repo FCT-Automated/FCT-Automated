@@ -55,6 +55,28 @@ function checkThatTheKeyExists(key){
     });
 }
 
+async function batchImportCurrencyList(data){
+    var currencyList = await getCurrencyList();  
+    if (currencyList['returnObject'] != null){
+        currencyList = Object.keys(currencyList['returnObject']);  
+    }else{
+        currencyList = [];
+    }
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        currencyList.forEach(function(currencyID){
+            delete jsonObject[currencyID]
+        })
+        if (JSON.stringify(jsonObject)==="{}"){
+            resv({'returnObject':'目前資料與匯入資料相同!'})
+        }else{
+            client.hmset('CurrencyList',jsonObject);
+            resv({'returnObject':null})
+        }
+    });
+}
+
 async function getCurrencyList(){
     var response = await checkThatTheKeyExists('CurrencyList');
     return new Promise((resv, rej) => {
@@ -91,7 +113,12 @@ function delCurrency(key){
 }
 
 async function addCurrency(data){
-    var currencyList = Object.keys(await getCurrencyList()); 
+    var currencyList = await getCurrencyList();  
+    if (currencyList['returnObject'] != null){
+        currencyList = Object.keys(currencyList['returnObject']);  
+    }else{
+        currencyList = [];
+    }
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
         let jsonObject= JSON.parse(data);
@@ -138,12 +165,11 @@ async function batchImportGameList(data){
         gameList.forEach(function(gameId){
             delete jsonObject[gameId]
         })
-        try {
+        if (JSON.stringify(jsonObject)==="{}"){
+            resv({'returnObject':'目前資料與匯入資料相同!'})
+        }else{
             client.hmset('GameList',jsonObject);
             resv({'returnObject':null})
-        }
-        catch(error){
-            rej(error)
         }
       
     });
@@ -186,7 +212,11 @@ function delGame(key){
 
 async function addGame(data){
     var gameList = await getGameList();
-    gameList = Object.keys(gameList['returnObject']);
+    if (gameList['returnObject'] != null){
+        gameList = Object.keys(gameList['returnObject']);  
+    }else{
+        gameList = [];
+    }
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
         let jsonObject= JSON.parse(data);
@@ -217,6 +247,29 @@ function updateGame(data){
             rej(error)
         }
   
+    });
+}
+
+async function batchImportLanguageList(data){
+    var languageList = await getLanguageList();
+    if (languageList['returnObject'] != null){
+        languageList = Object.keys(languageList['returnObject']);    
+    }else{
+        languageList = [];
+    }
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        let jsonObject= JSON.parse(data);
+        languageList.forEach(function(language){
+            delete jsonObject[language]
+        })
+        if (JSON.stringify(jsonObject)==="{}"){
+            resv({'returnObject':'目前資料與匯入資料相同!'})
+        }else{
+            client.hmset('LanguageList',jsonObject);
+            resv({'returnObject':null})
+        }
+      
     });
 }
 
@@ -255,7 +308,12 @@ function delLanguage(key){
 }
 
 async function addLanguage(data){
-    var languageList = Object.keys(await getLanguageList()); 
+    var languageList = await getLanguageList();
+    if (languageList['returnObject'] != null){
+        languageList = Object.keys(languageList['returnObject']);    
+    }else{
+        languageList = [];
+    }
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
         let jsonObject= JSON.parse(data);
@@ -462,6 +520,7 @@ module.exports.addCurrency = addCurrency;
 module.exports.delCurrency = delCurrency;
 module.exports.updateCurrency = updateCurrency;
 module.exports.getCurrencyList = getCurrencyList;
+module.exports.batchImportCurrencyList = batchImportCurrencyList;
 
 module.exports.addGame = addGame;
 module.exports.delGame = delGame;
@@ -473,6 +532,7 @@ module.exports.addLanguage = addLanguage;
 module.exports.delLanguage = delLanguage;
 module.exports.updateLanguage = updateLanguage;
 module.exports.getLanguageList = getLanguageList;
+module.exports.batchImportLanguageList = batchImportLanguageList;
 
 module.exports.addScript = addScript;
 module.exports.delScript = delScript;

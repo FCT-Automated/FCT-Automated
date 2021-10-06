@@ -1,12 +1,16 @@
 $(async function() {
     const electron = require('electron');
     let {ipcRenderer} = require('electron');
+    const { saveAs } = require('file-saver');
+
     const net = electron.remote.net;
     const addCurrencyMes = document.getElementById("addCurrencyMes");
     const currencySettingMes = document.getElementById("currencySettingMes");
     const updateCurrencyMes = document.getElementById("updateCurrencyMes");
     const addCurrencyModal = document.getElementById("addCurrencyModal");
-    
+    const exportBtn = document.getElementById("export");
+    const importBtn = document.getElementById("import");
+    const files = document.getElementById("files");
     
     var addCurrency = document.getElementById('addCurrency');
     var updateCurrency = document.getElementById('updateCurrency');
@@ -184,6 +188,31 @@ $(async function() {
         document.getElementById('CurrencyName').value = "";
         ipcRenderer.send('addCurrencyMes', "");
 
+    })
+
+    exportBtn.addEventListener('click', async function(){
+        returnObject = await getLocalhostApi('/getCurrencyList');
+        obj = returnObject['returnObject'];
+        let blob = new Blob([JSON.stringify(obj)], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "currencyList.json");
+    });
+
+    importBtn.addEventListener('click',function(){
+        $("#files").click();
+        files.addEventListener('change',function(){
+            let selectedFile = files.files[0];
+            let reader = new FileReader();
+            reader.readAsText(selectedFile);
+            reader.onload = async function(){
+                let currencyList = JSON.parse(this.result);
+                let response = await psotLocalhostApi('/batchImportCurrencyList',currencyList);
+                if (response['returnObject'] != null){
+                    ipcRenderer.send('currencySettingMes',response['returnObject']);
+                }
+                $(this).prev().click();
+                location.reload();
+            };
+        })
     })
 
     ipcRenderer.on('addCurrencyMes', (event, arg) => {

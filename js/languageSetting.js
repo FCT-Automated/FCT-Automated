@@ -1,12 +1,16 @@
 $(async function() {
     const electron = require('electron');
     let {ipcRenderer} = require('electron');
+    const { saveAs } = require('file-saver');
+
     const net = electron.remote.net;
     const addLanguageMes = document.getElementById("addLanguageMes");
     const languageSettingMes = document.getElementById("languageSettingMes");
     const updateLanguageMes = document.getElementById("updateLanguageMes");
     const addLanguageModal = document.getElementById("addLanguageModal");
-    
+    const exportBtn = document.getElementById("export");
+    const importBtn = document.getElementById("import");
+    const files = document.getElementById("files");
     
     var addLanguage = document.getElementById('addLanguage');
     var updateLanguage = document.getElementById('updateLanguage');
@@ -184,6 +188,32 @@ $(async function() {
         document.getElementById('LanguageName').value = "";
         ipcRenderer.send('addLanguageMes', "");
 
+    })
+
+    exportBtn.addEventListener('click', async function(){
+        returnObject = await getLocalhostApi('/getLanguageList');
+        obj = returnObject['returnObject'];
+        let blob = new Blob([JSON.stringify(obj)], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "language.json");
+    });
+
+    importBtn.addEventListener('click',function(){
+        $("#files").click();
+    })
+
+    files.addEventListener('change',function(){
+        let selectedFile = files.files[0];
+        let reader = new FileReader();
+        reader.readAsText(selectedFile);
+        reader.onload = async function(){
+            let language = JSON.parse(this.result);
+            let response = await psotLocalhostApi('/batchImportLanguageList',language);
+            if (response['returnObject'] != null){
+                ipcRenderer.send('languageSettingMes',response['returnObject']);
+            }
+            $(this).prev().click();
+            location.reload();
+        };
     })
 
     ipcRenderer.on('addLanguageMes', (event, arg) => {

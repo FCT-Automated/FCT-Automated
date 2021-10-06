@@ -31,6 +31,12 @@ var server = http.createServer(async function(req, res) {
             res.write(JSON.stringify(await redis.delCurrency(decoder.write(data))));
             res.end();
         });
+    }else if(req.url=='/batchImportCurrencyList'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.batchImportCurrencyList(decoder.write(data))));
+            res.end();
+        });
     }
 
     //db15:Game
@@ -85,6 +91,12 @@ var server = http.createServer(async function(req, res) {
         res.writeHead(200,{'Content-Type': 'application/json'});
         req.on('data', async function(data){
             res.write(JSON.stringify(await redis.delLanguage(decoder.write(data))));
+            res.end();
+        });
+    }else if(req.url=='/batchImportLanguageList'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.batchImportLanguageList(decoder.write(data))));
             res.end();
         });
     }

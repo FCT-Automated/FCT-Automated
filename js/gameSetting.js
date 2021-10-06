@@ -184,6 +184,13 @@ $(async function() {
         }
     });
 
+    addGameModal.addEventListener('click',function(){
+        document.getElementById('GameID').value = "";
+        document.getElementById('GameName').value = "";
+        ipcRenderer.send('addGameMes', "");
+
+    });
+
     exportBtn.addEventListener('click', async function(){
         returnObject = await getLocalhostApi('/getGameList');
         obj = returnObject['returnObject'];
@@ -198,28 +205,16 @@ $(async function() {
             let reader = new FileReader();
             reader.readAsText(selectedFile);
             reader.onload = async function(){
-                console.log();
                 let gameList = JSON.parse(this.result);
-                response = await psotLocalhostApi('/batchImportGameList',gameList);
-                if (response['returnObject'] == null){
-                    $(this).prev().click();
-                    location.reload();
-                }else{
-                    ipcRenderer.send('updateGameMes',response);
+                let response = await psotLocalhostApi('/batchImportGameList',gameList);
+                if (response['returnObject'] != null){
+                    ipcRenderer.send('gameSettingMes',response['returnObject']);
                 }
+                $(this).prev().click();
+                location.reload();
             };
         })
     })
-
-    
-
-
-    addGameModal.addEventListener('click',function(){
-        document.getElementById('GameID').value = "";
-        document.getElementById('GameName').value = "";
-        ipcRenderer.send('addGameMes', "");
-
-    });
 
     ipcRenderer.on('addGameMes', (event, arg) => {
         addGameMes.innerHTML = arg
