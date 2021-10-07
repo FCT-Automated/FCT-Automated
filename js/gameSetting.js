@@ -11,66 +11,75 @@ $(async function() {
     const exportBtn = document.getElementById("export");
     const importBtn = document.getElementById("import");
     const files = document.getElementById("files");
+    
 
-    var addGame = document.getElementById('addGame');
-    var updateGame = document.getElementById('updateGame');
+    const addGame = document.getElementById('addGame');
+    const updateGame = document.getElementById('updateGame');
 
-    var returnObject = await getLocalhostApi('/getGameList');
-    var obj = returnObject['returnObject'];
-    var table = document.getElementById("gameTable");
-    if (obj != null){
-        Object.keys(obj).sort();
-        for (let key in obj){
-            let rows = table.rows.length
-            let row = table.insertRow(-1)
-            let id = row.insertCell(0)
-            let gameID = row.insertCell(1)
-            let gameName = row.insertCell(2)
-            let update = row.insertCell(3)
-            let del = row.insertCell(4)
-            id.innerHTML = String(rows)
-            
-            let gameIDSpan = document.createElement('span')
-            gameIDSpan.id = key
-            gameIDSpan.innerHTML = key
-            gameID.appendChild(gameIDSpan)
-    
-            let gameNameSpan = document.createElement('span')
-            gameNameSpan.id = obj[key]
-            gameNameSpan.innerHTML = obj[key]
-            gameName.appendChild(gameNameSpan)
-    
-            //update
-            let updateBtn = document.createElement('Button')
-            let updateBtnIcon = document.createElement('i')
-            updateBtnIcon.className = "fas fa-edit"
-            updateBtn.className = "btn btn-default"
-            updateBtn.type = "button"
-            updateBtn.id = "update"+String(rows)
-            updateBtn.dataset.target="#updateGameModal"
-            updateBtn.dataset.toggle="modal"
-            updateBtn.onclick = function(){
-                document.getElementById('updateGameName').value = '';
-                document.getElementById("updateGameID").innerHTML = key;
-                ipcRenderer.send('updateGameMes', "");
-            } 
-            updateBtn.appendChild(updateBtnIcon)
-            update.appendChild(updateBtn)
-    
-            //del
-            let delBtn = document.createElement('Button')
-            let delBtnIcon = document.createElement('i')
-            delBtnIcon.className = "fas fa-trash-alt"
-            delBtn.className = "btn btn-default"
-            delBtn.type = "button"
-            delBtn.id = "delBtn"+String(rows)
-            delBtn.onclick = async function(){delFunction(key,delBtn)} 
-            delBtn.appendChild(delBtnIcon)
-            del.appendChild(delBtn)
+    var returnObject;
+    var obj;
+    var table = document.getElementById("gameTable").getElementsByTagName('tbody')[0];
+    var search = document.getElementById("search");
+
+    refresh();
+
+    async function refresh(){
+        $("#gameTable tbody").html("");
+        returnObject = await getLocalhostApi('/getGameList');
+        obj = returnObject['returnObject'];
+        if (obj != null){
+            Object.keys(obj).sort();
+            for (let key in obj){
+                let rows = table.rows.length+1
+                let row = table.insertRow(-1)
+                let id = row.insertCell(0)
+                let gameID = row.insertCell(1)
+                let gameName = row.insertCell(2)
+                let update = row.insertCell(3)
+                let del = row.insertCell(4)
+                id.innerHTML = String(rows)
+                
+                let gameIDSpan = document.createElement('span')
+                gameIDSpan.id = key
+                gameIDSpan.innerHTML = key
+                gameID.appendChild(gameIDSpan)
+        
+                let gameNameSpan = document.createElement('span')
+                gameNameSpan.id = obj[key]
+                gameNameSpan.innerHTML = obj[key]
+                gameName.appendChild(gameNameSpan)
+        
+                //update
+                let updateBtn = document.createElement('Button')
+                let updateBtnIcon = document.createElement('i')
+                updateBtnIcon.className = "fas fa-edit"
+                updateBtn.className = "btn btn-default"
+                updateBtn.type = "button"
+                updateBtn.id = "update"+String(rows)
+                updateBtn.dataset.target="#updateGameModal"
+                updateBtn.dataset.toggle="modal"
+                updateBtn.onclick = function(){
+                    document.getElementById('updateGameName').value = '';
+                    document.getElementById("updateGameID").innerHTML = key;
+                    ipcRenderer.send('updateGameMes', "");
+                } 
+                updateBtn.appendChild(updateBtnIcon)
+                update.appendChild(updateBtn)
+        
+                //del
+                let delBtn = document.createElement('Button')
+                let delBtnIcon = document.createElement('i')
+                delBtnIcon.className = "fas fa-trash-alt"
+                delBtn.className = "btn btn-default"
+                delBtn.type = "button"
+                delBtn.id = "delBtn"+String(rows)
+                delBtn.onclick = async function(){delFunction(key,delBtn)} 
+                delBtn.appendChild(delBtnIcon)
+                del.appendChild(delBtn)
+            }
         }
+        
     }
-    
-    
 
     function getLocalhostApi(path){
         return new Promise((resv, rej) => {
@@ -132,17 +141,17 @@ $(async function() {
         let response = await psotLocalhostApi('/delGame',key)
         if (response['returnObject'] == null){
             let targetRow = parseInt(delBtn.id.split('delBtn')[1])
-            table.deleteRow(targetRow)
+            table.deleteRow(targetRow-1)
             table.rows.forEach(function(ele,ind){
-                if(ele.rowIndex!=0){
-                    let target = ele.getElementsByTagName('td')[0]
-                    document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
-                    document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
-                    target.innerHTML = String(ind)
-                }                
+                ind = ind + 1;
+                let target = ele.getElementsByTagName('td')[0]
+                document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
+                document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
+                target.innerHTML = String(ind)
                 
             });
             ipcRenderer.send('gameSettingMes', key+"刪除成功!");
+            $("div.alert").show();
         }
     }
 
@@ -156,7 +165,7 @@ $(async function() {
             let response = await psotLocalhostApi('/addGame',data);
             if (response['returnObject'] == null){
                 $(this).prev().click();
-                location.reload();
+                refresh();
             }else{
                 ipcRenderer.send('addGameMes',response['returnObject']);
             }
@@ -175,7 +184,9 @@ $(async function() {
             let response = await psotLocalhostApi('/updateGame',data);
             if (response['returnObject'] == null){
                 $(this).prev().click();
-                location.reload();
+                refresh();
+                ipcRenderer.send('gameSettingMes',gameID.textContent+"編輯成功!");
+                $("div.alert").show();
             }else{
                 ipcRenderer.send('updateGameMes',response['returnObject']);
             }
@@ -199,9 +210,9 @@ $(async function() {
     });
 
     importBtn.addEventListener('click',function(){
-        $("#files").click();
-        files.addEventListener('change',function(){
-            let selectedFile = files.files[0];
+        files.click();
+        files.addEventListener('change',async function(){
+            let selectedFile = await files.files[0];
             let reader = new FileReader();
             reader.readAsText(selectedFile);
             reader.onload = async function(){
@@ -209,11 +220,31 @@ $(async function() {
                 let response = await psotLocalhostApi('/batchImportGameList',gameList);
                 if (response['returnObject'] != null){
                     ipcRenderer.send('gameSettingMes',response['returnObject']);
+                }else{
+                    ipcRenderer.send('gameSettingMes',"成功匯入!");
+                    refresh();
                 }
-                $(this).prev().click();
-                location.reload();
+                $("div.alert").show();
             };
+            $("form").get(1).reset()
         })
+    })
+
+    search.addEventListener('keyup',function(){
+        let searchID = document.getElementById("search").value;
+        if (searchID != ""){
+            table.rows.forEach(function(ele,ind){
+                let gameID = ele.getElementsByTagName('span')[0].id
+                if (gameID.includes(searchID)){
+                    ele.style.display = "";
+                }else{
+                    ele.style.display = "none";
+                }
+            });
+        }else{
+            $("#gameTable tbody tr").show();
+        }
+        
     })
 
     ipcRenderer.on('addGameMes', (event, arg) => {

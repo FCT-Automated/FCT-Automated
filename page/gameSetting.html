@@ -18,16 +18,20 @@
           <span class="fas fa-plus"></span>新增遊戲
         </button>
       </li>
-      <li class="nav-item" style="margin-top: 10px;">
+      <li class="nav-item" style="margin-top: 10px; margin-right: 20px;">
         <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
+          <input class="form-control me-2" placeholder="請輸入遊戲編號" aria-label="Search" id="search">
         </form>
+      </li>
+      <li class="nav-item" style="margin-top: 10px;">
+        <div class="alert alert-success" role="alert" style="padding-top: 5px; padding-bottom: 5px; margin-bottom: 0px; display: none;">
+          <span id="gameSettingMes"></span>
+        </div>
       </li>
     </ul>
     <ul class="nav justify-content-end" style="position: relative; top: 65px;">
       <li class="nav-item">
-        <input type="file" id="files" style="display:none"/>
+        <form><input type="file" id="files" style="display:none"/></form>
         <button type="button" class="btn btn-primary" style="margin: 10px" id="import">
           Import
         </button>
@@ -38,6 +42,7 @@
         </button>
       </li>
     </ul>
+    
 
     <div class="row" style="position: relative; top: 65px;">
         <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -66,7 +71,7 @@
               </div>
             </div>
         </div>
-
+        
         <table class="table table-hover" id="gameTable">
             <thead>
               <tr>
@@ -80,7 +85,7 @@
             <tbody>
             </tbody>
         </table>
-        <div><span id="gameSettingMes"></span></div>
+        
 
         <div class="modal fade" id="updateGameModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" >
