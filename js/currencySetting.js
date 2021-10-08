@@ -9,67 +9,73 @@ $(async function() {
     const updateCurrencyMes = document.getElementById("updateCurrencyMes");
     const addCurrencyModal = document.getElementById("addCurrencyModal");
     const exportBtn = document.getElementById("export");
-    const importBtn = document.getElementById("import");
-    const files = document.getElementById("files");
-    
-    var addCurrency = document.getElementById('addCurrency');
-    var updateCurrency = document.getElementById('updateCurrency');
+    const filesInput = document.getElementById("files");
+    const addCurrency = document.getElementById('addCurrency');
+    const updateCurrency = document.getElementById('updateCurrency');
+    const search = document.getElementById("search");
 
-    var returnObject = await getLocalhostApi('/getCurrencyList');
-    var obj = returnObject['returnObject'];
-    if (obj != null){
-        var table = document.getElementById("currencyTable");
-        for (let key in obj){
-            let rows = table.rows.length
-            let row = table.insertRow(-1)
-            let id = row.insertCell(0)
-            let currencyID = row.insertCell(1)
-            let currencyName = row.insertCell(2)
-            let update = row.insertCell(3)
-            let del = row.insertCell(4)
-            id.innerHTML = String(rows)
-            
-            let currencyIDSpan = document.createElement('span')
-            currencyIDSpan.id = key
-            currencyIDSpan.innerHTML = key
-            currencyID.appendChild(currencyIDSpan)
+    var returnObject ;
+    var obj;
+    var table = document.getElementById("currencyTable").getElementsByTagName('tbody')[0];
 
-            let currencyNameSpan = document.createElement('span')
-            currencyNameSpan.id = obj[key]
-            currencyNameSpan.innerHTML = obj[key]
-            currencyName.appendChild(currencyNameSpan)
+    refresh();
 
-            //update
-            let updateBtn = document.createElement('Button')
-            let updateBtnIcon = document.createElement('i')
-            updateBtnIcon.className = "fas fa-edit"
-            updateBtn.className = "btn btn-default"
-            updateBtn.type = "button"
-            updateBtn.id = "update"+String(rows)
-            updateBtn.dataset.target="#updateCurrencyModal"
-            updateBtn.dataset.toggle="modal"
-            updateBtn.onclick = function(){
-                document.getElementById('updateCurrencyName').value = '';
-                document.getElementById("updateCurrencyID").innerHTML = key;
-                ipcRenderer.send('updateCurrencyMes', "");
-            } 
-            updateBtn.appendChild(updateBtnIcon)
-            update.appendChild(updateBtn)
+    async function refresh(){
+        $("#currencyTable tbody").html("");
+        returnObject = await getLocalhostApi('/getCurrencyList');
+        obj = returnObject['returnObject'];
+        if (obj != null){
+            Object.keys(obj).sort();
+            for (let key in obj){
+                let rows = table.rows.length+1
+                let row = table.insertRow(-1)
+                let id = row.insertCell(0)
+                let currencyID = row.insertCell(1)
+                let currencyName = row.insertCell(2)
+                let update = row.insertCell(3)
+                let del = row.insertCell(4)
+                id.innerHTML = String(rows)
+                
+                let currencyIDSpan = document.createElement('span')
+                currencyIDSpan.id = key
+                currencyIDSpan.innerHTML = key
+                currencyID.appendChild(currencyIDSpan)
 
-            //del
-            let delBtn = document.createElement('Button')
-            let delBtnIcon = document.createElement('i')
-            delBtnIcon.className = "fas fa-trash-alt"
-            delBtn.className = "btn btn-default"
-            delBtn.type = "button"
-            delBtn.id = "delBtn"+String(rows)
-            delBtn.onclick = async function(){delFunction(key,delBtn)} 
-            delBtn.appendChild(delBtnIcon)
-            del.appendChild(delBtn)
+                let currencyNameSpan = document.createElement('span')
+                currencyNameSpan.id = obj[key]
+                currencyNameSpan.innerHTML = obj[key]
+                currencyName.appendChild(currencyNameSpan)
+
+                //update
+                let updateBtn = document.createElement('Button')
+                let updateBtnIcon = document.createElement('i')
+                updateBtnIcon.className = "fas fa-edit"
+                updateBtn.className = "btn btn-default"
+                updateBtn.type = "button"
+                updateBtn.id = "update"+String(rows)
+                updateBtn.dataset.target="#updateCurrencyModal"
+                updateBtn.dataset.toggle="modal"
+                updateBtn.onclick = function(){
+                    document.getElementById('updateCurrencyName').value = '';
+                    document.getElementById("updateCurrencyID").innerHTML = key;
+                    ipcRenderer.send('updateCurrencyMes', "");
+                } 
+                updateBtn.appendChild(updateBtnIcon)
+                update.appendChild(updateBtn)
+
+                //del
+                let delBtn = document.createElement('Button')
+                let delBtnIcon = document.createElement('i')
+                delBtnIcon.className = "fas fa-trash-alt"
+                delBtn.className = "btn btn-default"
+                delBtn.type = "button"
+                delBtn.id = "delBtn"+String(rows)
+                delBtn.onclick = async function(){delFunction(key,delBtn)} 
+                delBtn.appendChild(delBtnIcon)
+                del.appendChild(delBtn)
+            }
         }
     }
-    
-    
 
     function getLocalhostApi(path){
         return new Promise((resv, rej) => {
@@ -131,17 +137,17 @@ $(async function() {
         let response = await psotLocalhostApi('/delCurrency',key)
         if (response['returnObject'] == null){
             let targetRow = parseInt(delBtn.id.split('delBtn')[1])
-            table.deleteRow(targetRow)
+            table.deleteRow(targetRow-1)
             table.rows.forEach(function(ele,ind){
-                if(ele.rowIndex!=0){
-                    let target = ele.getElementsByTagName('td')[0]
-                    document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
-                    document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
-                    target.innerHTML = String(ind)
-                }                
+                ind = ind + 1;
+                let target = ele.getElementsByTagName('td')[0]
+                document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
+                document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
+                target.innerHTML = String(ind)
                 
             })
             ipcRenderer.send('currencySettingMes', key+"刪除成功!");
+            $("div.alert").show();
         }
     }
 
@@ -155,7 +161,10 @@ $(async function() {
             let response = await psotLocalhostApi('/addCurrency',data);
             if (response['returnObject'] == null){
                 $(this).prev().click();
-                location.reload();
+                document.getElementById("search").value = "";
+                refresh();
+                ipcRenderer.send('currencySettingMes', currencyID.value+"新增成功!");
+                $("div.alert").show();
             }else{
                 ipcRenderer.send('addCurrencyMes',response['returnObject']);
             }
@@ -174,7 +183,9 @@ $(async function() {
             let response = await psotLocalhostApi('/updateCurrency',data);
             if (response['returnObject'] == null){
                 $(this).prev().click();
-                location.reload();
+                refresh();
+                ipcRenderer.send('currencySettingMes',currencyID.textContent+"編輯成功!");
+                $("div.alert").show();
             }else{
                 ipcRenderer.send('updateCurrencyMes',response['returnObject']);
             }
@@ -197,22 +208,40 @@ $(async function() {
         saveAs(blob, "currencyList.json");
     });
 
-    importBtn.addEventListener('click',function(){
-        $("#files").click();
-        files.addEventListener('change',function(){
-            let selectedFile = files.files[0];
-            let reader = new FileReader();
-            reader.readAsText(selectedFile);
-            reader.onload = async function(){
-                let currencyList = JSON.parse(this.result);
-                let response = await psotLocalhostApi('/batchImportCurrencyList',currencyList);
-                if (response['returnObject'] != null){
-                    ipcRenderer.send('currencySettingMes',response['returnObject']);
+    filesInput.onchange = async function(){
+        let reader = new FileReader();
+        reader.readAsText(await filesInput.files[0]);
+        reader.onload = async function(){
+            let currencyList = JSON.parse(this.result);
+            let response = await psotLocalhostApi('/batchImportCurrencyList',currencyList);
+            if (response['returnObject'] != null){
+                ipcRenderer.send('currencySettingMes',response['returnObject']);
+            }else{
+                refresh();
+                ipcRenderer.send('currencySettingMes',"成功匯入!");
+            }
+            $("div.alert").show();
+        };
+        $("form").get(1).reset()
+    }
+
+
+
+    search.addEventListener('keyup',function(){
+        let searchID = document.getElementById("search").value;
+        if (searchID != ""){
+            table.rows.forEach(function(ele,ind){
+                let id = ele.getElementsByTagName('span')[0].id
+                if (id.includes(searchID)){
+                    ele.style.display = "";
+                }else{
+                    ele.style.display = "none";
                 }
-                $(this).prev().click();
-                location.reload();
-            };
-        })
+            });
+        }else{
+            $("#currencyTable tbody tr").show();
+        }
+        
     })
 
     ipcRenderer.on('addCurrencyMes', (event, arg) => {

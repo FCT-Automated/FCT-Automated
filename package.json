@@ -22,6 +22,7 @@
     "jquery": "^3.5.1",
     "jquery-treegrid": "^0.3.0",
     "js-datepicker": "^5.18.0",
+    "loaders.css": "^0.1.2",
     "mongodb": "^3.6.6",
     "node-static": "^0.7.11",
     "puppeteer": "^5.5.0",

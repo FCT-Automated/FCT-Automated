@@ -9,66 +9,72 @@ $(async function() {
     const updateLanguageMes = document.getElementById("updateLanguageMes");
     const addLanguageModal = document.getElementById("addLanguageModal");
     const exportBtn = document.getElementById("export");
-    const importBtn = document.getElementById("import");
-    const files = document.getElementById("files");
-    
-    var addLanguage = document.getElementById('addLanguage');
-    var updateLanguage = document.getElementById('updateLanguage');
+    const filesInput = document.getElementById("files");
+    const addLanguage = document.getElementById('addLanguage');
+    const updateLanguage = document.getElementById('updateLanguage');
+    const search = document.getElementById("search");
 
-    var returnObject = await getLocalhostApi('/getLanguageList');
-    var obj = returnObject['returnObject'];
-    if (obj != null){
-        var table = document.getElementById("languageTable");
-        for (let key in obj){
-            let rows = table.rows.length
-            let row = table.insertRow(-1)
-            let id = row.insertCell(0)
-            let languageID = row.insertCell(1)
-            let languageName = row.insertCell(2)
-            let update = row.insertCell(3)
-            let del = row.insertCell(4)
-            id.innerHTML = String(rows)
-            
-            let languageIDSpan = document.createElement('span')
-            languageIDSpan.id = key
-            languageIDSpan.innerHTML = key
-            languageID.appendChild(languageIDSpan)
+    var returnObject;
+    var obj;
+    var table = document.getElementById("languageTable").getElementsByTagName('tbody')[0];
 
-            let languageNameSpan = document.createElement('span')
-            languageNameSpan.id = obj[key]
-            languageNameSpan.innerHTML = obj[key]
-            languageName.appendChild(languageNameSpan)
+    refresh();
 
-            //update
-            let updateBtn = document.createElement('Button')
-            let updateBtnIcon = document.createElement('i')
-            updateBtnIcon.className = "fas fa-edit"
-            updateBtn.className = "btn btn-default"
-            updateBtn.type = "button"
-            updateBtn.id = "update"+String(rows)
-            updateBtn.dataset.target="#updateLanguageModal"
-            updateBtn.dataset.toggle="modal"
-            updateBtn.onclick = function(){
-                document.getElementById('updateLanguageName').value = '';
-                document.getElementById("updateLanguageID").innerHTML = key;
-                ipcRenderer.send('updateLanguageMes', "");
-            } 
-            updateBtn.appendChild(updateBtnIcon)
-            update.appendChild(updateBtn)
+    async function refresh(){
+        $("#languageTable tbody").html("");
+        returnObject = await getLocalhostApi('/getLanguageList');
+        obj = returnObject['returnObject'];
+        if (obj != null){
+            for (let key in obj){
+                let rows = table.rows.length+1
+                let row = table.insertRow(-1)
+                let id = row.insertCell(0)
+                let languageID = row.insertCell(1)
+                let languageName = row.insertCell(2)
+                let update = row.insertCell(3)
+                let del = row.insertCell(4)
+                id.innerHTML = String(rows)
+                
+                let languageIDSpan = document.createElement('span')
+                languageIDSpan.id = key
+                languageIDSpan.innerHTML = key
+                languageID.appendChild(languageIDSpan)
 
-            //del
-            let delBtn = document.createElement('Button')
-            let delBtnIcon = document.createElement('i')
-            delBtnIcon.className = "fas fa-trash-alt"
-            delBtn.className = "btn btn-default"
-            delBtn.type = "button"
-            delBtn.id = "delBtn"+String(rows)
-            delBtn.onclick = async function(){delFunction(key,delBtn)} 
-            delBtn.appendChild(delBtnIcon)
-            del.appendChild(delBtn)
+                let languageNameSpan = document.createElement('span')
+                languageNameSpan.id = obj[key]
+                languageNameSpan.innerHTML = obj[key]
+                languageName.appendChild(languageNameSpan)
+
+                //update
+                let updateBtn = document.createElement('Button')
+                let updateBtnIcon = document.createElement('i')
+                updateBtnIcon.className = "fas fa-edit"
+                updateBtn.className = "btn btn-default"
+                updateBtn.type = "button"
+                updateBtn.id = "update"+String(rows)
+                updateBtn.dataset.target="#updateLanguageModal"
+                updateBtn.dataset.toggle="modal"
+                updateBtn.onclick = function(){
+                    document.getElementById('updateLanguageName').value = '';
+                    document.getElementById("updateLanguageID").innerHTML = key;
+                    ipcRenderer.send('updateLanguageMes', "");
+                } 
+                updateBtn.appendChild(updateBtnIcon)
+                update.appendChild(updateBtn)
+
+                //del
+                let delBtn = document.createElement('Button')
+                let delBtnIcon = document.createElement('i')
+                delBtnIcon.className = "fas fa-trash-alt"
+                delBtn.className = "btn btn-default"
+                delBtn.type = "button"
+                delBtn.id = "delBtn"+String(rows)
+                delBtn.onclick = async function(){delFunction(key,delBtn)} 
+                delBtn.appendChild(delBtnIcon)
+                del.appendChild(delBtn)
+            }
         }
     }
-    
     
 
     function getLocalhostApi(path){
@@ -131,17 +137,17 @@ $(async function() {
         let response = await psotLocalhostApi('/delLanguage',key)
         if (response['returnObject'] == null){
             let targetRow = parseInt(delBtn.id.split('delBtn')[1])
-            table.deleteRow(targetRow)
+            table.deleteRow(targetRow-1)
             table.rows.forEach(function(ele,ind){
-                if(ele.rowIndex!=0){
-                    let target = ele.getElementsByTagName('td')[0]
-                    document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
-                    document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
-                    target.innerHTML = String(ind)
-                }                
+                ind = ind + 1;
+                let target = ele.getElementsByTagName('td')[0]
+                document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
+                document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
+                target.innerHTML = String(ind)
                 
             })
             ipcRenderer.send('languageSettingMes', key+"刪除成功!");
+            $("div.alert").show();
         }
     }
 
@@ -155,7 +161,10 @@ $(async function() {
             let response = await psotLocalhostApi('/addLanguage',data);
             if (response['returnObject'] == null){
                 $(this).prev().click();
-                location.reload();
+                document.getElementById("search").value = "";
+                refresh();
+                ipcRenderer.send('languageSettingMes', languageID.value+"新增成功!");
+                $("div.alert").show();
             }else{
                 ipcRenderer.send('addLanguageMes',response['returnObject']);
             }
@@ -174,7 +183,9 @@ $(async function() {
             let response = await psotLocalhostApi('/updateLanguage',data);
             if (response['returnObject'] == null){
                 $(this).prev().click();
-                location.reload();
+                refresh();
+                ipcRenderer.send('languageSettingMes',languageID.textContent+"編輯成功!");
+                $("div.alert").show();
             }else{
                 ipcRenderer.send('updateLanguageMes',response['returnObject']);
             }
@@ -197,24 +208,41 @@ $(async function() {
         saveAs(blob, "language.json");
     });
 
-    importBtn.addEventListener('click',function(){
-        $("#files").click();
-    })
-
-    files.addEventListener('change',function(){
-        let selectedFile = files.files[0];
+    filesInput.onchange = async function(){
         let reader = new FileReader();
-        reader.readAsText(selectedFile);
+        reader.readAsText(await filesInput.files[0]);
         reader.onload = async function(){
             let language = JSON.parse(this.result);
             let response = await psotLocalhostApi('/batchImportLanguageList',language);
             if (response['returnObject'] != null){
                 ipcRenderer.send('languageSettingMes',response['returnObject']);
+            }else{
+                refresh();
+                ipcRenderer.send('languageSettingMes',"成功匯入!");
             }
-            $(this).prev().click();
-            location.reload();
+            $("div.alert").show();
         };
+        $("form").get(1).reset()
+    }
+
+    search.addEventListener('keyup',function(){
+        let searchID = document.getElementById("search").value;
+        if (searchID != ""){
+            table.rows.forEach(function(ele,ind){
+                let id = ele.getElementsByTagName('span')[0].id
+                if (id.includes(searchID)){
+                    ele.style.display = "";
+                }else{
+                    ele.style.display = "none";
+                }
+            });
+        }else{
+            $("#languageTable tbody tr").show();
+        }
+        
     })
+
+    
 
     ipcRenderer.on('addLanguageMes', (event, arg) => {
         addLanguageMes.innerHTML = arg

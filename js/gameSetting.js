@@ -9,20 +9,17 @@ $(async function() {
     const updateGameMes = document.getElementById("updateGameMes");
     const addGameModal = document.getElementById("addGameModal");
     const exportBtn = document.getElementById("export");
-    const importBtn = document.getElementById("import");
-    const files = document.getElementById("files");
-    
-
+    const filesInput = document.getElementById("files");
     const addGame = document.getElementById('addGame');
     const updateGame = document.getElementById('updateGame');
+    const search = document.getElementById("search");
 
     var returnObject;
     var obj;
     var table = document.getElementById("gameTable").getElementsByTagName('tbody')[0];
-    var search = document.getElementById("search");
 
     refresh();
-
+    
     async function refresh(){
         $("#gameTable tbody").html("");
         returnObject = await getLocalhostApi('/getGameList');
@@ -78,7 +75,6 @@ $(async function() {
                 del.appendChild(delBtn)
             }
         }
-        
     }
 
     function getLocalhostApi(path){
@@ -165,7 +161,10 @@ $(async function() {
             let response = await psotLocalhostApi('/addGame',data);
             if (response['returnObject'] == null){
                 $(this).prev().click();
+                document.getElementById("search").value = "";
                 refresh();
+                ipcRenderer.send('gameSettingMes', gameID.value+"新增成功!");
+                $("div.alert").show();
             }else{
                 ipcRenderer.send('addGameMes',response['returnObject']);
             }
@@ -209,33 +208,29 @@ $(async function() {
         saveAs(blob, "gameList.json");
     });
 
-    importBtn.addEventListener('click',function(){
-        files.click();
-        files.addEventListener('change',async function(){
-            let selectedFile = await files.files[0];
-            let reader = new FileReader();
-            reader.readAsText(selectedFile);
-            reader.onload = async function(){
-                let gameList = JSON.parse(this.result);
-                let response = await psotLocalhostApi('/batchImportGameList',gameList);
-                if (response['returnObject'] != null){
-                    ipcRenderer.send('gameSettingMes',response['returnObject']);
-                }else{
-                    ipcRenderer.send('gameSettingMes',"成功匯入!");
-                    refresh();
-                }
-                $("div.alert").show();
-            };
-            $("form").get(1).reset()
-        })
-    })
+    filesInput.onchange = async function(){
+        let reader = new FileReader();
+        reader.readAsText(await filesInput.files[0]);
+        reader.onload = async function(){
+            let gameList = JSON.parse(this.result);
+            let response = await psotLocalhostApi('/batchImportGameList',gameList);
+            if (response['returnObject'] != null){
+                ipcRenderer.send('gameSettingMes',response['returnObject']);
+            }else{
+                refresh();
+                ipcRenderer.send('gameSettingMes',"成功匯入!");
+            }
+            $("div.alert").show();
+        };
+        $("form").get(1).reset()
+    }
 
     search.addEventListener('keyup',function(){
         let searchID = document.getElementById("search").value;
         if (searchID != ""){
             table.rows.forEach(function(ele,ind){
-                let gameID = ele.getElementsByTagName('span')[0].id
-                if (gameID.includes(searchID)){
+                let id = ele.getElementsByTagName('span')[0].id
+                if (id.includes(searchID)){
                     ele.style.display = "";
                 }else{
                     ele.style.display = "none";
