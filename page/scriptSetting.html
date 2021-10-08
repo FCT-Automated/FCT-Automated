@@ -7,16 +7,48 @@
     <script src="../bower_components/bootstrap-table/dist/bootstrap-table.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
     <script src="../js/scriptSetting.js"></script>
     <title>FCT-ScriptSetting</title>
+    <script type="text/javascript">
+      function filesInput(){
+        $('#files').click();
+      }
+    </script>
 </head>
 
 <body>
   <div class="container">
     <script type="text/javascript" src="nav.js"></script>
-    <div class="row" style="position: relative; top: 65px;">
+    <ul class="nav" style="position: relative; top: 65px; float: left;">
+      <li class="nav-item">
         <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#scriptModal" id="addScriptModal">
-            <span class="fas fa-plus"></span>新增腳本
+          <span class="fas fa-plus"></span>新增腳本
         </button>
+      </li>
+      <li class="nav-item" style="margin-top: 10px; margin-right: 20px;">
+        <form class="d-flex">
+          <input class="form-control me-2" placeholder="請輸入腳本名稱" aria-label="Search" id="search">
+        </form>
+      </li>
+      <li class="nav-item" style="margin-top: 10px;">
+        <div class="alert alert-success" role="alert" style="padding-top: 5px; padding-bottom: 5px; margin-bottom: 0px; display: none;">
+          <span id="scriptSettingMes"></span>
+        </div>
+      </li>
+    </ul>
+    <ul class="nav justify-content-end" style="position: relative; top: 65px;">
+      <li class="nav-item">
+        <form><input type="file" id="files" style="display:none"/></form>
+        <button type="button" class="btn btn-primary" style="margin: 10px" id="import" onclick="filesInput()">
+          Import
+        </button>
+      </li>
+      <li class="nav-item">
+        <button type="button" class="btn btn-primary" style="margin: 10px" id="export">
+          Export
+        </button>
+      </li>
+    </ul>
 
+    <div class="row" style="position: relative; top: 65px;">
         <div class="modal fade" id="scriptModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" >
               <div class="modal-content">
@@ -70,7 +102,6 @@
             <tbody>
             </tbody>
         </table>
-        <div><span id="scriptSettingMes"></span></div>
 
     </div>
   </div>

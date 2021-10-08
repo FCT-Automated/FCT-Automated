@@ -2,20 +2,33 @@ $(async function() {
     const electron = require('electron');
     let {ipcRenderer} = require('electron');
     const net = electron.remote.net;
+    
     const scriptListMes = document.getElementById("scriptListMes");
     const scriptSettingMes = document.getElementById("scriptSettingMes");
     const addScriptModal = document.getElementById("addScriptModal");
     const addScriptListRow = document.getElementById('addScriptListRow');
     const openDemoBtn = document.getElementById('OpenDemoBtn');
-    var scriptList = document.getElementById("scriptList");
+    const exportBtn = document.getElementById("export");
+    const filesInput = document.getElementById("files");
+    const search = document.getElementById("search");
 
+    var chromePath = await getLocalhostApi('/getChromePath');
+    var apiUrl = await getLocalhostApi('/getApiUrl');
+    var seamlessApiUrl = await getLocalhostApi('/getSeamlessApiUrl');
+    var apiJs = require('../js/api');
+    var open = require('../js/openChrome');
+    
+    var scriptList = document.getElementById("scriptList");
     var addScript = document.getElementById('addScript');
     var updateScript = document.getElementById('updateScript');
     var addTitle = document.getElementById('addTitle');
     var updateTitle = document.getElementById('updateTitle');
+    var returnObject;
+    var obj;
+    var table = document.getElementById("scriptTable").getElementsByTagName('tbody')[0];
 
-    var returnObject = await getLocalhostApi('/getGameList');
-    var obj = returnObject['returnObject'];
+    returnObject = await getLocalhostApi('/getGameList');
+    obj = returnObject['returnObject'];
     if (obj != null){
         for (let key in obj){
             let opt = document.createElement('option');
@@ -27,59 +40,66 @@ $(async function() {
         document.getElementById("DemoGameID").innerHTML = '<option>查無資料</option>'
     }
 
-    obj = await getLocalhostApi('/getScriptKeys');
-    var scriptTable = document.getElementById("scriptTable");
-    for (let key in obj){
-        let rows = scriptTable.rows.length
-        let row = scriptTable.insertRow(-1)
-        let id = row.insertCell(0)
-        let scriptName = row.insertCell(1)
-        let update = row.insertCell(2)
-        let del = row.insertCell(3)
-        id.innerHTML = String(rows)
+    refresh();
 
-        let scriptNameSpan = document.createElement('span')
-        scriptNameSpan.id = obj[key]
-        scriptNameSpan.innerHTML = obj[key]
-        scriptName.appendChild(scriptNameSpan)
+    async function refresh(){
+        $("#scriptTable tbody").html("");
+        obj = await getLocalhostApi('/getScriptKeys');
+        for (let key in obj){
+            let rows = table.rows.length+1
+            let row = table.insertRow(-1)
+            let id = row.insertCell(0)
+            let scriptName = row.insertCell(1)
+            let update = row.insertCell(2)
+            let del = row.insertCell(3)
+            id.innerHTML = String(rows)
 
-        //update
-        let updateBtn = document.createElement('Button')
-        let updateBtnIcon = document.createElement('i')
-        updateBtnIcon.className = "fas fa-edit"
-        updateBtn.className = "btn btn-default"
-        updateBtn.type = "button"
-        updateBtn.id = "update"+String(rows)
-        updateBtn.dataset.target="#scriptModal"
-        updateBtn.dataset.toggle="modal"
-        updateBtn.onclick = async function(){
-            addScript.style.display = "none";
-            updateScript.style.display = "block";
-            addTitle.style.display = "none";
-            updateTitle.style.display = "block";
-            document.getElementById("ScriptName").value = obj[key];
-            document.getElementById("ScriptName").disabled = true;
-            $("#scriptList tr").remove();
-            let response = await psotLocalhostApi('/getScript',obj[key])
-            for (let key in response['returnObject']){
-                addRow(key.split("_")[1],response['returnObject'][key]);
-            }
-            ipcRenderer.send('scriptListMes', "");
-        } 
-        updateBtn.appendChild(updateBtnIcon)
-        update.appendChild(updateBtn)
+            let scriptNameSpan = document.createElement('span')
+            scriptNameSpan.id = obj[key]
+            scriptNameSpan.innerHTML = obj[key]
+            scriptName.appendChild(scriptNameSpan)
 
-        //del
-        let delBtn = document.createElement('Button')
-        let delBtnIcon = document.createElement('i')
-        delBtnIcon.className = "fas fa-trash-alt"
-        delBtn.className = "btn btn-default"
-        delBtn.type = "button"
-        delBtn.id = "delBtn"+String(rows)
-        delBtn.onclick = async function(){delFunction(obj[key],delBtn)} 
-        delBtn.appendChild(delBtnIcon)
-        del.appendChild(delBtn)
+            //update
+            let updateBtn = document.createElement('Button')
+            let updateBtnIcon = document.createElement('i')
+            updateBtnIcon.className = "fas fa-edit"
+            updateBtn.className = "btn btn-default"
+            updateBtn.type = "button"
+            updateBtn.id = "update"+String(rows)
+            updateBtn.dataset.target="#scriptModal"
+            updateBtn.dataset.toggle="modal"
+            updateBtn.onclick = async function(){
+                addScript.style.display = "none";
+                updateScript.style.display = "block";
+                addTitle.style.display = "none";
+                updateTitle.style.display = "block";
+                document.getElementById("ScriptName").value = obj[key];
+                document.getElementById("ScriptName").disabled = true;
+                $("#scriptList tr").remove();
+                let response = await psotLocalhostApi('/getScript',obj[key])
+                for (let key in response['returnObject']){
+                    addRow(key.split("_")[1],response['returnObject'][key]);
+                }
+                ipcRenderer.send('scriptListMes', "");
+            } 
+            updateBtn.appendChild(updateBtnIcon)
+            update.appendChild(updateBtn)
+
+            //del
+            let delBtn = document.createElement('Button')
+            let delBtnIcon = document.createElement('i')
+            delBtnIcon.className = "fas fa-trash-alt"
+            delBtn.className = "btn btn-default"
+            delBtn.type = "button"
+            delBtn.id = "delBtn"+String(rows)
+            delBtn.onclick = async function(){delFunction(obj[key],delBtn)} 
+            delBtn.appendChild(delBtnIcon)
+            del.appendChild(delBtn)
+        }
+
     }
+    
+    
 
     function getLocalhostApi(path){
         return new Promise((resv, rej) => {
@@ -141,17 +161,17 @@ $(async function() {
         let response = await psotLocalhostApi('/delScript',key)
         if (response['returnObject'] == null){
             let targetRow = parseInt(delBtn.id.split('delBtn')[1])
-            scriptTable.deleteRow(targetRow)
-            scriptTable.rows.forEach(function(ele,ind){
-                if(ele.rowIndex!=0){
-                    let target = ele.getElementsByTagName('td')[0]
-                    document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
-                    document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
-                    target.innerHTML = String(ind)
-                }                
+            table.deleteRow(targetRow-1)
+            table.rows.forEach(function(ele,ind){
+                ind = ind + 1;
+                let target = ele.getElementsByTagName('td')[0]
+                document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
+                document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
+                target.innerHTML = String(ind)
                 
             })
             ipcRenderer.send('scriptSettingMes', key+"刪除成功!");
+            $("div.alert").show();
         }
     }
 
@@ -281,8 +301,11 @@ $(async function() {
                 if (Object.keys(scriptdata[scriptName]).length == rowLength){
                     let response = await psotLocalhostApi('/addScript',scriptdata)
                     if (response['returnObject'] == null){
-                        $("#scriptModal").modal('hide');
-                        location.reload();
+                        $('#scriptModal').modal('hide');
+                        document.getElementById("search").value = "";
+                        refresh();
+                        ipcRenderer.send('scriptSettingMes',scriptName+"新增成功!");
+                        $("div.alert").show();
                     }else{
                         ipcRenderer.send('scriptListMes',response['returnObject']);
                     }
@@ -319,8 +342,10 @@ $(async function() {
             if (Object.keys(scriptdata[scriptName]).length == rowLength){
                 let response = await psotLocalhostApi('/updateScript',scriptdata)
                 if (response['returnObject'] == null){
-                    $("#scriptModal").modal('hide');
-                    ipcRenderer.send('scriptSettingMes', scriptName+"修改成功!");
+                    $('#scriptModal').modal('hide');
+                    refresh();
+                    ipcRenderer.send('scriptSettingMes', scriptName+"編輯成功!");
+                    $("div.alert").show();
                 }else{
                     ipcRenderer.send('scriptListMes',response['returnObject']);
                 }
@@ -343,7 +368,7 @@ $(async function() {
         ipcRenderer.send('scriptListMes', "");
 
     })
-
+    //開啟demo帳號按鈕
     openDemoBtn.addEventListener('click', async function(){
         let response;
         let args ={
@@ -368,9 +393,32 @@ $(async function() {
             response = await apiJs.requestAPI(args,apiUrl)
             await open.openChrome(response.Url,chromePath,args['GameID'],"Demo")
         }
+    });
+    
+    exportBtn.addEventListener('click', async function(){
+        console.log("do somthing");
+    });
+
+    filesInput.onchange = async function(){
+        console.log("do somthing");
+    }
+
+    search.addEventListener('keyup',function(){
+        let searchID = document.getElementById("search").value;
+        if (searchID != ""){
+            table.rows.forEach(function(ele,ind){
+                let id = ele.getElementsByTagName('span')[0].id
+                if (id.includes(searchID)){
+                    ele.style.display = "";
+                }else{
+                    ele.style.display = "none";
+                }
+            });
+        }else{
+            $("#scriptTable tbody tr").show();
+        }
         
-        
-    })
+    });
 
     ipcRenderer.on('scriptListMes', (event, arg) => {
         scriptListMes.innerHTML = arg
