@@ -34,7 +34,7 @@ function createWindow() {
     electron.Menu.setApplicationMenu(null);
 
     win.loadURL(url.format({
-        pathname: path.join(__dirname, '../page/apiPage.html'),
+        pathname: path.join(__dirname, '../page/index.html'),
         protocol: 'file:',
         slashes: true
     }))
@@ -48,9 +48,6 @@ function createWindow() {
     })
 }
 
-ipcMain.on('result',(event,arg) =>{
-    event.reply('re', arg)
-})
 
 ipcMain.on('scriptPageMes',(event,arg) =>{
     event.reply('scriptPageMes', arg)

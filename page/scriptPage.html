@@ -1,121 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
-
 <head>
-    <script type="text/javascript" src="head.js"></script>
-    <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
-    <script src="../bower_components/bootstrap-table/dist/bootstrap-table.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
-    <script src="../js/scriptPage.js"></script>
-    <title>FCT-Auto</title>
+  <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" crossorigin="anonymous">
+  <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+  <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
+  <script src="../js/public.js"></script>
+  <script src="../js/scriptPage.js"></script>
+  <title>scriptPage</title>
 </head>
+<body>  
+  <form>
+    <div class="form-group">
+      <label for="API">API:</label>
+      <select class="form-control" id="API">
+        <option value="Login">Login</option>
+      </select>
+    </div>
+    <div class="form-group field_Login"> 
+      <label for="LanguageID">語系:</label> 
+      <select class="form-control LanguageID" id="LanguageID"> 
+      </select> 
+    </div> 
+    <div class="form-group"> 
+      <label for="Currency">幣別:</label> 
+      <select class="form-control Currency" id="Currency"> 
+      </select> 
+    </div> 
+    <div class="form-group field_Login"> 
+      <label for="GameID">遊戲名稱:</label> 
+      <select class="form-control GameID" id="GameID"> 
+      </select> 
+    </div> 
+    <div class="form-group"> 
+      <label for="AgentCode">商戶代碼:</label> 
+      <input class="form-control" id="AgentCode" required> 
+    </div> 
+    
+    <div class="form-group"> 
+      <label for="MemberAccount">帳號:</label> 
+      <input class="form-control" id="MemberAccount" required> 
+    </div>
 
-<body>
-  <div class="container">
-    <script type="text/javascript" src="nav.js"></script>
-    <div class="row" style="position: relative; top: 65px;">
-      <div class="col">
-        <form id="myForm">
-          <div class="form-group">
-            <label for="API">API:</label>
-            <select class="form-control" id="API">
-              <option value="Login">Login</option>
-            </select>
-          </div>
-          <div class="form-group field_Login"> 
-            <label for="LanguageID">語系:</label> 
-            <select class="form-control LanguageID" id="LanguageID"> 
-            </select> 
-          </div> 
-          <div class="form-group"> 
-            <label for="Currency">幣別:</label> 
-            <select class="form-control Currency" id="Currency"> 
-            </select> 
-          </div> 
-          <div class="form-group field_Login"> 
-            <label for="GameID">遊戲名稱:</label> 
-            <select class="form-control GameID" id="GameID"> 
-            </select> 
-          </div> 
-          <div class="form-group"> 
-            <label for="AgentCode">商戶代碼:</label> 
-            <input class="form-control" id="AgentCode" required> 
-          </div> 
-          
-          <div class="form-group"> 
-            <label for="MemberAccount">帳號:</label> 
-            <input class="form-control" id="MemberAccount" required> 
-          </div>
-
-          <div class="form-group field_Login"> 
-            <label for="Event">活動:</label> 
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="optionEvent" id="notAttend" value="notAttend" checked>
-              <label class="form-check-label" for="notAttend">
-                不參加
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="optionEvent" id="attend" value="attend">
-              <label class="form-check-label" for="attend">
-                參加
-              </label>
-              <select class="form-control" id="Event" disabled="disabled"> 
-              </select>
-            </div>
-          </div>
-          <div class="form-group"> 
-            <label for="scriptlist">腳本:</label> 
-            <select class="form-control" id="scriptlist"></select>
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addScriptModal" onclick='$("#addScriptTable tr").remove(); $("#scriptName")[0].value = "";'>
-                新增腳本
-            </button>
-            
-            <!-- Modal -->
-            <div class="modal fade" id="addScriptModal" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" >
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">新增腳本</h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group"> 
-                            <label for="GameID">Demo:</label> 
-                            <select class="form-control GameID" id="DemoGameID"></select> 
-                            <button type="Button" id="OpenDemoBtn" class="btn btn-primary">開啟</button>
-                        </div>
-                        <span>腳本名稱:</span><input type="text" id="scriptName" required>
-                        <button id="addScriptListRow" class="btn btn-dark" type="button">
-                          <span class="fas fa-plus"></span>新增動作
-                        </button>
-                        <table class="table table-bordered">
-                          <thead>
-                              <tr>
-                                  <th style="text-align: center; vertical-align: middle;" id='id'>動作順序</th>
-                                  <th style="text-align: center; vertical-align: middle;" id='action'>動作</th>
-                                  <th style="text-align: center; vertical-align: middle;" id='actiontext'>內容</th>
-                                  <th style="text-align: center; vertical-align: middle;" id='delBtn'>刪除</th>
-                              </tr>
-                          </thead>
-                          <tbody id="addScriptTable">
-
-                          </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
-                      <button type="button" class="btn btn-primary" id='addScript'>確定新增</button>
-                      <div><span id="addScriptMes"></span></div>
-                    </div>
-                  </div>
-                </div>
-            </div>
-          </div>
-          <button type="Button" id="autoStartBtn" class="btn btn-primary">開始</button>
-          <div><span id="scriptPageMes"></span></div>
-        </form>
+    <div class="form-group field_Login"> 
+      <label for="Event">活動:</label> 
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="optionEvent" id="notAttend" value="notAttend" checked>
+        <label class="form-check-label" for="notAttend">
+          不參加
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="optionEvent" id="attend" value="attend">
+        <label class="form-check-label" for="attend">
+          參加
+        </label>
+        <select class="form-control" id="Event" disabled="disabled"> 
+        </select>
       </div>
     </div>
-  </div>
+    <div class="form-group"> 
+      <label for="list">腳本:</label> 
+      <select class="form-control" id="list"></select>
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#openModal" 
+        onclick='$("#addTable tr").remove(); $("#name")[0].value = ""; $("#addMessage")[0].innerHTML = "";'>
+          新增腳本
+      </button>
+      
+      <!-- Modal -->
+      <div class="modal fade" id="openModal" tabindex="-1" role="dialog" aria-hidden="true" >
+          <div class="modal-dialog modal-dialog-centered" >
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">新增腳本</h5>
+              </div>
+              <div class="modal-body">
+                  <div class="form-group"> 
+                      <label for="GameID">Demo:</label> 
+                      <select class="form-control GameID" id="DemoGameID"></select> 
+                      <button type="Button" id="demoBtn" class="btn btn-primary">開啟</button>
+                  </div>
+                  <span>腳本名稱:</span><input type="text" id="name" required>
+                  <button id="addRowBtn" class="btn btn-dark" type="button">
+                    <span class="fas fa-plus"></span>新增動作
+                  </button>
+                  <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; vertical-align: middle;" id='id'>動作順序</th>
+                            <th style="text-align: center; vertical-align: middle;" id='action'>動作</th>
+                            <th style="text-align: center; vertical-align: middle;" id='actiontext'>內容</th>
+                            <th style="text-align: center; vertical-align: middle;" id='delBtn'>刪除</th>
+                        </tr>
+                    </thead>
+                    <tbody id="addTable">
+
+                    </tbody>
+                  </table>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id='addBtn'>確定新增</button>
+                <div><span id="addMessage"></span></div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    <button type="Button" id="submit" class="btn btn-primary">開始</button>
+  </form>
 </body>
-</html>
+        
+

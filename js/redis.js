@@ -77,12 +77,35 @@ async function batchImportCurrencyList(data){
     });
 }
 
-async function getCurrencyList(){
-    var response = await checkThatTheKeyExists('CurrencyList');
+async function importList(datas){
+    var data = JSON.parse(datas)['data'];
+    var tableName = JSON.parse(datas)['tableName'];
+    var currentList = await getList(JSON.stringify(tableName));
+    if (currentList['returnObject'] != null){
+        currentList = Object.keys(currentList['returnObject']);  
+    }else{
+        currentList = [];
+    }
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        currentList.forEach(function(id){
+            delete data[id]
+        })
+        if (JSON.stringify(data)==="{}"){
+            resv({'returnObject':'目前資料與匯入資料相同!'})
+        }else{
+            client.hmset(tableName,data);
+            resv({'returnObject':null})
+        }
+    });
+}
+
+async function getList(tableName){
+    var response = await checkThatTheKeyExists(JSON.parse(tableName));
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
         if (response['returnObject'] != null){
-            client.hgetall('CurrencyList', (error, result) => {
+            client.hgetall(JSON.parse(tableName), (error, result) => {
                 if (!error){
                     response['returnObject'] = result
                     resv(response)  
@@ -92,16 +115,31 @@ async function getCurrencyList(){
             });
         }else{
             resv(response)
-        }
-        
+        }        
     });
 }
 
-function delCurrency(key){
+function getUrlOrPath(key){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        let jsonObject= JSON.parse(key);
-        client.hdel('CurrencyList',jsonObject, (error, result) => {
+        client.hget('PathList',JSON.parse(key), (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                rej(error)
+            }
+        });
+    });
+    
+}
+
+
+function delData(data){
+    var key = JSON.parse(data)['key'];
+    var tableName = JSON.parse(data)['tableName'];
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        client.hdel(tableName,key, (error, result) => {
             if (!error){
                 resv({'returnObject':null})
             }else{
@@ -112,37 +150,39 @@ function delCurrency(key){
     
 }
 
-async function addCurrency(data){
-    var currencyList = await getCurrencyList();  
-    if (currencyList['returnObject'] != null){
-        currencyList = Object.keys(currencyList['returnObject']);  
+async function addData(datas){
+    var data = JSON.parse(datas)['data'];
+    var tableName = JSON.parse(datas)['tableName'];
+    var List = await getList(JSON.stringify(tableName));  
+    if (List['returnObject'] != null){
+        List = Object.keys(List['returnObject']);  
     }else{
-        currencyList = [];
+        List = [];
     }
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
-        let currencyID = Object.keys(jsonObject)[0];
-        if (! currencyList.includes(currencyID)){
+        let ID = Object.keys(data)[0];
+        if (! List.includes(ID)){
             try {
-                client.hmset('CurrencyList',jsonObject);
+                client.hmset(tableName,data);
                 resv({'returnObject':null})
             }
             catch(error){
                 rej(error)
             }
         }else{
-            resv({'returnObject':'此幣別代號已存在!'})
+            resv({'returnObject':'資料已存在!'})
         }  
     });
 }
 
-function updateCurrency(data){
+function updateData(datas){
+    var data = JSON.parse(datas)['data'];
+    var tableName = JSON.parse(datas)['tableName'];
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
         try {
-            client.hmset('CurrencyList',jsonObject);
+            client.hmset(tableName,data);
             resv({'returnObject':null})
         }
         catch(error){
@@ -151,6 +191,8 @@ function updateCurrency(data){
   
     });
 }
+
+
 
 async function batchImportGameList(data){
     var gameList = await getGameList();  
@@ -175,80 +217,7 @@ async function batchImportGameList(data){
     });
 }
 
-async function getGameList(){
-    var response = await checkThatTheKeyExists('GameList');
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        if (response['returnObject'] != null){
-            client.hgetall('GameList', (error, result) => {
-                if (!error){
-                    response['returnObject'] = result
-                    resv(response)  
-                }else{
-                    rej(error)
-                }
-            });
-        }else{
-            resv(response)
-        }
-    });
-    
-}
 
-function delGame(key){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(key);
-        client.hdel('GameList',jsonObject, (error, result) => {
-            if (!error){
-                resv({'returnObject':null})
-            }else{
-                rej(error)
-            }
-        });
-    });
-    
-}
-
-async function addGame(data){
-    var gameList = await getGameList();
-    if (gameList['returnObject'] != null){
-        gameList = Object.keys(gameList['returnObject']);  
-    }else{
-        gameList = [];
-    }
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
-        let gameID = Object.keys(jsonObject)[0];
-        if (! gameList.includes(gameID)){
-            try {
-                client.hmset('GameList',jsonObject);
-                resv({'returnObject':null})
-            }
-            catch(error){
-                rej(error)
-            }
-        }else{
-            resv({'returnObject':'此遊戲編號已存在!'})
-        }  
-    });
-}
-
-function updateGame(data){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
-        try {
-            client.hmset('GameList',jsonObject);
-            resv({'returnObject':null})
-        }
-        catch(error){
-            rej(error)
-        }
-  
-    });
-}
 
 async function batchImportLanguageList(data){
     var languageList = await getLanguageList();
@@ -273,79 +242,7 @@ async function batchImportLanguageList(data){
     });
 }
 
-async function getLanguageList(){
-    var response = await checkThatTheKeyExists('LanguageList');
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        if (response['returnObject'] != null){
-            client.hgetall('LanguageList', (error, result) => {
-                if (!error){
-                    response['returnObject'] = result
-                    resv(response)  
-                }else{
-                    rej(error)
-                }
-            });
-        }else{
-            resv(response)
-        }
-    });
-}
 
-function delLanguage(key){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(key);
-        client.hdel('LanguageList',jsonObject, (error, result) => {
-            if (!error){
-                resv({'returnObject':null})
-            }else{
-                rej(error)
-            }
-        });
-    });
-    
-}
-
-async function addLanguage(data){
-    var languageList = await getLanguageList();
-    if (languageList['returnObject'] != null){
-        languageList = Object.keys(languageList['returnObject']);    
-    }else{
-        languageList = [];
-    }
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
-        let languageID = Object.keys(jsonObject)[0];
-        if (! languageList.includes(languageID)){
-            try {
-                client.hmset('LanguageList',jsonObject);
-                resv({'returnObject':null})
-            }
-            catch(error){
-                rej(error)
-            }
-        }else{
-            resv({'returnObject':'此幣別代號已存在!'})
-        }  
-    });
-}
-
-function updateLanguage(data){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
-        try {
-            client.hmset('LanguageList',jsonObject);
-            resv({'returnObject':null})
-        }
-        catch(error){
-            rej(error)
-        }
-  
-    });
-}
 
 function getPathList(){
     return new Promise((resv, rej) => {
@@ -361,19 +258,6 @@ function getPathList(){
     });
 }
 
-function getChromePath(){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        client.hget('PathList','chromePath', (error, result) => {
-            if (!error){
-                resv(result)  
-            }else{
-                rej(error)
-            }
-        });
-    });
-    
-}
 
 function updatePath(data){
     return new Promise((resv, rej) => {
@@ -388,34 +272,6 @@ function updatePath(data){
         }
   
     });
-}
-
-function getApiUrl(){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        client.hget('PathList','apiUrl', (error, result) => {
-            if (!error){
-                resv(result)  
-            }else{
-                rej(error)
-            }
-        });
-    });
-    
-}
-
-function getSeamlessApiUrl(){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        client.hget('PathList','seamlessApiUrl', (error, result) => {
-            if (!error){
-                resv(result)  
-            }else{
-                rej(error)
-            }
-        });
-    });
-    
 }
 
 function getScriptKeys(){
@@ -508,30 +364,22 @@ function updateScript(script){
     });
 }
 
+module.exports.getList = getList;
+module.exports.getUrlOrPath = getUrlOrPath;
+module.exports.delData = delData;
+module.exports.addData = addData;
+module.exports.updateData = updateData;
+module.exports.importList = importList;
+
 module.exports.createPathList = createPathList;
 
 module.exports.updatePath = updatePath;
 module.exports.getPathList = getPathList;
-module.exports.getChromePath = getChromePath;
-module.exports.getApiUrl = getApiUrl;
-module.exports.getSeamlessApiUrl = getSeamlessApiUrl;
 
-module.exports.addCurrency = addCurrency;
-module.exports.delCurrency = delCurrency;
-module.exports.updateCurrency = updateCurrency;
-module.exports.getCurrencyList = getCurrencyList;
 module.exports.batchImportCurrencyList = batchImportCurrencyList;
 
-module.exports.addGame = addGame;
-module.exports.delGame = delGame;
-module.exports.updateGame = updateGame;
-module.exports.getGameList = getGameList;
 module.exports.batchImportGameList = batchImportGameList;
 
-module.exports.addLanguage = addLanguage;
-module.exports.delLanguage = delLanguage;
-module.exports.updateLanguage = updateLanguage;
-module.exports.getLanguageList = getLanguageList;
 module.exports.batchImportLanguageList = batchImportLanguageList;
 
 module.exports.addScript = addScript;

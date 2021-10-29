@@ -1,6 +1,7 @@
 var http = require('http');
 var redis = require('./redis');
 const { StringDecoder } = require('string_decoder');
+const { table } = require('console');
 
 redis.createPathList();
 
@@ -8,30 +9,47 @@ var server = http.createServer(async function(req, res) {
     const decoder = new StringDecoder('utf-8');
     if(req.url == '/'){
         res.end();
+    
+    }else if(req.url=='/getList'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(tableName){
+            res.write(JSON.stringify(await redis.getList(decoder.write(tableName))));
+            res.end();
+        });
+    }else if(req.url=='/getUrlOrPath'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(key){
+            res.write(JSON.stringify(await redis.getUrlOrPath(decoder.write(key))));
+            res.end();
+        });
+    }else if(req.url=='/delData'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.delData(decoder.write(data))));
+            res.end();
+        });
+    }else if(req.url=='/addData'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(datas){
+            res.write(JSON.stringify(await redis.addData(decoder.write(datas))));
+            res.end();
+        });
+    }else if(req.url=='/updateData'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(datas){
+            res.write(JSON.stringify(await redis.updateData(decoder.write(datas))));
+            res.end();
+        });
+    }else if(req.url=='/importList'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(datas){
+            res.write(JSON.stringify(await redis.importList(decoder.write(datas))));
+            res.end();
+        });
+    }
+
     //db15:Currency
-    }else if(req.url=='/getCurrencyList'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getCurrencyList()));
-        res.end();
-    }else if(req.url=='/addCurrency'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.addCurrency(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/updateCurrency'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.updateCurrency(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/delCurrency'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.delCurrency(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/batchImportCurrencyList'){
+    else if(req.url=='/batchImportCurrencyList'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         req.on('data', async function(data){
             res.write(JSON.stringify(await redis.batchImportCurrencyList(decoder.write(data))));
@@ -40,29 +58,7 @@ var server = http.createServer(async function(req, res) {
     }
 
     //db15:Game
-    else if(req.url=='/getGameList'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getGameList()));
-        res.end();
-    }else if(req.url=='/addGame'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.addGame(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/updateGame'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.updateGame(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/delGame'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.delGame(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/batchImportGameList'){
+    else if(req.url=='/batchImportGameList'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         req.on('data', async function(data){
             res.write(JSON.stringify(await redis.batchImportGameList(decoder.write(data))));
@@ -71,29 +67,7 @@ var server = http.createServer(async function(req, res) {
     }
     
     //db15:Language   
-    else if(req.url=='/getLanguageList'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getLanguageList()));
-        res.end();
-    }else if(req.url=='/addLanguage'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.addLanguage(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/updateLanguage'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.updateLanguage(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/delLanguage'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.delLanguage(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/batchImportLanguageList'){
+    else if(req.url=='/batchImportLanguageList'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         req.on('data', async function(data){
             res.write(JSON.stringify(await redis.batchImportLanguageList(decoder.write(data))));
@@ -102,19 +76,7 @@ var server = http.createServer(async function(req, res) {
     }
 
     //db15:Path
-    else if(req.url=='/getPathList'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getPathList()));
-        res.end();
-    }else if(req.url=='/getChromePath'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getChromePath()));
-        res.end();
-    }else if(req.url=='/getApiUrl'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getApiUrl()));
-        res.end();
-    }else if(req.url=='/getSeamlessApiUrl'){
+    else if(req.url=='/getSeamlessApiUrl'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         res.write(JSON.stringify(await redis.getSeamlessApiUrl()));
         res.end();
