@@ -1,9 +1,8 @@
 var http = require('http');
-var redis = require('./redis');
+var redis = require('../model/redis');
 const { StringDecoder } = require('string_decoder');
-const { table } = require('console');
 
-redis.createPathList();
+redis.createTableOfPath();
 
 var server = http.createServer(async function(req, res) {
     const decoder = new StringDecoder('utf-8');
@@ -16,10 +15,10 @@ var server = http.createServer(async function(req, res) {
             res.write(JSON.stringify(await redis.getList(decoder.write(tableName))));
             res.end();
         });
-    }else if(req.url=='/getUrlOrPath'){
+    }else if(req.url=='/getPath'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         req.on('data', async function(key){
-            res.write(JSON.stringify(await redis.getUrlOrPath(decoder.write(key))));
+            res.write(JSON.stringify(await redis.getPath(decoder.write(key))));
             res.end();
         });
     }else if(req.url=='/delData'){
@@ -48,50 +47,23 @@ var server = http.createServer(async function(req, res) {
         });
     }
 
-    //db15:Currency
-    else if(req.url=='/batchImportCurrencyList'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.batchImportCurrencyList(decoder.write(data))));
-            res.end();
-        });
-    }
-
-    //db15:Game
-    else if(req.url=='/batchImportGameList'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.batchImportGameList(decoder.write(data))));
-            res.end();
-        });
-    }
-    
-    //db15:Language   
-    else if(req.url=='/batchImportLanguageList'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.batchImportLanguageList(decoder.write(data))));
-            res.end();
-        });
-    }
-
     //db15:Path
-    else if(req.url=='/getSeamlessApiUrl'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getSeamlessApiUrl()));
-        res.end();
-    }else if(req.url=='/updatePath'){
+    else if(req.url=='/updatePath'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         req.on('data', async function(data){
             res.write(JSON.stringify(await redis.updatePath(decoder.write(data))));
             res.end();
         });
+    }else if(req.url=='/getPathList'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        res.write(JSON.stringify(await redis.getPathList()));
+        res.end();
     }
 
     //db14:Script
-    else if(req.url=='/getScriptKeys'){
+    else if(req.url=='/getKeys'){
         res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getScriptKeys()));
+        res.write(JSON.stringify(await redis.getKeys()));
         res.end();
     }else if(req.url=='/getScript'){
         res.writeHead(200,{'Content-Type': 'application/json'});

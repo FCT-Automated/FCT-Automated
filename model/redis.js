@@ -9,7 +9,7 @@ function connectRedis(db){
     return redis.createClient(redis_config)
 }
 
-function createPathList(){
+function createTableOfPath(){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
         var keys = ['chromePath','apiUrl','seamlessApiUrl'];
@@ -38,50 +38,11 @@ function createPathList(){
     });
 }
 
-function checkThatTheKeyExists(key){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        client.hgetall(key, (error, result) => {
-            if (!error){
-                if(result == null){
-                    resv({'returnObject':null})
-                }else{
-                    resv({'returnObject':{}})
-                }
-            }else{
-                rej(error)
-            }
-        })
-    });
-}
-
-async function batchImportCurrencyList(data){
-    var currencyList = await getCurrencyList();  
-    if (currencyList['returnObject'] != null){
-        currencyList = Object.keys(currencyList['returnObject']);  
-    }else{
-        currencyList = [];
-    }
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
-        currencyList.forEach(function(currencyID){
-            delete jsonObject[currencyID]
-        })
-        if (JSON.stringify(jsonObject)==="{}"){
-            resv({'returnObject':'目前資料與匯入資料相同!'})
-        }else{
-            client.hmset('CurrencyList',jsonObject);
-            resv({'returnObject':null})
-        }
-    });
-}
-
 async function importList(datas){
     var data = JSON.parse(datas)['data'];
     var tableName = JSON.parse(datas)['tableName'];
     var currentList = await getList(JSON.stringify(tableName));
-    if (currentList['returnObject'] != null){
+    if (currentList != null){
         currentList = Object.keys(currentList['returnObject']);  
     }else{
         currentList = [];
@@ -101,25 +62,38 @@ async function importList(datas){
 }
 
 async function getList(tableName){
-    var response = await checkThatTheKeyExists(JSON.parse(tableName));
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        if (response['returnObject'] != null){
-            client.hgetall(JSON.parse(tableName), (error, result) => {
-                if (!error){
-                    response['returnObject'] = result
-                    resv(response)  
-                }else{
-                    rej(error)
-                }
-            });
-        }else{
-            resv(response)
-        }        
+        client.hgetall(JSON.parse(tableName), (error, response) => {
+            if (response != null){
+                let result = {};
+                result['returnObject'] = response;
+                resv(result)  
+            }else{
+                resv(response)
+            }
+        });   
     });
 }
 
-function getUrlOrPath(key){
+function getScript(key){
+    return new Promise((resv, rej) => {
+        let response = {'returnObject':{}}
+        let jsonObject= JSON.parse(key);
+        let client = connectRedis(14);
+        client.hgetall(jsonObject, (error, result) => {
+            if (!error){
+                response['returnObject'] = result
+                resv(response)  
+            }else{
+                rej(error)
+            }
+        });
+        
+    });
+}
+
+function getPath(key){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
         client.hget('PathList',JSON.parse(key), (error, result) => {
@@ -130,7 +104,20 @@ function getUrlOrPath(key){
             }
         });
     });
-    
+}
+
+function getPathList(){
+    return new Promise((resv, rej) => {
+        let client = connectRedis(15);
+        client.hgetall('PathList', (error, result) => {
+            if (!error){
+                resv(result)  
+            }else{
+                rej(error)
+            }
+        });
+        
+    });
 }
 
 
@@ -154,7 +141,7 @@ async function addData(datas){
     var data = JSON.parse(datas)['data'];
     var tableName = JSON.parse(datas)['tableName'];
     var List = await getList(JSON.stringify(tableName));  
-    if (List['returnObject'] != null){
+    if (List != null){
         List = Object.keys(List['returnObject']);  
     }else{
         List = [];
@@ -194,70 +181,6 @@ function updateData(datas){
 
 
 
-async function batchImportGameList(data){
-    var gameList = await getGameList();  
-    if (gameList['returnObject'] != null){
-        gameList = Object.keys(gameList['returnObject']);  
-    }else{
-        gameList = [];
-    }
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
-        gameList.forEach(function(gameId){
-            delete jsonObject[gameId]
-        })
-        if (JSON.stringify(jsonObject)==="{}"){
-            resv({'returnObject':'目前資料與匯入資料相同!'})
-        }else{
-            client.hmset('GameList',jsonObject);
-            resv({'returnObject':null})
-        }
-      
-    });
-}
-
-
-
-async function batchImportLanguageList(data){
-    var languageList = await getLanguageList();
-    if (languageList['returnObject'] != null){
-        languageList = Object.keys(languageList['returnObject']);    
-    }else{
-        languageList = [];
-    }
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
-        languageList.forEach(function(language){
-            delete jsonObject[language]
-        })
-        if (JSON.stringify(jsonObject)==="{}"){
-            resv({'returnObject':'目前資料與匯入資料相同!'})
-        }else{
-            client.hmset('LanguageList',jsonObject);
-            resv({'returnObject':null})
-        }
-      
-    });
-}
-
-
-
-function getPathList(){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        client.hgetall('PathList', (error, result) => {
-            if (!error){
-                resv(result)  
-            }else{
-                rej(error)
-            }
-        });
-        
-    });
-}
-
 
 function updatePath(data){
     return new Promise((resv, rej) => {
@@ -274,7 +197,7 @@ function updatePath(data){
     });
 }
 
-function getScriptKeys(){
+function getKeys(){
     return new Promise((resv, rej) => {
         let client = connectRedis(14);
         client.keys('*',(error,keys) => {
@@ -289,25 +212,9 @@ function getScriptKeys(){
     });
 }
 
-function getScript(key){
-    return new Promise((resv, rej) => {
-        let response = {'returnObject':{}}
-        let jsonObject= JSON.parse(key);
-        let client = connectRedis(14);
-        client.hgetall(jsonObject, (error, result) => {
-            if (!error){
-                response['returnObject'] = result
-                resv(response)  
-            }else{
-                rej(error)
-            }
-        });
-        
-    });
-}
 
 async function addScript(script){
-    var tableNames = await getScriptKeys();    
+    var tableNames = await getKeys();    
     return new Promise((resv, rej) => {
         let client = connectRedis(14);
         let jsonObject= JSON.parse(script);
@@ -364,29 +271,29 @@ function updateScript(script){
     });
 }
 
+module.exports.createTableOfPath = createTableOfPath;
+
 module.exports.getList = getList;
-module.exports.getUrlOrPath = getUrlOrPath;
+module.exports.getPath = getPath;
 module.exports.delData = delData;
 module.exports.addData = addData;
 module.exports.updateData = updateData;
 module.exports.importList = importList;
 
-module.exports.createPathList = createPathList;
+module.exports.getKeys = getKeys;
+module.exports.getScript = getScript;
+module.exports.addScript = addScript;
+module.exports.delScript = delScript;
+module.exports.updateScript = updateScript;
 
 module.exports.updatePath = updatePath;
 module.exports.getPathList = getPathList;
 
-module.exports.batchImportCurrencyList = batchImportCurrencyList;
 
-module.exports.batchImportGameList = batchImportGameList;
 
-module.exports.batchImportLanguageList = batchImportLanguageList;
 
-module.exports.addScript = addScript;
-module.exports.delScript = delScript;
-module.exports.updateScript = updateScript;
-module.exports.getScriptKeys = getScriptKeys;
-module.exports.getScript = getScript;
+
+
 
 
 

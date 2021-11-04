@@ -1,36 +1,3 @@
-$(function() {
-    setList(parent.CurrencyList,"Currency");
-    setList(parent.GameList,"GameID");
-    setList(parent.LanguageList,"LanguageID");
-});
-
-function setList(returnObject,element){
-    let select = document.getElementById(element);
-    if (returnObject != null){
-        let obj = returnObject['returnObject'];
-        for (let key in obj){
-            let opt = document.createElement('option');
-            opt.value = key
-            opt.innerHTML = key+':'+obj[key]
-            select.appendChild(opt)
-        }
-    }else{
-        select.innerHTML = '<option>查無資料</option>'
-    }
-}
-
-function setKeys(data,element){
-    let select = document.getElementById(element);
-    select.options.length = 0;
-    let obj = data;
-    for (let key in obj){
-        let opt = document.createElement('option');
-        opt.value = key
-        opt.innerHTML = obj[key]
-        select.appendChild(opt)
-    }
-}
-
 async function isAttendCheck(isCheck){
     let eventlist = document.getElementById('Event');
     let mes = urlAndPathCheck();
@@ -74,4 +41,46 @@ function urlAndPathCheck(mes=''){
         mes += "seamlessApiUrl 不可空白</br>"
     }
     return mes;
+}
+
+function setList(returnObject,element){
+    let select = document.getElementById(element);
+    if (returnObject != null){
+        let obj = returnObject['returnObject'];
+        for (let key in obj){
+            let opt = document.createElement('option');
+            opt.value = key
+            opt.innerHTML = key+':'+obj[key]
+            select.appendChild(opt)
+        }
+    }else{
+        select.innerHTML = '<option>查無資料</option>'
+    }
+}
+
+function setKeys(data,element){
+    let select = document.getElementById(element);
+    select.options.length = 0;
+    let obj = data;
+    for (let key in obj){
+        let opt = document.createElement('option');
+        opt.value = key
+        opt.innerHTML = obj[key]
+        select.appendChild(opt)
+    }
+}
+
+function search(value,showTable){
+    if (value != ""){
+        showTable.rows.forEach(function(ele,ind){
+            let id = ele.getElementsByTagName('span')[0].id
+            if (id.includes(value)){
+                ele.style.display = "";
+            }else{
+                ele.style.display = "none";
+            }
+        });
+    }else{
+        $("#table tbody tr").show();
+    }
 }

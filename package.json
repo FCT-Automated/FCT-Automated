@@ -2,7 +2,7 @@
   "name": "FCT-Automated",
   "version": "1.0.0",
   "description": "",
-  "main": "./js/main.js",
+  "main": "./controller/main.js",
   "scripts": {
     "start": "electron .",
     "build_win32": "electron-packager . MyApp --platform=win32 --arch=x64 --asar=true --ignore=node_modules/electron-* "

@@ -1,7 +1,7 @@
 const electron = require('electron');
 const { saveAs } = require('file-saver');
-var apiJs = require('../js/api');
-var open = require('../js/openChrome')
+var apiJs = require('../controller/api');
+var browser = require('../controller/openBrowser');
 
 var chromePath;
 var apiUrl;
@@ -12,14 +12,14 @@ var LanguageList;
 var scriptList;
 
 async function init(){
-    chromePath = await psotLocalhostApi('/getUrlOrPath','chromePath');
-    apiUrl = await psotLocalhostApi('/getUrlOrPath','apiUrl');
-    seamlessApiUrl = await psotLocalhostApi('/getUrlOrPath','seamlessApiUrl');
+    chromePath = await psotLocalhostApi('/getPath','chromePath');
+    apiUrl = await psotLocalhostApi('/getPath','apiUrl');
+    seamlessApiUrl = await psotLocalhostApi('/getPath','seamlessApiUrl');
     CurrencyList = await psotLocalhostApi('/getList','CurrencyList');
     GameList = await psotLocalhostApi('/getList','GameList');
     LanguageList = await psotLocalhostApi('/getList','LanguageList');
-    scriptList = await getLocalhostApi('/getScriptKeys');
-    document.getElementById('myiframe').src ="apiPage.html";
+    scriptList = await getLocalhostApi('/getKeys');
+    document.getElementById('myiframe').src ="api_and_script_page.html?api";
 }
 
 function getLocalhostApi(path){
@@ -77,10 +77,6 @@ function psotLocalhostApi(path,data){
     })
 
 }
-
-window.addEventListener('message', e => {
-    document.getElementById("message").innerHTML = e.data
-},false);
 
 
 init();

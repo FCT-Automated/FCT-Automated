@@ -1,4 +1,13 @@
 $(async function() {
+    let replace = {
+        "Currency":"幣別",
+        "Language":"語系",
+        "Game":"遊戲"
+    }
+    var main = location.search.split("?")[1];
+    document.title = main+"List"
+    document.body.innerHTML = document.body.innerHTML.replace(/name/g,replace[main]);
+
     const add = document.getElementById('add');
     const update = document.getElementById('update');
     const inputSearch = document.getElementById("search");
@@ -25,7 +34,7 @@ $(async function() {
     });
 
     inputSearch.addEventListener('keyup',function(){
-        search(search.value);
+        search(inputSearch.value,showTable);
     });
 
     exportBtn.addEventListener('click', function(){
@@ -40,7 +49,14 @@ $(async function() {
     function setListSetting(returnObject){
         $('#table tbody').empty();
         if (returnObject != null){
-            let obj = returnObject['returnObject'];
+            let returnObj = returnObject['returnObject'];
+            var obj = Object.keys(returnObj).sort().reduce(
+                function(o,k){
+                    o[k] = returnObj[k];
+                    return o;
+                },
+                {}
+            );
             Object.keys(obj).sort(); //待處理
             for (let key in obj){
                 let rows = showTable.rows.length+1
@@ -123,7 +139,7 @@ $(async function() {
             datas['data'][addId.value] = addName.value
             let response = await parent.psotLocalhostApi('/addData',datas);
             if (response['returnObject'] == null){
-                document.getElementById("search").value = ""; //是否必要??????
+                document.getElementById("search").value = "";
                 setListSetting(await parent.psotLocalhostApi('/getList',DbTableName));
                 message.innerHTML = addId.value+"新增成功!";
                 $("div.alert").show();
@@ -156,21 +172,7 @@ $(async function() {
             }
         }
     }
-    //待改forEach
-    function search(value){
-        if (value != ""){
-            showTable.rows.forEach(function(ele,ind){
-                let id = ele.getElementsByTagName('span')[0].id
-                if (id.includes(value)){
-                    ele.style.display = "";
-                }else{
-                    ele.style.display = "none";
-                }
-            });
-        }else{
-            $("#table tbody tr").show();
-        }
-    }
+    
 
     async function myExport(){
         let obj = parent.window[DbTableName]['returnObject'];
@@ -188,6 +190,7 @@ $(async function() {
             let response = await parent.psotLocalhostApi('/importList',datas);
             if (response['returnObject'] === null){
                 setListSetting(await parent.psotLocalhostApi('/getList',DbTableName));
+                parent.window[DbTableName] = await parent.psotLocalhostApi('/getList',DbTableName);
                 message.innerHTML = "成功匯入!";
                 
             }else{
