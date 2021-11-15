@@ -1,5 +1,5 @@
 {
-  "name": "FCT-Automated",
+  "name": "QA",
   "version": "1.0.0",
   "description": "",
   "main": "./controller/main.js",
@@ -29,7 +29,6 @@
     "redis": "^3.1.2",
     "request": "^2.88.2",
     "require": "^2.4.20",
-    "sqlite3": "^5.0.2",
     "websocket": "^1.0.33",
     "ws": "^7.5.3"
   }

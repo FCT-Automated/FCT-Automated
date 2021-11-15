@@ -21,11 +21,16 @@
         onclick='$("#addTable tr").remove(); 
         $("#name")[0].disabled = false; 
         $("#name")[0].value = ""; 
-        $("#height")[0].value = ""; 
-        $("#width")[0].value = ""; 
+        $("#version")[0].value = ""; 
         $("#addMessage")[0].innerHTML = "";
         $(".modal-title")[0].innerHTML = "新增腳本";
-        $("#addBtn")[0].innerHTML = "確定新增";'>
+        $("#addBtn")[0].innerHTML = "確定新增";
+        $("#unassigned")[0].checked = true;
+        $("#defaultGameWindows")[0].checked = true;
+        $("#width")[0].value = $("#gameWindows")[0].value.split(",")[0];
+        $("#height")[0].value = $("#gameWindows")[0].value.split(",")[1];
+        $("#version")[0].disabled = true;
+        $("#gameWindows")[0].disabled = false;'>
         <span class="fas fa-plus"></span>新增腳本
       </button>
     </li>
@@ -75,19 +80,73 @@
         <div class="modal-header">
           <h5 class="modal-title">新增腳本</h5>
         </div>
-        <form >
+        <form>
           <div class="modal-body">
               <div class="form-group"> 
-                  <label for="GameID">Demo:</label> 
-                  <select class="form-control GameID" id="DemoGameID"></select> 
-                  <button type="Button" id="demoBtn" class="btn btn-primary">開啟</button>
+                <div style="display: inline-block;"><label for="GameID">Demo:</label> </div>
+                <div style="display: inline-block;"><select class="form-control GameID" id="DemoGameID"></select> </div>
+                <div style="display: inline-block;"><button type="submit" id="demoBtn" class="btn btn-primary">開啟</button></div>
               </div>
-              <div><span>腳本名稱:</span><input aria-required="true" id="name" required></div>
-              <div><span>遊戲視窗寬度:</span><input aria-required="true" id="width" required></div>
-              <div><span>遊戲視窗長度:</span><input aria-required="true" id="height" required></div>
-              <button id="addRowBtn" class="btn btn-dark" type="button">
-                <span class="fas fa-plus"></span>新增動作
-              </button>
+              <span class="text-primary" style="font-size: 12px; display: block; margin-bottom: 15px;">滑鼠點擊位置 請開啟上方Demo查看console並複製<br>注意:Demo的各設定會參考下方的數值</span>
+              <hr class="my-2">
+              <div class="form-group"> 
+                <div style="display: inline-block;"><label><span class="text-danger" style="font-size: 20px;">*</span>指定前端版號：</label> </div>
+                <div class="form-check" style="display: inline-block;">
+                  <div style="display: inline-block;">
+                    <input class="form-check-input" name="radioVersion" type="radio"  id="assign" >
+                    <label class="form-check-label">
+                      是
+                    </label>
+                  </div>
+                  <div style="display: inline-block;">
+                    <input id="version" style="width: 120px;" aria-required="true" disabled="disabled" required>
+                  </div>
+                </div>
+                <div class="form-check" style="display: inline-block; margin-left: 10px;">
+                  <input class="form-check-input" name="radioVersion" type="radio"  id="unassigned" checked>
+                  <label class="form-check-label" >
+                    否(使用當前版號)
+                  </label>
+                </div>
+              </div>
+              <div class="form-group"> 
+                <div style="display: inline-block;"><label>使用預設遊戲視窗：</label> </div>
+                <div class="form-check" style="display: inline-block;">
+                  <div style="display: inline-block;">
+                    <input class="form-check-input" name="setGameWindows" type="radio"  id="defaultGameWindows" checked>
+                    <label class="form-check-label">
+                      是
+                    </label>
+                  </div>
+                  <div style="display: inline-block;">
+                    <select class="form-control" id="gameWindows">
+                      <option value="553,959" selected="selected">直式</option>
+                      <option value="929,653">橫式</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-check" style="display: inline-block; margin-left: 10px;">
+                  <input class="form-check-input" name="setGameWindows" type="radio"  id="notDefaultGameWindows">
+                  <label class="form-check-label" >
+                    否
+                  </label>
+                </div>
+              </div>
+              <div>
+                <div style="display: inline-block;">
+                  <div class="form-group"><span><span class="text-danger" style="font-size: 20px;">*</span>遊戲寬度：</span><input aria-required="true" id="width"  required></div>
+                  <div class="form-group"><span><span class="text-danger" style="font-size: 20px;">*</span>遊戲長度：</span><input aria-required="true" id="height" required></div>
+                </div>
+                <hr class="my-3">
+                <div style="display: inline-block;">
+                  <div class="form-group"><span><span class="text-danger" style="font-size: 20px;">*</span>腳本名稱：</span><input style="width: 250px;" placeholder="腳本新增後此名稱不可再修改!" aria-required="true" id="name" required></div>
+                </div>
+                <div style="float: right;">
+                  <button id="addRowBtn" class="btn btn-dark" type="button" >
+                    <span class="fas fa-plus"></span>新增動作
+                  </button>
+                </div>
+              </div>
               <table class="table table-bordered">
                 <thead>
                     <tr>

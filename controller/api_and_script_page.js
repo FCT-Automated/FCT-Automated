@@ -100,9 +100,9 @@ async function Login(mes){
             data['user'] = args
             data['apiUrl'] = parent.apiUrl
             data['seamlessApiUrl'] = parent.seamlessApiUrl
-            await parent.browser.createBrowser(response.Url,parent.chromePath,data);
+            await parent.browser.createBrowser(response.Url,parent.chromePath,await setUpBrowerArgs('Script',data));
         }else{
-            await parent.browser.createBrowser(response.Url,parent.chromePath,"Normal")
+            await parent.browser.createBrowser(response.Url,parent.chromePath,await setUpBrowerArgs('Normal',{}));
         }
         mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入成功!! ]</br>"
     }else{

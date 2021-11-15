@@ -1,7 +1,7 @@
 const electron = require('electron');
 const { saveAs } = require('file-saver');
 var apiJs = require('../controller/api');
-var browser = require('../controller/openBrowser');
+var browser = require('../controller/browser');
 
 var chromePath;
 var apiUrl;

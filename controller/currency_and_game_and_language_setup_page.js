@@ -117,7 +117,8 @@ $(async function() {
         if (response['returnObject'] == null){
             let targetRow = parseInt(delBtn.id.split('delBtn')[1])
             showTable.deleteRow(targetRow-1)
-            showTable.rows.forEach(function(ele,ind){
+            let tableRows= showTable.rows;
+            tableRows.forEach(function(ele,ind){
                 ind = ind + 1;
                 let target = ele.getElementsByTagName('td')[0]
                 document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)

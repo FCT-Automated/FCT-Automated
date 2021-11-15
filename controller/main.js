@@ -20,7 +20,9 @@ app.on('activate', () => {
     }
 
 })
-app.allowRendererProcessReuse = false;
+
+
+// app.allowRendererProcessReuse = false;
 
 function createWindow() {
     win = new BrowserWindow({
@@ -40,10 +42,12 @@ function createWindow() {
     }))
 
     // Open DevTools.
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
 
     win.on('closed', () => {
         win = null
         ps.kill();
     })
 }
+
+

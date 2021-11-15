@@ -61,18 +61,23 @@ function setList(returnObject,element){
 function setKeys(data,element){
     let select = document.getElementById(element);
     select.options.length = 0;
-    let obj = data;
-    for (let key in obj){
-        let opt = document.createElement('option');
-        opt.value = key
-        opt.innerHTML = obj[key]
-        select.appendChild(opt)
+    if(data.length != 0){
+        for (let key in data){
+            let opt = document.createElement('option');
+            opt.value = key
+            opt.innerHTML = data[key]
+            select.appendChild(opt)
+        }
+    }else{
+        select.innerHTML = '<option>查無資料，請至設定新增</option>'
     }
+    
 }
 
 function search(value,showTable){
     if (value != ""){
-        showTable.rows.forEach(function(ele,ind){
+        let tableRows = showTable.rows;
+        tableRows.forEach(function(ele,ind){
             let id = ele.getElementsByTagName('span')[0].id
             if (id.includes(value)){
                 ele.style.display = "";
@@ -83,4 +88,13 @@ function search(value,showTable){
     }else{
         $("#table tbody tr").show();
     }
+}
+
+function setUpBrowerArgs(type,object){
+    return new Promise((resv, rej) => {
+        let datas = {};
+        datas['type'] = type;
+        datas['object'] = object;
+        resv(datas);
+    });
 }

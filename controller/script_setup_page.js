@@ -3,6 +3,12 @@ $(async function() {
     var showTable = document.getElementById("table").getElementsByTagName('tbody')[0];
     var message = document.getElementById("message");
     var DbTableName = document.title;
+    var assign = document.getElementById('assign');
+    var unassigned = document.getElementById('unassigned');
+    var defaultGameWindows = document.getElementById('defaultGameWindows');
+    var notDefaultGameWindows = document.getElementById('notDefaultGameWindows');
+    var gameWindows = document.getElementById('gameWindows');
+    
 
     const addRowBtn = document.getElementById('addRowBtn');
     const demoBtn = document.getElementById('demoBtn');
@@ -18,9 +24,9 @@ $(async function() {
         addRow(null,null);
     });
 
-    demoBtn.addEventListener('click', function(){
+    demoBtn.addEventListener('click', function(event){
         let DemoID = document.getElementById("DemoGameID").value;
-        runDemoAccount(DemoID);
+        runDemoAccount(DemoID,event);
     });
 
     addBtn.addEventListener('click',function(event){
@@ -38,6 +44,32 @@ $(async function() {
     filesInput.onchange = function(){
         myImport();
     }
+
+    assign.addEventListener('change',function(){
+        $("#version")[0].disabled = false;
+    });
+
+    unassigned.addEventListener('change',function(){
+        $("#version")[0].disabled = true;
+    });
+
+    defaultGameWindows.addEventListener('change',function(){
+        gameWindows.disabled = false;
+        $("#width")[0].value = gameWindows.value.split(",")[0];
+        $("#height")[0].value = gameWindows.value.split(",")[1];
+
+    });
+
+    notDefaultGameWindows.addEventListener('change',function(){
+        gameWindows.disabled = true;
+        $("#width")[0].value = "";
+        $("#height")[0].value = "";
+    });
+
+    gameWindows.addEventListener('change',function(){
+        $("#width")[0].value = gameWindows.value.split(",")[0];
+        $("#height")[0].value = gameWindows.value.split(",")[1];
+    })
 
     
     async function setListSetting(){
@@ -74,27 +106,46 @@ $(async function() {
                 $("#addTable tr").remove();
                 let response = await parent.psotLocalhostApi('/getScript',obj[key])
                 for (let k in response['returnObject']){
-                    if(k.includes("width") || k.includes("height")){
-                        $("#"+k)[0].value = response['returnObject'][k]
+                    let d = response['returnObject'][k];
+                    if(k.includes("width") || k.includes("height") || k.includes("version")){
+                        $("#"+k)[0].value = d
+                        if(k === "version" && d === ""){
+                            $("#version")[0].disabled = true;
+                            $("#unassigned")[0].checked = true;
+                        }else{
+                            $("#assign")[0].checked = true;
+                            $("#version")[0].disabled = false;
+                        }
                     }else{
-                        addRow(k.split("_")[1],response['returnObject'][k]);
+                        addRow(k.split("_")[1],d);
                     }
                     
                 }
+                $("#gameWindows option").each(function(i,item){
+                    if(item.value.split(",")[0] === $("#width")[0].value && item.value.split(",")[1] === $("#height")[0].value){
+                        gameWindows.disabled = false
+                        defaultGameWindows.checked = true
+                        item.selected = true
+                        return false;
+                    }else{
+                        gameWindows.disabled = true
+                        notDefaultGameWindows.checked = true
+                    }
+                });
+
             } 
             updateBtn.appendChild(updateBtnIcon)
             update.appendChild(updateBtn)
 
             //del
-            let delBtn = document.createElement('Button')
-            let delBtnIcon = document.createElement('i')
-            delBtnIcon.className = "fas fa-trash-alt"
-            delBtn.className = "btn btn-default"
-            delBtn.type = "button"
-            delBtn.id = "delBtn"+String(rows)
+            let delBtn = document.createElement('Button');
+            let delBtnIcon = document.createElement('i');
+            delBtnIcon.className = "fas fa-trash-alt";
+            delBtn.className = "btn";
+            delBtn.id = "delBtn"+String(rows);
             delBtn.onclick = async function(){delScript(obj[key],delBtn)} 
-            delBtn.appendChild(delBtnIcon)
-            del.appendChild(delBtn)
+            delBtn.appendChild(delBtnIcon);
+            del.appendChild(delBtn);
         }
 
     }
@@ -104,7 +155,8 @@ $(async function() {
         if (response['returnObject'] == null){
             let targetRow = parseInt(delBtn.id.split('delBtn')[1])
             showTable.deleteRow(targetRow-1)
-            showTable.rows.forEach(function(ele,ind){
+            let tableRows = showTable.rows;
+            tableRows.forEach(function(ele,ind){
                 ind = ind + 1;
                 let target = ele.getElementsByTagName('td')[0]
                 document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
@@ -165,9 +217,8 @@ $(async function() {
         //建立delBtn
         let btn = document.createElement('Button')
         let btnicon = document.createElement('i')
-        btn.className = "btn btn-default"
-        btn.type = "button"
-        btn.id = "delBtn"+String(rows+1)
+        btn.className = "btn"
+        btn.id = "delRowBtn"+String(rows+1)
         btn.onclick = function(){delRowFunction(btn)} 
         btnicon.className = "fas fa-trash-alt"
         btn.appendChild(btnicon)
@@ -203,7 +254,7 @@ $(async function() {
         }
     }
     
-    async function runDemoAccount(DemoID){
+    async function runDemoAccount(DemoID,event){
         let response;
         let args ={
             API : 'GetDemoUrl',
@@ -214,95 +265,128 @@ $(async function() {
         }
         let mes = urlAndPathCheck();
         if(mes.length === 0){
-            response = await parent.apiJs.requestAPI(args,parent.apiUrl)
-            await parent.browser.createBrowser(response.Url,parent.chromePath,"Demo")
+            if(await isAssign()){
+                event.preventDefault();
+                response = await parent.apiJs.requestAPI(args,parent.apiUrl)
+                let object = {};
+                if($("#assign")[0].checked){
+                    object['version'] = $("#version")[0].value;
+                }else{
+                    object['version'] = "";
+                }
+                if(defaultGameWindows.checked){
+                    object['width'] = gameWindows.value.split(",")[0];
+                    object['height'] = gameWindows.value.split(",")[1];
+                    await parent.browser.createBrowser(response.Url,parent.chromePath,await setUpBrowerArgs("Demo",object));
+                }else{
+                    await parent.browser.createBrowser(response.Url,parent.chromePath,await setUpBrowerArgs("Demo",object));
+                }
+            }
         }
-        parent.postMessage(JSON.parse(JSON.stringify(mes)),"*");
+        message.innerHTML = mes;
     }
     
     async function addScript(event){
-        if($("#name")[0].checkValidity() && $("#width")[0].checkValidity() && $("#height")[0].checkValidity()){
-            event.preventDefault();
-            let rowLength = addTable.rows.length;
-            if (rowLength !=0) {
-                let eleName = document.getElementById('name');
-                let width = document.getElementById('width');
-                let height = document.getElementById('height');
-                let addMessage = document.getElementById("addMessage");
-                let data = {};
-                data[eleName.value] = {};
-                data[eleName.value]['width'] = width.value;
-                data[eleName.value]['height'] = height.value;
-                let key;
-                let value;
-                for (let i = 0; i < rowLength; i++){
-                    key = (i+1).toString()+"_" +addTable.rows.item(i).cells[1].children[0].value 
-                    value = addTable.rows.item(i).cells[2].children[0].value.replaceAll(" ","")
-                    if (value !="" || key.includes('refresh')){
-                        data[eleName.value][key] = value
+        if(await isAssign()){
+            if($("#name")[0].checkValidity() && $("#width")[0].checkValidity() && $("#height")[0].checkValidity()){
+                event.preventDefault();
+                let rowLength = addTable.rows.length;
+                if (rowLength !=0) {
+                    let eleName = document.getElementById('name');
+                    let width = document.getElementById('width');
+                    let height = document.getElementById('height');
+                    let addMessage = document.getElementById("addMessage");
+                    let version = document.getElementById("version");
+                    let data = {};
+                    data[eleName.value] = {};
+                    data[eleName.value]['width'] = width.value;
+                    data[eleName.value]['height'] = height.value;
+                    if($("#assign")[0].checked){
+                        data[eleName.value]['version'] = version.value;
                     }else{
-                        break
-                    }                
-                }
-                if (Object.keys(data[eleName.value]).length == rowLength+2){
-                    let response;
-                    if($("#addBtn")[0].innerHTML.includes("修改")){
-                        response = await parent.psotLocalhostApi('/updateScript',data);
-                        if (response['returnObject'] == null){
-                            parent.scriptList = await parent.getLocalhostApi('/getKeys');
-                            setListSetting();
-                            message.innerHTML = eleName.value+"修改成功!";
-                            $("div.alert").show();
-                            $("#addModal").modal("hide");
+                        data[eleName.value]['version'] = "";
+                    }
+                    let key;
+                    let value;
+                    for (let i = 0; i < rowLength; i++){
+                        key = (i+1).toString()+"_" +addTable.rows.item(i).cells[1].children[0].value 
+                        value = addTable.rows.item(i).cells[2].children[0].value.replaceAll(" ","")
+                        if (value !="" || key.includes('refresh')){
+                            data[eleName.value][key] = value
                         }else{
-                            addMessage.innerHTML = response['returnObject'];
+                            break
+                        }                
+                    }
+                    if (Object.keys(data[eleName.value]).length == rowLength+3){
+                        let response;
+                        if($("#addBtn")[0].innerHTML.includes("修改")){
+                            response = await parent.psotLocalhostApi('/updateScript',data);
+                            if (response['returnObject'] == null){
+                                parent.scriptList = await parent.getLocalhostApi('/getKeys');
+                                setListSetting();
+                                message.innerHTML = eleName.value+"修改成功!";
+                                $("div.alert").show();
+                                $("#addModal").modal("hide");
+                            }else{
+                                addMessage.innerHTML = response['returnObject'];
+                            }
+                        }else{
+                            response = await parent.psotLocalhostApi('/addScript',data);
+                            if (response['returnObject'] == null){
+                                parent.scriptList = await parent.getLocalhostApi('/getKeys');
+                                setListSetting();
+                                message.innerHTML = eleName.value+"新增成功!";
+                                $("div.alert").show();
+                                $("#addModal").modal("hide");
+                            }else{
+                                addMessage.innerHTML = response['returnObject'];
+                            }
                         }
                     }else{
-                        response = await parent.psotLocalhostApi('/addScript',data);
-                        if (response['returnObject'] == null){
-                            parent.scriptList = await parent.getLocalhostApi('/getKeys');
-                            setListSetting();
-                            message.innerHTML = eleName.value+"新增成功!";
-                            $("div.alert").show();
-                            $("#addModal").modal("hide");
-                        }else{
-                            addMessage.innerHTML = response['returnObject'];
-                        }
+                        addMessage.innerHTML = "內容不可空白!";
                     }
                 }else{
-                    addMessage.innerHTML = "內容不可空白!";
+                    addMessage.innerHTML ="至少新增一列!";
                 }
-            }else{
-                addMessage.innerHTML ="至少新增一列!";
             }
-            
         }
-        
     }
     
     function delRowFunction(btnHtml){
-        let targetRow = parseInt(btnHtml.id.split('delBtn')[1])-1
+        let targetRow = parseInt(btnHtml.id.split('delRowBtn')[1])-1
         addTable.deleteRow(targetRow)
+        let context = ["actionList","actionText","delRowBtn"];
         Object.keys(addTable.rows).forEach(function(ind){
-            ind = parseInt(ind);
-            let target = addTable.rows[ind].getElementsByTagName('td')[0]
-            if (target.innerHTML != String(ind+1)){
-                document.getElementById("actionList"+String(target.innerHTML)).id = "actionList"+String(ind+1)
-                document.getElementById("actionText"+String(target.innerHTML)).id = "actionText"+String(ind+1)
-                document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind+1)
-                target.innerHTML = String(ind+1)
-            }
+            var index = parseInt(ind);
+            var target = addTable.rows[index].getElementsByTagName('td')[0]
+            context.forEach(function(ele){
+                $("#"+ele+String(target.innerHTML)).attr("id",ele+String(index+1));
+            });
+            target.innerHTML = String(index+1)
         })
     }
 
-    //待改
-    function myExport(){
-        var result = [];
-        parent.scriptList.forEach(async function(key,ind){
-            result.push({});
-            let response = await parent.psotLocalhostApi('/getScript',key);
-            result[ind][key] = await response['returnObject'];      
+    async function isAssign(){
+        return new Promise((resv, rej) => {
+            if($("#assign")[0].checked){
+                if($("#version")[0].checkValidity()){
+                    resv(true);
+                }else{
+                    resv(false);
+                }
+            }else{
+                resv(true);
+            }
         });
+    }
+
+    async function myExport(){
+        var result = [];
+        for (const [index, value] of parent.scriptList.entries()){
+            let response = await parent.psotLocalhostApi('/getScript',value);
+            result.push({});
+            result[index][value] = response['returnObject'];  
+        }
         let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
         parent.saveAs(blob, DbTableName+".json");
     }
@@ -311,19 +395,20 @@ $(async function() {
         let reader = new FileReader();
         reader.readAsText(await filesInput.files[0]);
         reader.onload = async function(){
-            let datas = {};
-            datas['data'] = JSON.parse(this.result);
-            datas['tableName'] = DbTableName;
-            let response = await parent.psotLocalhostApi('/importList',datas);
-            if (response['returnObject'] === null){
-                // setListSetting(await parent.psotLocalhostApi('/getList',DbTableName));
-                parent.window[DbTableName] = await parent.psotLocalhostApi('/getList',DbTableName);
-                message.innerHTML = "成功匯入!";
-                
-            }else{
-                message.innerHTML = response['returnObject'];
+            var datas = JSON.parse(this.result);
+            for (let data of datas){
+                if(!parent.scriptList.includes(Object.keys(data)[0])){
+                    let response = await parent.psotLocalhostApi('/addScript',data);
+                    if (response['returnObject'] != null){
+                        message.innerHTML = Object.keys(data)[0]+"新增失敗!";
+                        $("div.alert").show();
+                        return;
+                    }
+                }                
             }
-            $("div.alert").show();
+            message.innerHTML = "成功匯入!";
+            parent.scriptList = await parent.getLocalhostApi('/getKeys');
+            setListSetting();
         };
         $("form").get(1).reset()
     }
