@@ -1,11 +1,21 @@
 {
   "name": "QA",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "./controller/main.js",
   "scripts": {
     "start": "electron .",
-    "build_win32": "electron-packager . MyApp --platform=win32 --arch=x64 --asar=true --ignore=node_modules/electron-* "
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.fc.app",
+    "productName":"QA",
+    "win": {
+      "icon": "build/favicon.ico",
+      "target": [
+        "zip"
+      ]
+    }
   },
   "keywords": [],
   "author": "",
@@ -15,14 +25,10 @@
     "async": "^3.2.1",
     "bootstrap": "^4.6.0",
     "bootstrap-table": "^1.18.2",
-    "electron": "^11.1.1",
-    "electron-rebuild": "^2.3.5",
     "express.js": "^1.0.0",
     "file-saver": "^2.0.5",
     "jquery": "^3.5.1",
     "jquery-treegrid": "^0.3.0",
-    "js-datepicker": "^5.18.0",
-    "loaders.css": "^0.1.2",
     "mongodb": "^3.6.6",
     "node-static": "^0.7.11",
     "puppeteer": "^5.5.0",
@@ -31,5 +37,9 @@
     "require": "^2.4.20",
     "websocket": "^1.0.33",
     "ws": "^7.5.3"
+  },
+  "devDependencies": {
+    "electron": "^11.5.0",
+    "electron-builder": "^22.13.1"
   }
 }
