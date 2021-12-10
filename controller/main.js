@@ -1,4 +1,4 @@
-const electron = require('electron')
+// const electron = require('electron')
 const {app, BrowserWindow } = require('electron')
 const path = require('path')
 const url = require('url')
@@ -26,14 +26,16 @@ app.allowRendererProcessReuse = false;
 
 function createWindow() {
     win = new BrowserWindow({
-        width: 1010, 
-        height: 840,
+        maxWidth : 804, 
+        minWidth : 804,
+        maxHeight : 600,
+        minHeight :600,
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true
         }
     })
-    electron.Menu.setApplicationMenu(null);
+    // electron.Menu.setApplicationMenu(null);
 
     win.loadURL(url.format({
         pathname: path.join(__dirname, '../view/index.html'),
@@ -42,7 +44,7 @@ function createWindow() {
     }))
 
     // Open DevTools.
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
 
     win.on('closed', () => {
         win = null

@@ -5,14 +5,15 @@ function connectRedis(db){
         "host": "127.0.0.1",
         "port": 6379,
         "db":db
-    }    
+    }
+    console.log("successfully connected to the redis");    
     return redis.createClient(redis_config)
 }
 
 function createTableOfPath(){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        var keys = ['chromePath','apiUrl','seamlessApiUrl'];
+        var keys = ['chromePath','apiUrl','seamlessApiUrl','DBUsername','DBPassword','DBhost','DBPort','DBName'];
         client.hgetall('PathList', (error, result) => {
             if (!error){
                 if(result == null){

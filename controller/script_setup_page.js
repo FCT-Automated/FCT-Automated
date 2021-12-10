@@ -267,7 +267,7 @@ $(async function() {
         if(mes.length === 0){
             if(await isAssign()){
                 event.preventDefault();
-                response = await parent.apiJs.requestAPI(args,parent.apiUrl)
+                response = await parent.apiJs.requestAPI(args)
                 let object = {};
                 if($("#assign")[0].checked){
                     object['version'] = $("#version")[0].value;
@@ -277,9 +277,9 @@ $(async function() {
                 if(defaultGameWindows.checked){
                     object['width'] = gameWindows.value.split(",")[0];
                     object['height'] = gameWindows.value.split(",")[1];
-                    await parent.browser.createBrowser(response.Url,parent.chromePath,await setUpBrowerArgs("Demo",object));
+                    await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object));
                 }else{
-                    await parent.browser.createBrowser(response.Url,parent.chromePath,await setUpBrowerArgs("Demo",object));
+                    await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object));
                 }
             }
         }

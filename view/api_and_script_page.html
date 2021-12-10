@@ -11,83 +11,160 @@
       <div class="col">
         <form>
           <div class="form-group">
-            <label for="API">API:</label>
-            <select class="form-control" id="API">
-              <option value="Login" selected="selected">Login</option>
-              <option value="SetPoints">SetPoints</option>
-              <option value="KickOut">KickOut</option>
-            </select>
-          </div>
-          <div class="form-group field_Login "> 
-            <label for="LanguageID">語系:</label> 
-            <select class="form-control LanguageID" id="LanguageID"> 
-            </select> 
-          </div> 
-          <div class="form-group"> 
-            <label for="Currency">幣別:</label> 
-            <select class="form-control Currency" id="Currency"> 
-            </select> 
-          </div> 
-          <div class="form-group field_Login"> 
-            <label for="GameID">遊戲名稱:</label> 
-            <select class="form-control GameID" id="GameID"> 
-            </select> 
-          </div> 
-          <div class="form-group"> 
-            <label for="AgentCode">商戶代碼:</label> 
-            <input class="form-control" id="AgentCode" aria-required="true" required>
-          </div> 
-          
-          <div class="form-group"> 
-            <label for="MemberAccount">帳號:</label> 
-            <input class="form-control" id="MemberAccount" aria-required="true" required> 
-          </div>
-        
-          <div class="form-group field_Login"> 
-            <label for="Event">活動:</label> 
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="optionEvent" id="notAttend" value="notAttend" checked>
-              <label class="form-check-label" for="notAttend">
-                不參加
-              </label>
+            <div style="display: inline-block;">
+              <label for="API">API：</label>
             </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="optionEvent" id="attend" value="attend">
-              <label class="form-check-label" for="attend">
-                參加
-              </label>
-              <select class="form-control" id="Event" disabled="disabled"> 
+            <div style="display: inline-block;">
+              <select class="form-control" id="API">
+                <option value="Login" selected="selected">Login</option>
+                <option value="SetPoints">SetPoints</option>
+                <option value="KickOut">KickOut</option>
               </select>
             </div>
           </div>
           
-          <div class="form-group scriptList"> 
-            <label for="list">腳本:</label> 
-            <select class="form-control" id="list"></select>
+          <div>
+            <div class="form-group field_Login " style="display: inline-block; margin-right: 20px;"> 
+              <div style="display: inline-block;">
+                <label for="LanguageID">語　　系：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <select class="form-control LanguageID" style="width: 200px;" id="LanguageID"> </select> 
+              </div>
+            </div> 
+
+            <div class="form-group field_SetPoints" style="display: inline-block; margin-right: 20px;"> 
+              <div style="display: inline-block;">
+                <label for="Wallet">錢　　包：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <select class="form-control" style="width: 200px;" id="Wallet"> 
+                  <option id="seamlessWallet">單一錢包</option>
+                  <option id="transferWallet">轉帳錢包</option>
+                </select>
+              </div>
+            </div>
+  
+            <div class="form-group" style="display: inline-block;"> 
+              <div style="display: inline-block;">
+                <label for="Currency">幣　　別：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <select class="form-control Currency" style="width: 200px;" id="Currency"> </select> 
+              </div>
+            </div> 
           </div>
-        
-          <div class="form-group field_SetPoints" style="display: none;"> 
-            <label for="Wallet">錢包:</label> 
-            <select class="form-control" id="Wallet"> 
-              <option id="seamlessWallet">單一錢包</option>
-              <option id="transferWallet">轉帳錢包</option>
-            </select>
+          
+          <div>
+            <div class="form-group field_Login" style="display: inline-block; margin-right: 20px;"> 
+              <div style="display: inline-block;">
+                <label for="GameID">遊戲名稱：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <select class="form-control GameID" style="width: 200px;" id="GameID"> </select> 
+              </div>  
+            </div> 
+
+            <div class="form-group field_SetPoints" style="display: inline-block; margin-right: 20px;"> 
+              <div style="display: inline-block;">
+                <label for="Points">點　　數：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <input class="form-control" id="Points"> 
+              </div>
+            </div>
+  
+            <div class="form-group" style="display: inline-block;"> 
+              <div style="display: inline-block;">
+                <label for="AgentCode">商戶代碼：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <input class="form-control" style="width: 200px;" id="AgentCode" aria-required="true" required>
+              </div>
+            </div> 
           </div>
-        
-          <div class="form-group field_SetPoints" style="display: none;"> 
-            <label for="Points">點數:</label> 
-            <input class="form-control" id="Points"> 
+          
+          <div>
+            <div class="form-group" style="display: inline-block;"> 
+              <div style="display: inline-block;">
+                <label for="MemberAccount">帳　　號：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <input class="form-control" style="width: 200px;" placeholder="多個帳號請用,分隔(半形)" id="MemberAccount" aria-required="true" required> 
+              </div>
+            </div>
+  
+            <div class="form-group field_Login" style="display: inline-block;"> 
+              <div style="display: inline-block; margin-left: 20px;">
+                <label for="Event">活　　動：</label> 
+              </div>              
+              <div class="form-check" style="display: inline-block; margin-left: 10px;">
+                <input class="form-check-input" type="radio" name="optionEvent" id="notAttend" value="notAttend" checked>
+                <label class="form-check-label" for="notAttend">
+                  不參加
+                </label>
+              </div>
+              <div class="form-check" style="display: inline-block; margin: 10px;">
+                <div style="display: inline-block;">
+                  <input class="form-check-input" type="radio" name="optionEvent" id="attend" value="attend">
+                  <label class="form-check-label" for="attend">
+                    參加
+                  </label>
+                </div>
+                <div style="display: inline-block;">
+                  <select class="form-control" id="Event" disabled="disabled"></select>
+                </div>
+                
+              </div>
+            </div>
           </div>
-    
-          <button type="submit" id="submit" class="btn btn-primary">送出</button>
+          
+          <div>
+            <div class="form-group scriptList" style="display: inline-block; margin-right: 20px;"> 
+              <div style="display: inline-block;">
+                <label for="list">腳　　本：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <select class="form-control" id="list"></select>
+              </div>
+            </div>
+
+            <div class="form-group multiple" style="display: inline-block;"> 
+              <div style="display: inline-block;">
+                <label for="multiple">多帳號時只開一個視窗：</label> 
+              </div>
+              <div class="form-check" style="display: inline-block; margin-left: 10px;">
+                <div style="display: inline-block;">
+                  <input class="form-check-input" type="radio" name="optionMultiple" id="multipleYes" value="multipleYes" >
+                  <label class="form-check-label" for="multipleYes">
+                    是
+                  </label>
+                </div>
+                <div style="display: inline-block;">
+                  <input class="form-control"  id="multipleMin" placeholder="分鐘" aria-required="true" required> 
+                </div>
+              </div>
+              <div class="form-check" style="display: inline-block; margin-left: 10px;">
+                <input class="form-check-input" type="radio" name="optionMultiple" id="multipleNo" value="multipleNo" checked>
+                <label class="form-check-label" for="multipleNo">
+                  否
+                </label>
+              </div>
+            </div>
+            <span class="tip" style="font-size: 13px; display: block;">選是：送出後會根據填寫的分鐘數輪流登入帳號且腳本會自動執行</span>
+            <span class="tip" style="font-size: 13px; display: block;">選否：送出後會開啟多個視窗，如要執行腳本請分別於console裡打上console.log("start")，停止執行請打console.log("end")</span>
+
+          </div>
+          <button type="submit" style="display: block;" id="submit" class="btn btn-primary">送出</button>
         </form>
       </div>
-      <div class="col">
-        <div>
-          <span id="message"></span>
-        </div>
-      </div>
+
     </div> 
+    <div class="row">
+      <div class="col">
+        <span id="message"></span>
+      </div>
+    </div>
     
   </body>
           

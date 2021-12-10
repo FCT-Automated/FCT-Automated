@@ -8,7 +8,7 @@ async function isAttendCheck(isCheck){
             Currency : document.getElementById("Currency").value,
             AgentCode : document.getElementById("AgentCode").value,
         }      
-        let Eventresult = await parent.apiJs.requestAPI(args,parent.apiUrl);
+        let Eventresult = await parent.apiJs.requestAPI(args);
         if (Eventresult['Data'] != null){
             Eventresult['Data'].forEach(function(datas){
                 let opt = document.createElement('option')

@@ -1,13 +1,13 @@
 $(function() {
     document.title = location.search.split("?")[1];
     window[document.title]();
-   
-
+    
     var attend = document.getElementById('attend');
     var notAttend = document.getElementById('notAttend');
     var apiSelect = document.getElementById('API');
     const submit = document.getElementById('submit');
 
+    changeApi(apiSelect.value);
     setList(parent.CurrencyList,"Currency");
     setList(parent.GameList,"GameID");
     setList(parent.LanguageList,"LanguageID");
@@ -32,12 +32,16 @@ $(function() {
 function api(){
     $('#API')[0].disabled = false
     $('.scriptList').hide()
+    $('.multiple').hide()
+    $('.tip').hide()
 }
 
 function script(){
     $('.scriptList').show()
     setKeys(parent.scriptList,"list");
     $('#API')[0].disabled = true
+    $('.tip').show()
+
     
 }
 
@@ -65,53 +69,118 @@ function getCurrentDateTime(){
 }
 
 //submit
-async function run(event,api){
-    if ($("#AgentCode")[0].checkValidity() && $("#MemberAccount")[0].checkValidity()){
+async function run(event,apiValue){
+    if(checkValidity()){
+        let MemberAccounts = document.getElementById("MemberAccount").value.split(",");
         event.preventDefault();
         let mes = urlAndPathCheck();
         if(mes.length === 0){
-            var apiFunction = window[api];
-            if(typeof apiFunction === "function"){
-                mes = await apiFunction(mes);
+            if(document.title == 'script' && $("#multipleYes")[0].checked){
+                AutoScript(MemberAccounts);
             }else{
-                mes = "查無此Api Function</br>"
+                for(let MemberAccount of MemberAccounts){
+                    if(typeof window[apiValue] === "function"){
+                        mes = await window[apiValue](mes,MemberAccount);
+                    }else{
+                        mes = "查無此Api Function</br>"
+                    }
+                    $("#message")[0].innerHTML += mes;
+                }
             }
+            
         }  
-        $("#message")[0].innerHTML += mes;
     }
     
 }
 
-async function Login(mes){
+function checkValidity(){
+    if ($("#AgentCode")[0].checkValidity() && $("#MemberAccount")[0].checkValidity()){
+        if(document.title == "script" && $("#multipleYes")[0].checked){
+            if ($("#multipleMin")[0].checkValidity()){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+async function AutoScript(MemberAccounts){
+    let browserArgs ={
+        executablePath: parent.chromePath, // windows
+        headless: false, // 是否在背景運行瀏覽器
+        args: ['--no-default-browser-check','--no-sandbox'],
+        ignoreDefaultArgs: ['--enable-automation'],
+        autoClose: false,
+        devtools: true
+      }
+    var page = await parent.browser.openBrowser(browserArgs);
+
+    while(true){
+        for(let MemberAccount of MemberAccounts){
+            let args ={
+                API : "Login",
+                Currency : document.getElementById("Currency").value,
+                GameID : document.getElementById("GameID").value,
+                AgentCode : document.getElementById("AgentCode").value,
+                MemberAccount : MemberAccount,
+                LanguageID : document.getElementById("LanguageID").value
+            }
+            let response = await parent.apiJs.requestAPI(args)
+            let code = response.Result;
+            if ( code == 0){
+                data = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
+                data['user'] = args
+                let datas= await setUpBrowerArgs('OnlyOneWindowsScript',data);
+                await parent.browser.OnlyOneWindowsScript(response.Url,page,datas);
+                var isStart = true;
+                setTimeout(() => isStart = false, parseInt(document.getElementById("multipleMin").value)*1000*60);
+                while(isStart){
+                    await parent.browser.runScript(datas['object'],page)     
+                }
+                
+            }else{
+                break
+            }
+        } 
+    }
+}
+
+async function Login(mes,MemberAccount){       
     let args ={
         API : "Login",
         Currency : document.getElementById("Currency").value,
         GameID : document.getElementById("GameID").value,
         AgentCode : document.getElementById("AgentCode").value,
-        MemberAccount : document.getElementById("MemberAccount").value,
+        MemberAccount : MemberAccount,
         LanguageID : document.getElementById("LanguageID").value
     }
-    let response = await parent.apiJs.requestAPI(args,parent.apiUrl)
+    let response = await parent.apiJs.requestAPI(args)
     let code = response.Result;
     if ( code == 0){
         if(document.title == 'script'){
             //待改
-            let data = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
+            data = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
             data['user'] = args
-            data['apiUrl'] = parent.apiUrl
-            data['seamlessApiUrl'] = parent.seamlessApiUrl
-            await parent.browser.createBrowser(response.Url,parent.chromePath,await setUpBrowerArgs('Script',data));
+            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Script',data));
         }else{
-            await parent.browser.createBrowser(response.Url,parent.chromePath,await setUpBrowerArgs('Normal',{}));
+            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Normal',{}));
         }
         mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入成功!! ]</br>"
     }else{
-        mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入失敗 - Error Code："+code+"!! ]</br>"
+        mes = "Log:[ login- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 登入失敗 - Error Code："+code+"!! ]</br>";
     }
+
     return mes;
 }
 
-async function SetPoints(mes){
+function wait(ms){
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function SetPoints(mes,MemberAccount){
     let args;
     let response;
     let code;
@@ -121,10 +190,10 @@ async function SetPoints(mes){
             API : 'SetJson',
             Currency : document.getElementById("Currency").value,
             AgentCode : document.getElementById("AgentCode").value,
-            MemberAccount : document.getElementById("MemberAccount").value,
+            MemberAccount : MemberAccount,
             Points : document.getElementById("Points").value
         }
-        response = await parent.apiJs.requestSeamlessAPI(args,parent.seamlessApiUrl);
+        response = await parent.apiJs.requestSeamlessAPI(args);
         code = response.Result;
         if ( code == 0){
             mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.Points+"]</br>"
@@ -135,10 +204,10 @@ async function SetPoints(mes){
             API : 'SetPoints',
             Currency : document.getElementById("Currency").value,
             AgentCode : document.getElementById("AgentCode").value,
-            MemberAccount : document.getElementById("MemberAccount").value,
+            MemberAccount : MemberAccount,
             Points : document.getElementById("Points").value
         }
-        response = await parent.apiJs.requestAPI(args,parent.apiUrl);
+        response = await parent.apiJs.requestAPI(args);
         code = response.Result;
         if ( code == 0){
             mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+args["AgentCode"]+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.AfterPoint+"，BankID："+response.BankID+"]</br>"
@@ -150,14 +219,14 @@ async function SetPoints(mes){
     return mes;
 }
 
-async function KickOut(mes){
+async function KickOut(mes,MemberAccount){
     let args ={
         API : 'KickOut',
         Currency : document.getElementById("Currency").value,
         AgentCode : document.getElementById("AgentCode").value,
-        MemberAccount : document.getElementById("MemberAccount").value,
+        MemberAccount : MemberAccount,
     }
-    let response = await parent.apiJs.requestAPI(args,parent.apiUrl);
+    let response = await parent.apiJs.requestAPI(args);
     let code = response.Result;
     if ( code == 0){
         mes = "Log:[ KickOut- "+getCurrentDateTime()+" - "+args['AgentCode']+"-"+args['MemberAccount']+" 踢出成功!! ]</br>"

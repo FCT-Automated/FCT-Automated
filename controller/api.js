@@ -2,18 +2,11 @@ var querystring = require('querystring')
 var request = require('request')
 var mongodbClient = require('mongodb').MongoClient;
 
-var apiUrl
 var homeUrl = 'https://www.mearhh.com'
 
 function connectMongoDB(code){
     return new Promise((resv, rej) => {
-        const DATABASEUSERNAME = "game_server";
-        const DATABASEPASSWORD = "GS77SvbADc";
-        const DATABASEHOST = "104.199.225.172";
-        const DATABASEPORT = "27017";
-        const DATABASENAME = "gamesystem";
-
-        mongodbClient.connect('mongodb://'+DATABASEUSERNAME+':'+DATABASEPASSWORD+'@'+DATABASEHOST+':'+DATABASEPORT+'/'+DATABASENAME,
+        mongodbClient.connect('mongodb://'+parent.DBUsername+':'+parent.DBPassword+'@'+parent.DBhost+':'+parent.DBPort+'/'+parent.DBName,
         { useNewUrlParser: true , useUnifiedTopology: true},
         function(err,db){
             if(!err) {
@@ -48,7 +41,7 @@ function setApiKey(params,agentKey){
         let formData = querystring.stringify(form)
         let postOptions = {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            url: 'https://'+apiUrl+'/Key',
+            url: 'https://'+parent.apiUrl+'/Key',
             method: 'POST',
             body: formData ,
             agentOptions: {
@@ -70,7 +63,7 @@ function setApiTools(getKey,apis,agentCode,currency){
         let formData = querystring.stringify(form)
         let postOptions = {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            url: 'https://'+apiUrl+'/'+apis,
+            url: 'https://'+parent.apiUrl+'/'+apis,
             method: 'POST',
             body: formData ,
             agentOptions: {
@@ -82,13 +75,14 @@ function setApiTools(getKey,apis,agentCode,currency){
 }
 
 function apiSeamlessRequest(apis,params){
-    return new Promise(function(resolve,reject){        let form = {
+    return new Promise(function(resolve,reject){        
+        let form = {
             Params:params,
         }
         let formData = querystring.stringify(form)
         let postOptions = {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            url: 'https://'+apiUrl+'/'+apis,
+            url: 'https://'+parent.seamlessApiUrl+'/'+apis,
             method: 'POST',
             body: formData ,
             agentOptions: {
@@ -105,14 +99,13 @@ function doRequest(postOptions) {
             if (!error && response.statusCode == 200) {
                 resolve(JSON.parse(body))
             }else{
-                reject(error)
+                resolve("-Request Fail");
             }
         })
     })
 }
  
-async function requestAPI(args,url) {
-    apiUrl = url
+async function requestAPI(args) {
     var arg
     switch (args['API']){
         case 'Login':
@@ -153,8 +146,7 @@ async function requestAPI(args,url) {
     return doRequest(apisOptions)
 }
 
-async function requestSeamlessAPI(args,url) {
-    apiUrl = url
+async function requestSeamlessAPI(args) {
     var arg = JSON.stringify({
         MemberAccount : args['MemberAccount'],
         Points : args['Points']

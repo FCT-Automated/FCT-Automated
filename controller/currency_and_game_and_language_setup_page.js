@@ -108,7 +108,6 @@ $(async function() {
         }
     }
     
-    //待改forEach
     async function delRow(key,delBtn){
         let data = {};
         data['key'] = key;

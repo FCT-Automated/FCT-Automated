@@ -1,8 +1,8 @@
 const puppeteer = require('puppeteer');
 
-async function createBrowser(url,browserPath,datas) {
+async function createBrowser(url,datas) {
   let browserArgs ={
-    executablePath: browserPath, // windows
+    executablePath: parent.chromePath, // windows
     headless: false, // 是否在背景運行瀏覽器
     args: ['--no-default-browser-check','--no-sandbox'],
     ignoreDefaultArgs: ['--enable-automation'],
@@ -87,6 +87,16 @@ async function Script(url,object,browserArgs){
   })
 }
 
+async function OnlyOneWindowsScript(url,page,datas){
+  let object = datas["object"];
+  if (object['returnObject']['version'] != ""){
+    await page.goto(url+"&version="+object['returnObject']['version']);
+  }else{
+    await page.goto(url);
+  }
+  await page.setViewport({width: parseInt(object['returnObject']['width']),height: parseInt(object['returnObject']['height'])});
+}
+
 async function Normal(url,object,browserArgs){
   browserArgs["defaultViewport"] = null
   let page =  await openBrowser(browserArgs);
@@ -105,9 +115,10 @@ async function openBrowser(browserArgs){
   await client.send('Network.enable')
   //當websocket關閉時
   client.on('Network.webSocketClosed', 
-    async function(params){
-      console.log("斷線")
-      await page.screenshot({path: Date().replace(/:/g,".")+'.png'}); // 截圖
+    async function(){
+      console.log(Date()+"斷線");
+      // await page.waitFor(1000);
+      // await page.screenshot({path: Date().replace(/:/g,".")+'.png'}); // 截圖
     }
   )
 
@@ -123,31 +134,43 @@ async function runScript(datas,page){
   delete scripts["version"]; 
   let user = datas['user'];
   user['API'] = 'SetPoints';
-  let seamlessApiUrl = datas['seamlessApiUrl'];
-  let apiUrl = datas['apiUrl'];
+  let response;
   for (let action in scripts){
+    console.log(action.split("_")[1]+"-start");
     switch (action.split("_")[1]){
       case "wait":
         await wait(parseInt(scripts[action])*1000);
         break
       case "click":
         let postion = JSON.parse(scripts[action])
-        await page.mouse.move(postion["x"], postion["y"])
+        await page.mouse.move(postion["x"], postion["y"]);
         await page.mouse.down()
+        //await wait(0.01*1000);
         await page.mouse.up()
         break
       case "setpoints-normal":
         user['Points'] = scripts[action];
-        await apiJs.requestAPI(user,apiUrl);
+        response = await apiJs.requestAPI(user);
+        if(response.Result != 0){
+          console.log("setPoints Fail")
+        }else{
+          console.log("setPoints Successfully")
+        }
         break
       case "setpoints-seamless":
         user['Points'] = scripts[action];
-        await apiJs.requestSeamlessAPI(user,seamlessApiUrl);
+        response =  await apiJs.requestSeamlessAPI(user);
+        if(response.Result != 0){
+          console.log("setPoints Fail")
+        }else{
+          console.log("setPoints Successfully")
+        }
         break
       case "refresh":
         await page.reload();
         break
     }
+    console.log(action.split("_")[1]+"-end");
   }
 }
   
@@ -155,10 +178,14 @@ function wait(ms){
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+
 module.exports.createBrowser = createBrowser;
+module.exports.OnlyOneWindowsScript = OnlyOneWindowsScript;
 module.exports.Normal = Normal;
 module.exports.Script = Script;
 module.exports.Demo = Demo;
+module.exports.openBrowser =openBrowser;
+module.exports.runScript = runScript;
 
 
 
