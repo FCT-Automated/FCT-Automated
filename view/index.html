@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="container" style="padding: 0px;">
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -39,11 +39,11 @@
                 </div>
             </div>
         </nav>
-        <div class="row" style="position: relative; top: 65px;">
+        <div class="row" style="position: relative;">
             <div class="col">
                 <div>
                     <form id="myForm">
-                        <iframe id="myiframe" style=" height: 100%; width: 100%;" frameborder="0" scrolling="auto"></iframe>
+                        <iframe id="myiframe" style=" height: 100%; width: 100%; padding-top: 65px;" frameborder="0" scrolling="auto"></iframe>
                     </form>
                 </div>
                 
@@ -55,7 +55,7 @@
         var iframe = document.getElementById("myiframe");
         iframe.onload = function(){
             const iframeWin = iframe.contentWindow;
-            iframe.style.height = iframeWin.document.body.scrollHeight + 'px';
+            iframe.style.height = '515px';
             iframeWin.require = window.require;
         }      
         function changeUrl(url){
