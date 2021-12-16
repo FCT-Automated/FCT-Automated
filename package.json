@@ -9,7 +9,7 @@
   },
   "build": {
     "appId": "com.fc.app",
-    "productName":"QA",
+    "productName": "QA",
     "win": {
       "icon": "build/favicon.ico",
       "target": [

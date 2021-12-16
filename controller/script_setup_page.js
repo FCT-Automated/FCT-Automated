@@ -13,7 +13,6 @@ $(async function() {
     const addRowBtn = document.getElementById('addRowBtn');
     const demoBtn = document.getElementById('demoBtn');
     const addBtn = document.getElementById('addBtn');
-    const inputSearch = document.getElementById("search");
     const exportBtn = document.getElementById("export");
     const filesInput = document.getElementById("files");
 
@@ -31,10 +30,6 @@ $(async function() {
 
     addBtn.addEventListener('click',function(event){
         addScript(event);
-    });
-
-    inputSearch.addEventListener('keyup',function(){
-        search(inputSearch.value,showTable);
     });
 
     exportBtn.addEventListener('click', function(){
@@ -104,6 +99,7 @@ $(async function() {
                 $("#name")[0].disabled = true; 
                 $("#name")[0].value = obj[key]; 
                 $("#addTable tr").remove();
+                addMessage.innerHTML = "";
                 let response = await parent.psotLocalhostApi('/getScript',obj[key])
                 for (let k in response['returnObject']){
                     let d = response['returnObject'][k];

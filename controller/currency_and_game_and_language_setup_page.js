@@ -142,14 +142,14 @@ $(async function() {
                 document.getElementById("search").value = "";
                 setListSetting(await parent.psotLocalhostApi('/getList',DbTableName));
                 message.innerHTML = addId.value+"新增成功!";
-                $("div.alert").show();
-                $("#addModal").modal("hide");
-                addId.value = "";
-                addName.value = "";
                 parent.window[DbTableName] = await parent.psotLocalhostApi('/getList',DbTableName);
             }else{
-                message.innerHTML = response['returnObject'];
+                message.innerHTML = addId.value+response['returnObject'];
             }
+            $("div.alert").show();
+            $("#addModal").modal("hide");
+            addId.value = "";
+            addName.value = "";
         }
     }
 

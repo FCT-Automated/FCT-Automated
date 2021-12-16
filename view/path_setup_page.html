@@ -7,6 +7,11 @@
     <script src="../controller/publicMethod.js"></script>
     <script src="../controller/path_setup_page.js"></script>
     <title>PathSetup</title>
+    <script type="text/javascript">      
+      function filesInput(){
+          $('#files').click(); 
+      }
+    </script>
 </head>
 
 <body>
@@ -15,6 +20,19 @@
       <div class="alert alert-success" role="alert" style="padding-top: 5px; padding-bottom: 5px; margin-bottom: 0px; display: none;">
         <span id="message"></span>
       </div>
+    </li>
+  </ul>
+  <ul class="nav justify-content-end" style="position: relative; ">
+    <li class="nav-item">
+      <form style="display:none"><input type="file" id="files" style="display:none"/></form>
+      <button type="button" class="btn btn-primary" style="margin: 10px" id="import" onclick="filesInput()">
+        Import
+      </button>
+    </li>
+    <li class="nav-item">
+      <button type="button" class="btn btn-primary" style="margin: 10px" id="export">
+        Export
+      </button>
     </li>
   </ul>
   <div class="row" style="position: relative; width: 100%; margin: 0;">

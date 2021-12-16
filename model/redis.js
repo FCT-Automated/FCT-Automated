@@ -6,7 +6,6 @@ function connectRedis(db){
         "port": 6379,
         "db":db
     }
-    console.log("successfully connected to the redis");    
     return redis.createClient(redis_config)
 }
 

@@ -1,14 +1,23 @@
 $(async function() {
     var showTable = document.getElementById("table").getElementsByTagName('tbody')[0];
     var message = document.getElementById("message");
-
     const updateBtn = document.getElementById('update');
+    const exportBtn = document.getElementById("export");
+    const filesInput = document.getElementById("files");
 
     setPathList();
 
     updateBtn.addEventListener('click',function(event){
         updatePath(event);
     });
+
+    exportBtn.addEventListener('click', function(){
+        myExport();
+    });
+
+    filesInput.onchange = async function(){
+        myImport();
+    }
 
     async function setPathList(){
         $('#table tbody').empty();
@@ -60,7 +69,7 @@ $(async function() {
             data[name] = path
             let response = await parent.psotLocalhostApi('/updatePath',data);
             if (response['returnObject'] == null){
-                parent[name]  = path;
+                parent[name] = path;
                 setPathList();
                 $("div.alert").show();
                 $("#updateModal").modal("hide");
@@ -69,6 +78,35 @@ $(async function() {
                 console.log(response['returnObject']);
             }
         }
+    }
+
+    async function myExport(){
+        var obj = await parent.getLocalhostApi('/getPathList');
+        let blob = new Blob([JSON.stringify(obj)], {type: "text/plain;charset=utf-8"});
+        parent.saveAs(blob, document.title+"List"+".json");
+    }
+
+    async function myImport(){
+        let reader = new FileReader();
+        reader.readAsText(await filesInput.files[0]);
+        reader.onload = async function(){
+            let datas = JSON.parse(this.result);
+            for(let key in datas){
+                let data ={};
+                data[key] = datas[key]
+                let response = await parent.psotLocalhostApi('/updatePath',data);
+                if (response['returnObject'] == null){
+                    parent[key] = datas[key];
+                    message.innerHTML = "成功匯入!";
+                }else{
+                    message.innerHTML = key+"匯入失敗!";
+                    break
+                }
+            }
+            setPathList();
+            $("div.alert").show();
+        };
+        $("form").get(0).reset()
     }
     
 });

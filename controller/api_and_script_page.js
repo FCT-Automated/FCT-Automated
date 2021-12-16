@@ -6,6 +6,7 @@ $(function() {
     var notAttend = document.getElementById('notAttend');
     var apiSelect = document.getElementById('API');
     const submit = document.getElementById('submit');
+    const clearLog = document.getElementById('clearLog');
 
     changeApi(apiSelect.value);
     setList(parent.CurrencyList,"Currency");
@@ -26,6 +27,10 @@ $(function() {
 
     submit.addEventListener("click",async function(event){ 
         run(event,apiSelect.value);
+    });
+
+    clearLog.addEventListener("click",function(){
+        $("#message")[0].innerHTML = "";
     });
 });
     
@@ -70,6 +75,8 @@ function getCurrentDateTime(){
 
 //submit
 async function run(event,apiValue){
+    submit.disabled = true;
+    submit.innerHTML = "處理中請稍等..";
     if(checkValidity()){
         let MemberAccounts = document.getElementById("MemberAccount").value.split(",");
         event.preventDefault();
@@ -90,6 +97,8 @@ async function run(event,apiValue){
             
         }  
     }
+    submit.innerHTML = "送出";
+    submit.disabled = false;
     
 }
 
