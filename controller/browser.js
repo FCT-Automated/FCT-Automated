@@ -10,22 +10,7 @@ async function createBrowser(url,datas) {
     devtools: true
   }
   //setUpBrowerArgs
-  await this[datas["type"]](url,datas["object"],browserArgs);
-
-  
-  //接收server to client message
-  // client.on('Network.webSocketFrameReceived', 
-  //   function(params){
-  //     //解碼base64
-  //     var decodeMessage = new Buffer.from(params.response.payloadData, 'base64').toString()
-  //     const targetWord = '"message"'
-  //     if (decodeMessage.includes(targetWord)){
-  //       console.log("斷線")
-  //       page.screenshot({path: 'google.png'}) // 截圖
-  //     }
-  //   }
-  // )
-  
+  await this[datas["type"]](url,datas["object"],browserArgs); 
   
 }
 
@@ -71,6 +56,9 @@ async function Script(url,object,browserArgs){
       isStart = true;
       console.log("開始執行腳本")
       while(isStart){
+        if(page.isClosed()){
+          isStart = false;
+        }
         try{
           await runScript(object,page)
         }catch{
@@ -84,23 +72,61 @@ async function Script(url,object,browserArgs){
       isStart = false;
 
     }
+    
   })
-}
-
-async function OnlyOneWindowsScript(url,page,datas){
-  let object = datas["object"];
-  if (object['returnObject']['version'] != ""){
-    await page.goto(url+"&version="+object['returnObject']['version']);
-  }else{
-    await page.goto(url);
-  }
-  await page.setViewport({width: parseInt(object['returnObject']['width']),height: parseInt(object['returnObject']['height'])});
 }
 
 async function Normal(url,object,browserArgs){
   browserArgs["defaultViewport"] = null
   let page =  await openBrowser(browserArgs);
   await page.goto(url);
+}
+
+async function AutoScript(MemberAccounts,args,script,minute){
+  let browserArgs ={
+    executablePath: parent.chromePath, // windows
+    headless: false, // 是否在背景運行瀏覽器
+    args: ['--no-default-browser-check','--no-sandbox'],
+    ignoreDefaultArgs: ['--enable-automation'],
+    autoClose: false,
+    devtools: true
+  }
+  var page = await openBrowser(browserArgs);
+  let version = script['returnObject']['version'];
+  let width = script['returnObject']['width'];
+  let height = script['returnObject']['height'];
+  let datas = script;
+  let isStart_out = true;
+  while(isStart_out){
+      for(let MemberAccount of MemberAccounts){
+        args['MemberAccount'] = MemberAccount;
+        datas['user'] = args;
+        let response = await parent.apiJs.requestAPI(args)
+        if ( response.Result == 0){            
+            if ( version!= ""){
+              await page.goto(response.Url+"&version="+version);
+            }else{
+              await page.goto(response.Url);
+            }
+            await page.setViewport({width: parseInt(width),height: parseInt(height)});
+            var isStart = true;
+            setTimeout(() => isStart = false, parseInt(minute)*1000*60);
+            while(isStart){
+              if (page.isClosed()) {
+                isStart = false;
+                isStart_out = false;
+              }
+              else{
+                await runScript(datas,page)  
+              }
+                 
+            }
+            
+        }else{
+            console.log("requestAPI errorCode:"+response.Result,args);
+        }
+      } 
+  }
 }
 
 async function openBrowser(browserArgs){
@@ -133,8 +159,8 @@ async function runScript(datas,page){
   delete scripts["height"]; 
   delete scripts["version"]; 
   let user = datas['user'];
-  user['API'] = 'SetPoints';
   let response;
+  
   for (let action in scripts){
     console.log(action.split("_")[1]+"-start");
     switch (action.split("_")[1]){
@@ -145,10 +171,10 @@ async function runScript(datas,page){
         let postion = JSON.parse(scripts[action])
         await page.mouse.move(postion["x"], postion["y"]);
         await page.mouse.down()
-        //await wait(0.01*1000);
         await page.mouse.up()
         break
       case "setpoints-normal":
+        user['API'] = 'SetPoints';
         user['Points'] = scripts[action];
         response = await apiJs.requestAPI(user);
         if(response.Result != 0){
@@ -158,6 +184,7 @@ async function runScript(datas,page){
         }
         break
       case "setpoints-seamless":
+        user['API'] = 'SetJson';
         user['Points'] = scripts[action];
         response =  await apiJs.requestSeamlessAPI(user);
         if(response.Result != 0){
@@ -172,6 +199,7 @@ async function runScript(datas,page){
     }
     console.log(action.split("_")[1]+"-end");
   }
+  user['API'] = 'Login';
 }
   
 function wait(ms){
@@ -180,12 +208,12 @@ function wait(ms){
 
 
 module.exports.createBrowser = createBrowser;
-module.exports.OnlyOneWindowsScript = OnlyOneWindowsScript;
 module.exports.Normal = Normal;
 module.exports.Script = Script;
 module.exports.Demo = Demo;
 module.exports.openBrowser =openBrowser;
 module.exports.runScript = runScript;
+module.exports.AutoScript = AutoScript;
 
 
 

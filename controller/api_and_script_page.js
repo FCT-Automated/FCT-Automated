@@ -77,28 +77,46 @@ function getCurrentDateTime(){
 async function run(event,apiValue){
     submit.disabled = true;
     submit.innerHTML = "處理中請稍等..";
-    if(checkValidity()){
-        let MemberAccounts = document.getElementById("MemberAccount").value.split(",");
-        event.preventDefault();
-        let mes = urlAndPathCheck();
-        if(mes.length === 0){
-            if(document.title == 'script' && $("#multipleYes")[0].checked){
-                AutoScript(MemberAccounts);
-            }else{
-                for(let MemberAccount of MemberAccounts){
-                    if(typeof window[apiValue] === "function"){
-                        mes = await window[apiValue](mes,MemberAccount);
-                    }else{
-                        mes = "查無此Api Function</br>"
+    try{
+        if(checkValidity()){
+            let MemberAccounts = document.getElementById("MemberAccount").value.split(",");
+            event.preventDefault();
+            let mes = urlAndPathCheck();
+            if(mes.length === 0){
+                if(document.title == 'script' && $("#multipleYes")[0].checked){
+                    let args ={
+                        API : "Login",
+                        Currency : document.getElementById("Currency").value,
+                        GameID : document.getElementById("GameID").value,
+                        AgentCode : document.getElementById("AgentCode").value,
+                        LanguageID : document.getElementById("LanguageID").value
                     }
-                    $("#message")[0].innerHTML += mes;
+                    let autoScriptList = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
+                    submit.innerHTML = "送出";
+                    submit.disabled = false;
+                    await parent.browser.AutoScript(MemberAccounts,args,autoScriptList,document.getElementById("multipleMin").value);
+                }else{
+                    for(let MemberAccount of MemberAccounts){
+                        if(typeof window[apiValue] === "function"){
+                            mes = await window[apiValue](mes,MemberAccount);
+                        }else{
+                            mes = "查無此Api Function</br>"
+                        }
+                        $("#message")[0].innerHTML += mes;
+                    }
                 }
-            }
-            
-        }  
+                
+            }  
+        }
+        submit.innerHTML = "送出";
+        submit.disabled = false;
     }
-    submit.innerHTML = "送出";
-    submit.disabled = false;
+    catch{
+        submit.innerHTML = "送出";
+        submit.disabled = false;
+    }
+    
+    
     
 }
 
@@ -116,46 +134,6 @@ function checkValidity(){
         return false;
     }
 }
-async function AutoScript(MemberAccounts){
-    let browserArgs ={
-        executablePath: parent.chromePath, // windows
-        headless: false, // 是否在背景運行瀏覽器
-        args: ['--no-default-browser-check','--no-sandbox'],
-        ignoreDefaultArgs: ['--enable-automation'],
-        autoClose: false,
-        devtools: true
-      }
-    var page = await parent.browser.openBrowser(browserArgs);
-
-    while(true){
-        for(let MemberAccount of MemberAccounts){
-            let args ={
-                API : "Login",
-                Currency : document.getElementById("Currency").value,
-                GameID : document.getElementById("GameID").value,
-                AgentCode : document.getElementById("AgentCode").value,
-                MemberAccount : MemberAccount,
-                LanguageID : document.getElementById("LanguageID").value
-            }
-            let response = await parent.apiJs.requestAPI(args)
-            let code = response.Result;
-            if ( code == 0){
-                data = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
-                data['user'] = args
-                let datas= await setUpBrowerArgs('OnlyOneWindowsScript',data);
-                await parent.browser.OnlyOneWindowsScript(response.Url,page,datas);
-                var isStart = true;
-                setTimeout(() => isStart = false, parseInt(document.getElementById("multipleMin").value)*1000*60);
-                while(isStart){
-                    await parent.browser.runScript(datas['object'],page)     
-                }
-                
-            }else{
-                break
-            }
-        } 
-    }
-}
 
 async function Login(mes,MemberAccount){       
     let args ={
@@ -171,7 +149,7 @@ async function Login(mes,MemberAccount){
     if ( code == 0){
         if(document.title == 'script'){
             //待改
-            data = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
+            let data = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
             data['user'] = args
             await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Script',data));
         }else{

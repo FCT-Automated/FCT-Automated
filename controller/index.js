@@ -35,7 +35,7 @@ async function init(){
 
 function getLocalhostApi(path){
     return new Promise((resv, rej) => {
-        console.log("request start -get");
+        console.log("request start - "+ path);
         const request = electron.remote.net.request({
             method: 'GET',
             protocol: 'http:',
@@ -47,7 +47,7 @@ function getLocalhostApi(path){
         request.setHeader('Content-Type', 'application/json');
         request.on('response', (response) => {
             response.on('data', (chunk) => {
-                console.log("request end -get");
+                console.log("request end - "+path);
                 resv(JSON.parse(chunk))
             });
         });
@@ -64,7 +64,7 @@ function getLocalhostApi(path){
 
 function psotLocalhostApi(path,data){
     return new Promise((resv, rej) => {
-        console.log("request start -post");
+        console.log("request start - "+path);
         var body = JSON.stringify(data);
         const request = electron.remote.net.request({
             method: 'POST',
@@ -77,7 +77,7 @@ function psotLocalhostApi(path,data){
         request.setHeader('Content-Type', 'application/json');
         request.on('response', (response) => {
             response.on('data', (chunk) => {
-                console.log("request end -post");
+                console.log("request end - "+path);
                 resv(JSON.parse(chunk))
             });
         });

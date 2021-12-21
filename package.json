@@ -1,6 +1,6 @@
 {
-  "name": "QA_ver.20211216",
-  "version": "4.0.0",
+  "name": "ver.20211221",
+  "version": "2021.12.21",
   "description": "",
   "main": "./controller/main.js",
   "scripts": {
@@ -8,10 +8,8 @@
     "build": "electron-builder"
   },
   "build": {
-    "appId": "com.fc.app",
-    "productName": "QA_ver.20211216",
+    "productName": "QA",
     "win": {
-      "icon": "build/favicon.ico",
       "target": [
         "zip"
       ]
