@@ -54,16 +54,19 @@ function script(){
 function changeApi(curAPI){
     switch (curAPI) {
         case 'Login':
-            $('.field_Login').show()
-            $('.field_SetPoints').hide()
+            $('.field_Login').show();
+            $('.field_SetPoints').hide();
+            $('#other')[0].value = "HomeUrl:https://www.mearhh.com,JackpotStatus:true";
             break
         case 'SetPoints':
-            $('.field_SetPoints').show()
-            $('.field_Login').hide()
+            $('.field_SetPoints').show();
+            $('.field_Login').hide();
+            $('#other')[0].value = "";
             break
         case 'KickOut':
-            $('.field_SetPoints').hide()
-            $('.field_Login').hide()
+            $('.field_SetPoints').hide();
+            $('.field_Login').hide();
+            $('#other')[0].value = "";
             break
     }
 }
@@ -142,7 +145,8 @@ async function Login(mes,MemberAccount){
         GameID : document.getElementById("GameID").value,
         AgentCode : document.getElementById("AgentCode").value,
         MemberAccount : MemberAccount,
-        LanguageID : document.getElementById("LanguageID").value
+        LanguageID : document.getElementById("LanguageID").value,
+        Other : document.getElementById("other").value
     }
     let response = await parent.apiJs.requestAPI(args)
     let code = response.Result;

@@ -2,8 +2,6 @@ var querystring = require('querystring')
 var request = require('request')
 var mongodbClient = require('mongodb').MongoClient;
 
-var homeUrl = 'https://www.mearhh.com'
-
 function connectMongoDB(code){
     return new Promise((resv, rej) => {
         mongodbClient.connect('mongodb://'+parent.DBUsername+':'+parent.DBPassword+'@'+parent.DBhost+':'+parent.DBPort+'/'+parent.DBName,
@@ -104,40 +102,55 @@ function doRequest(postOptions) {
         })
     })
 }
+
+async function parseOtherParam(args,arg){
+    return new Promise((resv, rej) => {
+        if(args["Other"]){
+            for(let other of args["Other"].split(",")){
+                let key = other.split(":")[0];
+                let value = other.split(key+":")[1];
+                arg[key] = value;
+            }
+        }
+        resv(arg);
+    });
+}
  
 async function requestAPI(args) {
     var arg
     switch (args['API']){
         case 'Login':
-            arg = JSON.stringify({
+            arg = {
                 MemberAccount : args['MemberAccount'],
                 GameID : args['GameID'],
-                LanguageID : args['LanguageID'],
-                HomeUrl : homeUrl
-            })
+                LanguageID : args['LanguageID']
+            }
+            arg = await parseOtherParam(args,arg);
             break
         case 'SetPoints':
-            arg = JSON.stringify({
+            arg = {
                 MemberAccount : args['MemberAccount'],
                 AllOut : 0,
                 Points : args['Points']
-            })            
+            }
+            arg = await parseOtherParam(args,arg);          
             break
         case 'KickOut':
-            arg = JSON.stringify({
+            arg = {
                 MemberAccount : args['MemberAccount']
-            })
+            }
+            arg = await parseOtherParam(args,arg);
             break
         case 'GetEvents':
-            arg = JSON.stringify({})
             break
         case 'GetDemoUrl':
-            arg = JSON.stringify({
+            arg = {
                 GameID : args['GameID'],
                 LanguageID : args['LanguageID']
-            })
+            }
             break
     }
+    arg =  JSON.stringify(arg);
     let agentCode = await connectMongoDB(args['AgentCode'])
     let keyOptions = await setApiKey(arg,agentCode)
     let getKey = await doRequest(keyOptions)
