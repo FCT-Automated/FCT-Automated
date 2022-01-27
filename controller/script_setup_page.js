@@ -176,7 +176,6 @@ $(async function() {
         id.innerHTML = String(rows+1)
         //建立select+option
         let select = document.createElement('select')
-        //待改
         let opts={
             "click":"滑鼠點擊",
             "wait":"等待",
@@ -251,35 +250,42 @@ $(async function() {
     }
     
     async function runDemoAccount(DemoID,event){
-        let response;
-        let args ={
-            API : 'GetDemoUrl',
-            Currency : "DEM",
-            GameID : DemoID,
-            LanguageID : 2,
-            AgentCode : "FCDEM"
-        }
         let mes = urlAndPathCheck();
-        if(mes.length === 0){
-            if(await isAssign()){
-                event.preventDefault();
-                response = await parent.apiJs.requestAPI(args)
-                let object = {};
-                if($("#assign")[0].checked){
-                    object['version'] = $("#version")[0].value;
-                }else{
-                    object['version'] = "";
-                }
-                if(defaultGameWindows.checked){
-                    object['width'] = gameWindows.value.split(",")[0];
-                    object['height'] = gameWindows.value.split(",")[1];
-                    await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object));
-                }else{
-                    await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object));
+        var AgentKey = parent.AgentKeyList["returnObject"]["FCDEM"];
+        let response; 
+        if(AgentKey){
+            let args ={
+                API : 'GetDemoUrl',
+                Currency : "DEM",
+                GameID : DemoID,
+                LanguageID : 2,
+                AgentCode : "FCDEM",
+                AgentKey : AgentKey
+            } 
+            if(mes.length === 0){
+                if(await isAssign()){
+                    event.preventDefault();
+                    response = await parent.apiJs.requestAPI(args)
+                    let object = {};
+                    if($("#assign")[0].checked){
+                        object['version'] = $("#version")[0].value;
+                    }else{
+                        object['version'] = "";
+                    }
+                    if(defaultGameWindows.checked){
+                        object['width'] = gameWindows.value.split(",")[0];
+                        object['height'] = gameWindows.value.split(",")[1];
+                        await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object));
+                    }else{
+                        await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object));
+                    }
                 }
             }
+        }else{
+            mes = "FCDEM - 未查詢到此AgentKey，請先至設定新增!!"
         }
-        message.innerHTML = mes;
+        
+        addMessage.innerHTML = mes;
     }
     
     async function addScript(event){

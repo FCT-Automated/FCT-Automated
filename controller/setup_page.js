@@ -2,11 +2,16 @@ $(async function() {
     let replace = {
         "Currency":"幣別",
         "Language":"語系",
-        "Game":"遊戲"
+        "Game":"遊戲",
+        "AgentKey":"Agent"
     }
     var main = location.search.split("?")[1];
     document.title = main+"List"
     document.body.innerHTML = document.body.innerHTML.replace(/name/g,replace[main]);
+    if(replace[main] == "Agent"){
+        document.body.innerHTML = document.body.innerHTML.replace(/代號/g,"Code");
+        document.body.innerHTML = document.body.innerHTML.replace(/名稱/g,"Key");
+    }
 
     const add = document.getElementById('add');
     const update = document.getElementById('update');

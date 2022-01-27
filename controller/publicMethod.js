@@ -1,33 +1,45 @@
 async function isAttendCheck(isCheck){
     let eventlist = document.getElementById('Event');
     let mes = urlAndPathCheck();
+    var AgentCode = document.getElementById("AgentCode").value;
+    var AgentKey = parent.AgentKeyList["returnObject"][AgentCode];       
+    
     if (isCheck && mes.length === 0){
         eventlist.disabled=false
-        let args ={
-            API : 'GetEvents',
-            Currency : document.getElementById("Currency").value,
-            AgentCode : document.getElementById("AgentCode").value,
-        }      
-        let Eventresult = await parent.apiJs.requestAPI(args);
-        if (Eventresult['Data'] != null){
-            Eventresult['Data'].forEach(function(datas){
+        if(AgentKey){
+            let args ={
+                API : 'GetEvents',
+                Currency : document.getElementById("Currency").value,
+                AgentCode : AgentCode,
+                AgentKey : AgentKey
+            }      
+            let Eventresult = await parent.apiJs.requestAPI(args);
+            if (Eventresult['Data'] != null){
+                Eventresult['Data'].forEach(function(datas){
+                    let opt = document.createElement('option')
+                    opt.value = datas['eventID']
+                    opt.className = 'eventOption'
+                    opt.innerHTML = datas['eventID']
+                    eventlist.appendChild(opt)
+                })
+            }else{
                 let opt = document.createElement('option')
-                opt.value = datas['eventID']
                 opt.className = 'eventOption'
-                opt.innerHTML = datas['eventID']
+                opt.innerHTML = '查無活動'
                 eventlist.appendChild(opt)
-            })
+            }  
         }else{
             let opt = document.createElement('option')
             opt.className = 'eventOption'
-            opt.innerHTML = '查無活動'
+            opt.innerHTML = '未查詢到此AgentKey'
             eventlist.appendChild(opt)
-        }        
+        }
+            
     }else{
         eventlist.options.length = 0;
         eventlist.disabled=true
     }
-    parent.postMessage(JSON.parse(JSON.stringify(mes)),"*");
+    
 }
 
 function urlAndPathCheck(mes=''){

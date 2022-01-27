@@ -10,6 +10,7 @@ var seamlessApiUrl;
 var CurrencyList;
 var GameList;
 var LanguageList;
+var AgentKeyList;
 var scriptList;
 var DBUsername;
 var DBPassword;
@@ -29,6 +30,7 @@ async function init(){
     CurrencyList = await psotLocalhostApi('/getList','CurrencyList');
     GameList = await psotLocalhostApi('/getList','GameList');
     LanguageList = await psotLocalhostApi('/getList','LanguageList');
+    AgentKeyList = await psotLocalhostApi('/getList','AgentKeyList');
     scriptList = await getLocalhostApi('/getKeys');
     document.getElementById('myiframe').src ="api_and_script_page.html?api";
 }

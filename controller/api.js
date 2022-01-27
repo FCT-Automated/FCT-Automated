@@ -151,8 +151,8 @@ async function requestAPI(args) {
             break
     }
     arg =  JSON.stringify(arg);
-    let agentCode = await connectMongoDB(args['AgentCode'])
-    let keyOptions = await setApiKey(arg,agentCode)
+    // let agentCode = await connectMongoDB(args['AgentCode'])
+    let keyOptions = await setApiKey(arg,args["AgentKey"])
     let getKey = await doRequest(keyOptions)
     //-----second request-----
     let apisOptions = await setApiTools(getKey,args['API'],args['AgentCode'],args['Currency'])
