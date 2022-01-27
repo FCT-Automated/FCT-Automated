@@ -1,0 +1,78 @@
+<head>
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/css/bootstrap-datetimepicker.min.css" crossorigin="anonymous">
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="../bower_components/bootstrap-datepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="../bower_components/bootstrap-datepicker/js/bootstrap-datetimepicker.zh-CN.js"></script>
+    <!-- <script src="../controller/publicMethod.js"></script>
+    <script src="../controller/api_and_script_page.js"></script> -->
+    <title>BetRecord</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="col">
+        <form>          
+          <div>
+            <div class="form-group" style="display: inline-block; margin-right: 20px;"> 
+              <div style="display: inline-block;">
+                <label for="AccountMembers">會員帳號：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <input class="form-control" style="width: 200px;" id="AccountMembers" aria-required="true" required>
+              </div>
+            </div> 
+  
+            <div class="form-group" style="display: inline-block;"> 
+              <div style="display: inline-block;">
+                <label for="BetRecordID">賽果編號：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <input class="form-control" style="width: 200px;" id="BetRecordID">
+              </div>
+            </div> 
+          </div>
+          
+          <div>
+            <div class="form-group" style="display: inline-block; margin-right: 20px;"> 
+              <div style="display: inline-block;">
+                <label for="GameID">遊戲名稱：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <select class="form-control GameID" style="width: 200px;" id="GameID"> </select> 
+              </div>  
+            </div> 
+
+            <div class="form-group field_SetPoints" style="display: inline-block; margin-right: 20px;"> 
+              <div style="display: inline-block;">
+                <label for="datetimepicker">創建時間：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <input type="text" id="datetimepicker">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" style="display: inline-block;" id="submit" class="btn btn-primary">送出</button>
+          <button type="button"  id="clearLog" class="btn btn-warning">清除log</button>
+        </form>
+      </div>
+
+    </div> 
+    <div class="row">
+      <div class="col">
+        <span id="message"></span>
+      </div>
+    </div>
+    <script type="text/javascript">
+        $('#datetimepicker').datetimepicker({
+            language: 'zh-CN', //語言
+            autoclose: true, //選擇後自動關閉
+            clearBtn: true,//清除按鈕
+            format: "yyyy-mm-dd hh:ii:ss"//日期格式
+        });
+    </script>
+  </body>
+          
+  
+  

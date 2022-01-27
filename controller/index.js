@@ -16,8 +16,11 @@ var DBPassword;
 var DBhost;
 var DBPort;
 var DBName;
+var CMS;
+var token;
 
 async function init(){
+    CMS = await getLocalhostApi('/getCMS');
     chromePath = await psotLocalhostApi('/getPath','chromePath');
     apiUrl = await psotLocalhostApi('/getPath','apiUrl');
     seamlessApiUrl = await psotLocalhostApi('/getPath','seamlessApiUrl');
