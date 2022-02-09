@@ -22,7 +22,6 @@ function init(){
                             keys.forEach(key => {
                                 client.hmset(env,key,'');
                             });
-                            resv({'returnObject':null})
                         }
                         catch(error){
                             rej(error)
@@ -31,12 +30,27 @@ function init(){
                         keys.filter(function(v){ return Object.keys(result).indexOf(v) == -1 }).forEach(key => {
                             client.hmset(env,key,'');
                         });
-                        resv({'returnObject':null})
                     }
                 }else{
                     rej(error)
                 }
             })
+        })
+
+        client.hgetall("defaultWindowSize", (error, result) => {
+            if (!error){
+                if(result == null){
+                    try {
+                        client.hmset("defaultWindowSize","Portrait",'553,959');
+                        client.hmset("defaultWindowSize","Landscape",'929,653');
+                    }
+                    catch(error){
+                        rej(error)
+                    }
+                }
+            }else{
+                rej(error)
+            }
         })
        
     });

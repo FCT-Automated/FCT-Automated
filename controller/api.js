@@ -30,7 +30,7 @@ var request = require('request')
     
 // }
 
-function setApiKey(params,agentKey){
+function setApiKey(params,agentKey,apiUrl){
     return new Promise(function(resolve,reject){
         let form = {
             Params:params,
@@ -39,7 +39,7 @@ function setApiKey(params,agentKey){
         let formData = querystring.stringify(form)
         let postOptions = {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            url: parent.apiUrl+'/Key',
+            url: apiUrl+'/Key',
             method: 'POST',
             body: formData ,
             agentOptions: {
@@ -50,7 +50,7 @@ function setApiKey(params,agentKey){
     })
 }
 
-function setApiTools(getKey,apis,agentCode,currency){
+function setApiTools(getKey,apis,agentCode,currency,apiUrl){
     return new Promise(function(resolve,reject){
         let form = {
             Params:getKey.Params,
@@ -61,7 +61,7 @@ function setApiTools(getKey,apis,agentCode,currency){
         let formData = querystring.stringify(form)
         let postOptions = {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            url: parent.apiUrl+'/'+apis,
+            url: apiUrl+'/'+apis,
             method: 'POST',
             body: formData ,
             agentOptions: {
@@ -72,7 +72,7 @@ function setApiTools(getKey,apis,agentCode,currency){
     })
 }
 
-function apiSeamlessRequest(apis,params){
+function apiSeamlessRequest(apis,params,seamlessApiUrl){
     return new Promise(function(resolve,reject){        
         let form = {
             Params:params,
@@ -80,7 +80,7 @@ function apiSeamlessRequest(apis,params){
         let formData = querystring.stringify(form)
         let postOptions = {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            url: parent.seamlessApiUrl+'/'+apis,
+            url: seamlessApiUrl+'/'+apis,
             method: 'POST',
             body: formData ,
             agentOptions: {
@@ -116,7 +116,7 @@ async function parseOtherParam(args,arg){
     });
 }
  
-async function requestAPI(args) {
+async function requestAPI(args,apiUrl) {
     var arg
     switch (args['API']){
         case 'Login':
@@ -152,20 +152,20 @@ async function requestAPI(args) {
     }
     arg =  JSON.stringify(arg);
     // let agentCode = await connectMongoDB(args['AgentCode'])
-    let keyOptions = await setApiKey(arg,args["AgentKey"])
+    let keyOptions = await setApiKey(arg,args["AgentKey"],apiUrl)
     let getKey = await doRequest(keyOptions)
     //-----second request-----
-    let apisOptions = await setApiTools(getKey,args['API'],args['AgentCode'],args['Currency'])
+    let apisOptions = await setApiTools(getKey,args['API'],args['AgentCode'],args['Currency'],apiUrl)
     return doRequest(apisOptions)
 }
 
-async function requestSeamlessAPI(args) {
+async function requestSeamlessAPI(args,seamlessApiUrl) {
     var arg = JSON.stringify({
         MemberAccount : args['MemberAccount'],
         Points : args['Points']
     })
     //-----request-----
-    return apiSeamlessRequest(args['API'],arg)
+    return apiSeamlessRequest(args['API'],arg,seamlessApiUrl)
 }
 
 module.exports.requestAPI = requestAPI;

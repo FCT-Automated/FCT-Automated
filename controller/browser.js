@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 
-async function createBrowser(url,datas) {
+async function createBrowser(url,datas,apiUrl,seamlessApiUrl) {
   let browserArgs ={
     executablePath: parent.chromePath, // windows
     headless: false, // 是否在背景運行瀏覽器
@@ -10,11 +10,11 @@ async function createBrowser(url,datas) {
     devtools: true
   }
   //setUpBrowerArgs
-  await this[datas["type"]](url,datas["object"],browserArgs); 
+  await this[datas["type"]](url,datas["object"],browserArgs,apiUrl,seamlessApiUrl); 
   
 }
 
-async function Demo(url,object,browserArgs){
+async function Demo(url,object,browserArgs,apiUrl,seamlessApiUrl){
   if(object['width'] === undefined){
     browserArgs["defaultViewport"] = null
     let page = await openBrowser(browserArgs);
@@ -41,7 +41,7 @@ async function Demo(url,object,browserArgs){
   }
 }
 
-async function Script(url,object,browserArgs){
+async function Script(url,object,browserArgs,apiUrl,seamlessApiUrl){
   let page = await openBrowser(browserArgs);
   if (object['returnObject']['version'] != ""){
     await page.goto(url+"&version="+object['returnObject']['version']);
@@ -60,7 +60,7 @@ async function Script(url,object,browserArgs){
           isStart = false;
         }
         try{
-          await runScript(object,page)
+          await runScript(object,page,apiUrl,seamlessApiUrl)
         }catch{
           console.log("start出錯")
           break
@@ -76,13 +76,13 @@ async function Script(url,object,browserArgs){
   })
 }
 
-async function Normal(url,object,browserArgs){
+async function Normal(url,object,browserArgs,apiUrl,seamlessApiUrl){
   browserArgs["defaultViewport"] = null
   let page =  await openBrowser(browserArgs);
   await page.goto(url);
 }
 
-async function AutoScript(MemberAccounts,args,script,minute){
+async function AutoScript(MemberAccounts,args,script,minute,apiUrl,seamlessApiUrl){
   let browserArgs ={
     executablePath: parent.chromePath, // windows
     headless: false, // 是否在背景運行瀏覽器
@@ -101,7 +101,7 @@ async function AutoScript(MemberAccounts,args,script,minute){
       for(let MemberAccount of MemberAccounts){
         args['MemberAccount'] = MemberAccount;
         datas['user'] = args;
-        let response = await parent.apiJs.requestAPI(args)
+        let response = await parent.apiJs.requestAPI(args,apiUrl)
         if ( response.Result == 0){            
             if ( version!= ""){
               await page.goto(response.Url+"&version="+version);
@@ -117,7 +117,7 @@ async function AutoScript(MemberAccounts,args,script,minute){
                 isStart_out = false;
               }
               else{
-                await runScript(datas,page)  
+                await runScript(datas,page,apiUrl,seamlessApiUrl)  
               }
                  
             }
@@ -152,7 +152,7 @@ async function openBrowser(browserArgs){
 }
 
 
-async function runScript(datas,page){
+async function runScript(datas,page,apiUrl,seamlessApiUrl){
   var apiJs = require('./api');
   let scripts = datas['returnObject'];
   delete scripts["width"]; 
@@ -176,7 +176,7 @@ async function runScript(datas,page){
       case "setpoints-normal":
         user['API'] = 'SetPoints';
         user['Points'] = scripts[action];
-        response = await apiJs.requestAPI(user);
+        response = await apiJs.requestAPI(user,apiUrl);
         if(response.Result != 0){
           console.log("setPoints Fail")
         }else{
@@ -186,7 +186,7 @@ async function runScript(datas,page){
       case "setpoints-seamless":
         user['API'] = 'SetJson';
         user['Points'] = scripts[action];
-        response =  await apiJs.requestSeamlessAPI(user);
+        response =  await apiJs.requestSeamlessAPI(user,seamlessApiUrl);
         if(response.Result != 0){
           console.log("setPoints Fail")
         }else{

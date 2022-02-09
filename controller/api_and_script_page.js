@@ -101,7 +101,7 @@ async function run(event,apiValue){
                     let autoScriptList = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
                     submit.innerHTML = "送出";
                     submit.disabled = false;
-                    await parent.browser.AutoScript(MemberAccounts,args,autoScriptList,document.getElementById("multipleMin").value);
+                    await parent.browser.AutoScript(MemberAccounts,args,autoScriptList,document.getElementById("multipleMin").value,parent.apiUrl,parent.seamlessApiUrl);
                 }else{
                     for(let MemberAccount of MemberAccounts){
                         if(typeof window[apiValue] === "function"){
@@ -157,15 +157,15 @@ async function Login(mes,MemberAccount){
         LanguageID : document.getElementById("LanguageID").value,
         Other : document.getElementById("other").value
     }
-    let response = await parent.apiJs.requestAPI(args)
+    let response = await parent.apiJs.requestAPI(args,parent.apiUrl)
     let code = response.Result;
     if ( code == 0){
         if(document.title == 'script'){
             let data = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
             data['user'] = args
-            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Script',data));
+            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Script',data),parent.apiUrl,parent.seamlessApiUrl);
         }else{
-            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Normal',{}));
+            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Normal',{}),parent.apiUrl,parent.seamlessApiUrl);
         }
         mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入成功!! ]</br>"
     }else{
@@ -195,7 +195,7 @@ async function SetPoints(mes,MemberAccount){
             MemberAccount : MemberAccount,
             Points : document.getElementById("Points").value
         }
-        response = await parent.apiJs.requestSeamlessAPI(args);
+        response = await parent.apiJs.requestSeamlessAPI(args,parent.seamlessApiUrl);
         code = response.Result;
         if ( code == 0){
             mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.Points+"]</br>"
@@ -210,7 +210,7 @@ async function SetPoints(mes,MemberAccount){
             MemberAccount : MemberAccount,
             Points : document.getElementById("Points").value
         }
-        response = await parent.apiJs.requestAPI(args);
+        response = await parent.apiJs.requestAPI(args,parent.apiUrl);
         code = response.Result;
         if ( code == 0){
             mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.AfterPoint+"，BankID："+response.BankID+"]</br>"
@@ -233,7 +233,7 @@ async function KickOut(mes,MemberAccount){
         AgentKey : AgentKey,
         MemberAccount : MemberAccount,
     }
-    let response = await parent.apiJs.requestAPI(args);
+    let response = await parent.apiJs.requestAPI(args,parent.apiUrl);
     let code = response.Result;
     if ( code == 0){
         mes = "Log:[ KickOut- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出成功!! ]</br>"

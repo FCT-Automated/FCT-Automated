@@ -50,8 +50,7 @@ $(async function() {
 
     defaultGameWindows.addEventListener('change',function(){
         gameWindows.disabled = false;
-        $("#width")[0].value = gameWindows.value.split(",")[0];
-        $("#height")[0].value = gameWindows.value.split(",")[1];
+        getDefaultWindowSize();
 
     });
 
@@ -62,8 +61,7 @@ $(async function() {
     });
 
     gameWindows.addEventListener('change',function(){
-        $("#width")[0].value = gameWindows.value.split(",")[0];
-        $("#height")[0].value = gameWindows.value.split(",")[1];
+        getDefaultWindowSize();
     })
 
     
@@ -283,7 +281,7 @@ $(async function() {
             if(mes.length === 0){
                 if(await isAssign()){
                     event.preventDefault();
-                    response = await parent.apiJs.requestAPI(args)
+                    response = await parent.apiJs.requestAPI(args,parent.apiUrl)
                     let object = {};
                     if($("#assign")[0].checked){
                         object['version'] = $("#version")[0].value;
@@ -291,11 +289,11 @@ $(async function() {
                         object['version'] = "";
                     }
                     if(defaultGameWindows.checked){
-                        object['width'] = gameWindows.value.split(",")[0];
-                        object['height'] = gameWindows.value.split(",")[1];
-                        await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object));
+                        object['width'] = $("#width")[0].value;
+                        object['height'] = $("#height")[0].value;
+                        await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object),parent.apiUrl,parent.seamlessApiUrl);
                     }else{
-                        await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object));
+                        await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object),parent.apiUrl,parent.seamlessApiUrl);
                     }
                 }
             }
@@ -431,6 +429,12 @@ $(async function() {
             setListSetting();
         };
         $("form").get(1).reset()
+    }
+
+    async function getDefaultWindowSize(){
+        let defaultWindowSize = await parent.psotLocalhostApi('/getList','defaultWindowSize');
+        $("#width")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[0];
+        $("#height")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[1];
     }
 
 });

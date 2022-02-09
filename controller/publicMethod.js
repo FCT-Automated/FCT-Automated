@@ -12,7 +12,7 @@ async function isAttendCheck(isCheck){
             AgentCode : AgentCode,
             AgentKey : AgentKey
         }      
-        let Eventresult = await parent.apiJs.requestAPI(args);
+        let Eventresult = await parent.apiJs.requestAPI(args,parent.apiUrl);
         if (Eventresult['Data'] != null){
             Eventresult['Data'].forEach(function(datas){
                 let opt = document.createElement('option')
