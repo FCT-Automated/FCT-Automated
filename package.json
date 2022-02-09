@@ -1,6 +1,6 @@
 {
-  "name": "ver.20220127",
-  "version": "2022.01.27",
+  "name": "ver.20220209",
+  "version": "2022.02.09",
   "description": "",
   "main": "./controller/main.js",
   "scripts": {
