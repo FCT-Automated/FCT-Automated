@@ -38,8 +38,19 @@
                         </div>
                     </li>
                 </div>
+
             </div>
-            <span style="color:darkgrey; font-size: 12px;">如無法使用請先確認是否已安裝Redis(必要)&路徑設定是否正確</span>
+            <ul class="nav justify-content-end">
+                <label for="env" style="margin: 0px; margin-top: 6px; color: white;">環境：</label>
+                <div style="display: inline-block;">
+                <select class="form-control" id="env" style="height: 33px; padding-top: 4px;">
+                    <option value="QA" selected="selected">QA</option>
+                    <option value="Release">Release</option>
+                    <option value="Live">Live</option>
+                </select>
+                </div>
+            </ul>
+            <span style="color:darkgrey; font-size: 9px; bottom: 0px;  position: absolute; ">如無法使用請先確認是否已安裝Redis(必要)&路徑設定是否正確</span>
         </nav>
         <div class="row" style="position: relative;">
             <div class="col">

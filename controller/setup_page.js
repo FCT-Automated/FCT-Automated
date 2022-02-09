@@ -2,16 +2,18 @@ $(async function() {
     let replace = {
         "Currency":"幣別",
         "Language":"語系",
-        "Game":"遊戲",
-        "AgentKey":"Agent"
+        "Game":"遊戲"
     }
+    replace[parent.env+"AgentKey"] = parent.env+"Agent"
     var main = location.search.split("?")[1];
-    document.title = main+"List"
-    document.body.innerHTML = document.body.innerHTML.replace(/name/g,replace[main]);
-    if(replace[main] == "Agent"){
+    
+    if(main == "AgentKey"){
+        main = parent.env+main;   
         document.body.innerHTML = document.body.innerHTML.replace(/代號/g,"Code");
         document.body.innerHTML = document.body.innerHTML.replace(/名稱/g,"Key");
     }
+    document.title = main+"List"
+    document.body.innerHTML = document.body.innerHTML.replace(/name/g,replace[main]);
 
     const add = document.getElementById('add');
     const update = document.getElementById('update');
@@ -50,7 +52,6 @@ $(async function() {
         myImport();
     }
 
-    //變數名稱待改
     function setListSetting(returnObject){
         $('#table tbody').empty();
         if (returnObject != null){
@@ -62,7 +63,7 @@ $(async function() {
                 },
                 {}
             );
-            Object.keys(obj).sort(); //待處理
+            Object.keys(obj).sort(); 
             for (let key in obj){
                 let rows = showTable.rows.length+1
                 let row = showTable.insertRow(-1)

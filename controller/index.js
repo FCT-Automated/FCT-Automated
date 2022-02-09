@@ -10,27 +10,21 @@ var seamlessApiUrl;
 var CurrencyList;
 var GameList;
 var LanguageList;
-var AgentKeyList;
+var QAAgentKeyList;
+var ReleaseAgentKeyList;
+var LiveAgentKeyList;
 var scriptList;
-var DBUsername;
-var DBPassword;
-var DBhost;
-var DBPort;
-var DBName;
+var env;
+
+
 
 async function init(){
-    chromePath = await psotLocalhostApi('/getPath','chromePath');
-    apiUrl = await psotLocalhostApi('/getPath','apiUrl');
-    seamlessApiUrl = await psotLocalhostApi('/getPath','seamlessApiUrl');
-    DBUsername = await psotLocalhostApi('/getPath','DBUsername');
-    DBPassword = await psotLocalhostApi('/getPath','DBPassword');
-    DBhost = await psotLocalhostApi('/getPath','DBhost');
-    DBPort = await psotLocalhostApi('/getPath','DBPort');
-    DBName = await psotLocalhostApi('/getPath','DBName');
     CurrencyList = await psotLocalhostApi('/getList','CurrencyList');
     GameList = await psotLocalhostApi('/getList','GameList');
     LanguageList = await psotLocalhostApi('/getList','LanguageList');
-    AgentKeyList = await psotLocalhostApi('/getList','AgentKeyList');
+    QAAgentKeyList = await psotLocalhostApi('/getList','QAAgentKeyList');
+    ReleaseAgentKeyList = await psotLocalhostApi('/getList','ReleaseAgentKeyList');
+    LiveAgentKeyList = await psotLocalhostApi('/getList','LiveAgentKeyList');
     scriptList = await getLocalhostApi('/getKeys');
     document.getElementById('myiframe').src ="api_and_script_page.html?api";
 }
@@ -95,6 +89,23 @@ function psotLocalhostApi(path,data){
 
 }
 
+async function changePath(chengeEnv){
+    env = document.getElementById("env").value;
+    chromePath = await psotLocalhostApi('/getPath',[chengeEnv,'chromePath']);
+    apiUrl = await psotLocalhostApi('/getPath',[chengeEnv,'apiUrl']);
+    seamlessApiUrl = await psotLocalhostApi('/getPath',[chengeEnv,'seamlessApiUrl']);
+    document.getElementById('myiframe').contentWindow.location.reload(true);
+}
 
 init();
 
+
+$(function() {
+    var changeEnv = document.getElementById("env");
+    changeEnv.addEventListener('change', function(){
+        changePath(changeEnv.value);
+    });
+
+    env = document.getElementById("env").value;
+    changePath(env);
+})

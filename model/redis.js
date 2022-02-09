@@ -12,29 +12,33 @@ function connectRedis(db){
 function createTableOfPath(){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        var keys = ['chromePath','apiUrl','seamlessApiUrl','DBUsername','DBPassword','DBhost','DBPort','DBName'];
-        client.hgetall('PathList', (error, result) => {
-            if (!error){
-                if(result == null){
-                    try {
-                        keys.forEach(key => {
-                            client.hmset('PathList',key,'');
+        var keys = ['chromePath','apiUrl','seamlessApiUrl'];
+        var envs = ['QAPathList','ReleasePathList','LivePathList'];
+        envs.forEach(env =>{
+            client.hgetall(env, (error, result) => {
+                if (!error){
+                    if(result == null){
+                        try {
+                            keys.forEach(key => {
+                                client.hmset(env,key,'');
+                            });
+                            resv({'returnObject':null})
+                        }
+                        catch(error){
+                            rej(error)
+                        }
+                    }else{
+                        keys.filter(function(v){ return Object.keys(result).indexOf(v) == -1 }).forEach(key => {
+                            client.hmset(env,key,'');
                         });
                         resv({'returnObject':null})
                     }
-                    catch(error){
-                        rej(error)
-                    }
                 }else{
-                    keys.filter(function(v){ return Object.keys(result).indexOf(v) == -1 }).forEach(key => {
-                        client.hmset('PathList',key,'');
-                    });
-                    resv({'returnObject':null})
+                    rej(error)
                 }
-            }else{
-                rej(error)
-            }
+            })
         })
+       
     });
 }
 
@@ -93,10 +97,12 @@ function getScript(key){
     });
 }
 
-function getPath(key){
+function getPath(datas){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        client.hget('PathList',JSON.parse(key), (error, result) => {
+        var env = JSON.parse(datas)[0];
+        var key = JSON.parse(datas)[1];
+        client.hget(env+"PathList",key, (error, result) => {
             if (!error){
                 resv(result)  
             }else{
@@ -106,10 +112,10 @@ function getPath(key){
     });
 }
 
-function getPathList(){
+function getPathList(env){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        client.hgetall('PathList', (error, result) => {
+        client.hgetall(JSON.parse(env)+"PathList", (error, result) => {
             if (!error){
                 resv(result)  
             }else{
@@ -182,12 +188,13 @@ function updateData(datas){
 
 
 
-function updatePath(data){
+function updatePath(datas){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
+        var env = JSON.parse(datas)[0];
+        let jsonObject= JSON.parse(datas)[1];
         try {
-            client.hmset('PathList',jsonObject);
+            client.hmset(env+"PathList",jsonObject);
             resv({'returnObject':null})
         }
         catch(error){

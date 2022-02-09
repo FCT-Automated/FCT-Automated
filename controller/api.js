@@ -39,7 +39,7 @@ function setApiKey(params,agentKey){
         let formData = querystring.stringify(form)
         let postOptions = {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            url: 'https://'+parent.apiUrl+'/Key',
+            url: parent.apiUrl+'/Key',
             method: 'POST',
             body: formData ,
             agentOptions: {
@@ -61,7 +61,7 @@ function setApiTools(getKey,apis,agentCode,currency){
         let formData = querystring.stringify(form)
         let postOptions = {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            url: 'https://'+parent.apiUrl+'/'+apis,
+            url: parent.apiUrl+'/'+apis,
             method: 'POST',
             body: formData ,
             agentOptions: {
@@ -80,7 +80,7 @@ function apiSeamlessRequest(apis,params){
         let formData = querystring.stringify(form)
         let postOptions = {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            url: 'https://'+parent.seamlessApiUrl+'/'+apis,
+            url: parent.seamlessApiUrl+'/'+apis,
             method: 'POST',
             body: formData ,
             agentOptions: {

@@ -19,9 +19,10 @@ $(async function() {
         myImport();
     }
 
+
     async function setPathList(){
         $('#table tbody').empty();
-        var obj = await parent.getLocalhostApi('/getPathList');
+        var obj = await parent.psotLocalhostApi('/getPathList',parent.env);
         for (let key in obj){
             let rows = showTable.rows.length+1
             let row = showTable.insertRow(-1)
@@ -67,7 +68,7 @@ $(async function() {
             let name = $("#name")[0].textContent;
             let path = $("#path")[0].value;
             data[name] = path
-            let response = await parent.psotLocalhostApi('/updatePath',data);
+            let response = await parent.psotLocalhostApi('/updatePath',[parent.env,data]);
             if (response['returnObject'] == null){
                 parent[name] = path;
                 setPathList();
@@ -81,9 +82,9 @@ $(async function() {
     }
 
     async function myExport(){
-        var obj = await parent.getLocalhostApi('/getPathList');
+        var obj = await parent.psotLocalhostApi('/getPathList',parent.env);
         let blob = new Blob([JSON.stringify(obj)], {type: "text/plain;charset=utf-8"});
-        parent.saveAs(blob, document.title+"List"+".json");
+        parent.saveAs(blob, parent.env+"PathList"+".json");
     }
 
     async function myImport(){
@@ -94,7 +95,7 @@ $(async function() {
             for(let key in datas){
                 let data ={};
                 data[key] = datas[key]
-                let response = await parent.psotLocalhostApi('/updatePath',data);
+                let response = await parent.psotLocalhostApi('/updatePath',[parent.env,data]);
                 if (response['returnObject'] == null){
                     parent[key] = datas[key];
                     message.innerHTML = "成功匯入!";

@@ -75,14 +75,32 @@ $(async function() {
             let row = showTable.insertRow(-1)
             let id = row.insertCell(0)
             let Name = row.insertCell(1)
-            let update = row.insertCell(2)
-            let del = row.insertCell(3)
+            let exportSeparately = row.insertCell(2)
+            let update = row.insertCell(3)
+            let del = row.insertCell(4)
             id.innerHTML = String(rows)
 
             let NameSpan = document.createElement('span')
             NameSpan.id = obj[key]
             NameSpan.innerHTML = obj[key]
             Name.appendChild(NameSpan)
+
+            //export
+            let exportSeparatelyBtn = document.createElement('Button');
+            let exportBtnIcon = document.createElement('i');
+            exportBtnIcon.className = "fas fa-file-download";
+            exportSeparatelyBtn.className = "btn";
+            exportSeparatelyBtn.id = "delBtn"+String(rows);
+            exportSeparatelyBtn.onclick = async function(){
+                var result = [];
+                result.push({});
+                let response = await parent.psotLocalhostApi('/getScript',obj[key])
+                result[0][obj[key]] = response['returnObject'];
+                let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
+                parent.saveAs(blob, obj[key]+".json");
+            } 
+            exportSeparatelyBtn.appendChild(exportBtnIcon);
+            exportSeparately.appendChild(exportSeparatelyBtn);
 
             //update
             let updateBtn = document.createElement('Button')
@@ -251,7 +269,7 @@ $(async function() {
     
     async function runDemoAccount(DemoID,event){
         let mes = urlAndPathCheck();
-        var AgentKey = parent.AgentKeyList["returnObject"]["FCDEM"];
+        var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"]["FCDEM"];
         let response; 
         if(AgentKey){
             let args ={

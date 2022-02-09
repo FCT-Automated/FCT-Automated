@@ -56,8 +56,10 @@ var server = http.createServer(async function(req, res) {
         });
     }else if(req.url=='/getPathList'){
         res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getPathList()));
-        res.end();
+        req.on('data', async function(key){
+            res.write(JSON.stringify(await redis.getPathList(decoder.write(key))));
+            res.end();
+        });
     }
 
     //db14:Script
