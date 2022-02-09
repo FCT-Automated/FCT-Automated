@@ -1,34 +1,34 @@
 var querystring = require('querystring')
 var request = require('request')
-var mongodbClient = require('mongodb').MongoClient;
+// var mongodbClient = require('mongodb').MongoClient;
 
-function connectMongoDB(code){
-    return new Promise((resv, rej) => {
-        mongodbClient.connect('mongodb://'+parent.DBUsername+':'+parent.DBPassword+'@'+parent.DBhost+':'+parent.DBPort+'/'+parent.DBName,
-        { useNewUrlParser: true , useUnifiedTopology: true},
-        function(err,db){
-            if(!err) {
-                console.log("successfully connected to the MongoDataBase");
-                var dbo = db.db("gamesystem");
-                dbo.collection("APIAgentSetting").findOne({code:code},function(err,result){
-                    if (err){
-                        console.log(err);
-                    } 
-                    db.close();
-                    if (result != null){
-                        resv(result['key']);
-                    }else{
-                        resv("");
-                    }
+// function connectMongoDB(code){
+//     return new Promise((resv, rej) => {
+//         mongodbClient.connect('mongodb://'+parent.DBUsername+':'+parent.DBPassword+'@'+parent.DBhost+':'+parent.DBPort+'/'+parent.DBName,
+//         { useNewUrlParser: true , useUnifiedTopology: true},
+//         function(err,db){
+//             if(!err) {
+//                 console.log("successfully connected to the MongoDataBase");
+//                 var dbo = db.db("gamesystem");
+//                 dbo.collection("APIAgentSetting").findOne({code:code},function(err,result){
+//                     if (err){
+//                         console.log(err);
+//                     } 
+//                     db.close();
+//                     if (result != null){
+//                         resv(result['key']);
+//                     }else{
+//                         resv("");
+//                     }
                     
-                });
-            }else{
-                console.log(err);
-            }
-        });
-    })
+//                 });
+//             }else{
+//                 console.log(err);
+//             }
+//         });
+//     })
     
-}
+// }
 
 function setApiKey(params,agentKey){
     return new Promise(function(resolve,reject){

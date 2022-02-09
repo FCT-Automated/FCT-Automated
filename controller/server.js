@@ -2,7 +2,7 @@ var http = require('http');
 var redis = require('../model/redis');
 const { StringDecoder } = require('string_decoder');
 
-redis.createTableOfPath();
+redis.init();
 
 var server = http.createServer(async function(req, res) {
     const decoder = new StringDecoder('utf-8');
@@ -60,6 +60,19 @@ var server = http.createServer(async function(req, res) {
             res.write(JSON.stringify(await redis.getPathList(decoder.write(key))));
             res.end();
         });
+    }
+    
+    //db15:CMS
+    else if(req.url=='/updateCMS'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        req.on('data', async function(data){
+            res.write(JSON.stringify(await redis.updateCMS(decoder.write(data))));
+            res.end();
+        });
+    }else if(req.url=='/getCMS'){
+        res.writeHead(200,{'Content-Type': 'application/json'});
+        res.write(JSON.stringify(await redis.getCMS()));
+        res.end();
     }
 
     //db14:Script
