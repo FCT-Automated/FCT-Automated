@@ -62,18 +62,6 @@ var server = http.createServer(async function(req, res) {
         });
     }
     
-    //db15:CMS
-    else if(req.url=='/updateCMS'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.updateCMS(decoder.write(data))));
-            res.end();
-        });
-    }else if(req.url=='/getCMS'){
-        res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getCMS()));
-        res.end();
-    }
 
     //db14:Script
     else if(req.url=='/getKeys'){

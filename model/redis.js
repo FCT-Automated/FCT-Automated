@@ -140,19 +140,6 @@ function getPathList(env){
     });
 }
 
-function getCMS(){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        client.hgetall('CMS', (error, result) => {
-            if (!error){
-                resv(result)  
-            }else{
-                rej(error)
-            }
-        });
-        
-    });
-}
 
 
 function delData(data){
@@ -213,20 +200,6 @@ function updateData(datas){
     });
 }
 
-function updateCMS(data){
-    return new Promise((resv, rej) => {
-        let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
-        try {
-            client.hmset('CMS',jsonObject);
-            resv({'returnObject':null})
-        }
-        catch(error){
-            rej(error)
-        }
-  
-    });
-}
 
 
 function updatePath(datas){
@@ -336,9 +309,6 @@ module.exports.updateScript = updateScript;
 
 module.exports.updatePath = updatePath;
 module.exports.getPathList = getPathList;
-
-module.exports.getCMS = getCMS;
-module.exports.updateCMS = updateCMS;
 
 
 
