@@ -4,6 +4,9 @@ $(async function() {
     const updateBtn = document.getElementById('update');
     const exportBtn = document.getElementById("export");
     const filesInput = document.getElementById("files");
+    const env = document.getElementById("env");
+
+    env.innerHTML = parent.env
 
     setPathList();
 
