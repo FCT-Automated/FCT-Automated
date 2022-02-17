@@ -7,6 +7,7 @@ $(async function() {
     var unassigned = document.getElementById('unassigned');
     var defaultGameWindows = document.getElementById('defaultGameWindows');
     var notDefaultGameWindows = document.getElementById('notDefaultGameWindows');
+    var defaultWindowSizeUpdate = document.getElementById('defaultWindowSizeUpdate');
     var gameWindows = document.getElementById('gameWindows');
     
 
@@ -51,6 +52,7 @@ $(async function() {
     defaultGameWindows.addEventListener('change',function(){
         gameWindows.disabled = false;
         getDefaultWindowSize();
+        defaultWindowSizeUpdate.style.display = "block";
 
     });
 
@@ -58,6 +60,7 @@ $(async function() {
         gameWindows.disabled = true;
         $("#width")[0].value = "";
         $("#height")[0].value = "";
+        defaultWindowSizeUpdate.style.display = "none";
     });
 
     gameWindows.addEventListener('change',function(){
