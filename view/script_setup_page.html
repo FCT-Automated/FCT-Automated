@@ -184,7 +184,7 @@
       let datas = {};
       datas['data'] = {};
       datas['tableName'] = "defaultWindowSize";
-      datas['data'][$("#gameWindows")[0].value] = $("#width")[0].value+","+$("#height")[0].value
+      datas['data'][$("#gameWindows")[0].value.replace(/\s*/g,"")] = ($("#width")[0].value+","+$("#height")[0].value).replace(/\s*/g,"")
       let response = await parent.psotLocalhostApi('/updateData',datas);
     }
     

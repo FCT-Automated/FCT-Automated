@@ -2,9 +2,9 @@ const puppeteer = require('puppeteer');
 
 async function createBrowser(url,datas,apiUrl,seamlessApiUrl) {
   let browserArgs ={
-    executablePath: parent.chromePath, // windows
+    executablePath: parent.chromePath,
     headless: false, // 是否在背景運行瀏覽器
-    args: ['--no-default-browser-check','--no-sandbox'],
+    args: ['--no-default-browser-check'],
     ignoreDefaultArgs: ['--enable-automation'],
     autoClose: false,
     devtools: true

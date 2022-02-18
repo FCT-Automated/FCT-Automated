@@ -41,8 +41,9 @@
                 </div>
 
             </div>
+            <button type="button" style="margin-right: 20px;" class="btn btn-secondary" onclick = 'browser()'>空白瀏覽器</button>
             <ul class="nav justify-content-end">
-                <label for="env" style="margin: 0px; margin-top: 6px; color: white;">環境：</label>
+                <label for="env" style="margin: 0px; margin-top: 4px; color: white;">環境：</label>
                 <div style="display: inline-block;">
                 <select class="form-control" id="env" style="height: 33px; padding-top: 4px;">
                     <option value="QA" selected="selected">QA</option>
@@ -80,6 +81,17 @@
                 changePath("QA")
             }
         };
+        async function browser(){
+            const puppeteer = require('puppeteer');
+            let browserArgs ={
+                executablePath: parent.chromePath,
+                headless: false, // 是否在背景運行瀏覽器
+                args: ['--no-default-browser-check','--no-sandbox'],
+                ignoreDefaultArgs: ['--enable-automation'],
+                autoClose: false
+            }
+            const browser = await puppeteer.launch(browserArgs);
+        }
         
     </script>
 </body>

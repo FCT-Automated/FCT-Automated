@@ -331,7 +331,7 @@ $(async function() {
                     let value;
                     for (let i = 0; i < rowLength; i++){
                         key = (i+1).toString()+"_" +addTable.rows.item(i).cells[1].children[0].value 
-                        value = addTable.rows.item(i).cells[2].children[0].value.replaceAll(" ","")
+                        value = addTable.rows.item(i).cells[2].children[0].value.replace(/\s*/g,"")
                         if (value !="" || key.includes('refresh')){
                             data[eleName.value][key] = value
                         }else{

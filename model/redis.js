@@ -59,15 +59,15 @@ function init(){
 async function importList(datas){
     var data = JSON.parse(datas)['data'];
     var tableName = JSON.parse(datas)['tableName'];
-    var currentList = await getList(JSON.stringify(tableName));
-    if (currentList != null){
-        currentList = Object.keys(currentList['returnObject']);  
+    var list = await getList(JSON.stringify(tableName));
+    if (list != null){
+        list = Object.keys(list['returnObject']);  
     }else{
-        currentList = [];
+        list = [];
     }
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        currentList.forEach(function(id){
+        list.forEach(function(id){
             delete data[id]
         })
         if (JSON.stringify(data)==="{}"){
