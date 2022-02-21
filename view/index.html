@@ -41,7 +41,7 @@
                 </div>
 
             </div>
-            <button type="button" style="margin-right: 20px;" class="btn btn-secondary" onclick = 'browser()'>空白瀏覽器</button>
+            <button type="button" style="margin-right: 20px;" class="btn btn-secondary" onclick = 'blankBrowser()'>空白瀏覽器</button>
             <ul class="nav justify-content-end">
                 <label for="env" style="margin: 0px; margin-top: 4px; color: white;">環境：</label>
                 <div style="display: inline-block;">
@@ -81,7 +81,7 @@
                 changePath("QA")
             }
         };
-        async function browser(){
+        async function blankBrowser(){
             const puppeteer = require('puppeteer');
             let browserArgs ={
                 executablePath: parent.chromePath,

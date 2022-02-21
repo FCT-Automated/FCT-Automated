@@ -119,10 +119,11 @@ async function run(event,apiValue){
         submit.innerHTML = "送出";
         submit.disabled = false;
     }
-    catch{
+    catch (e){
         submit.innerHTML = "送出";
         submit.disabled = false;
-        $("#message")[0].innerHTML += "請確認參數是否正確或目前是否可以使用API";
+        $("#message")[0].innerHTML += "請查看console的錯誤訊息!</br>";
+        console.log(e);
     }
     
     
