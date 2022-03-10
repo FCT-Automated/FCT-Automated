@@ -139,18 +139,20 @@ $(async function() {
     async function addData(addId,addName,e){
         if(addId.checkValidity() && addName.checkValidity()){
             e.preventDefault();
+            let key = addId.value.replace(/\s*/g,"");;
+            let value = addName.value.replace(/\s*/g,"");
             let datas = {};
             datas['data'] = {};
             datas['tableName'] = DbTableName;
-            datas['data'][addId.value] = addName.value
+            datas['data'][key] = value;
             let response = await parent.psotLocalhostApi('/addData',datas);
             if (response['returnObject'] == null){
                 document.getElementById("search").value = "";
                 setListSetting(await parent.psotLocalhostApi('/getList',DbTableName));
-                message.innerHTML = addId.value+"新增成功!";
+                message.innerHTML = key+"新增成功!";
                 parent.window[DbTableName] = await parent.psotLocalhostApi('/getList',DbTableName);
             }else{
-                message.innerHTML = addId.value+response['returnObject'];
+                message.innerHTML = key+response['returnObject'];
             }
             $("div.alert").show();
             $("#addModal").modal("hide");
@@ -165,11 +167,11 @@ $(async function() {
             let datas = {};
             datas['data'] = {};
             datas['tableName'] = DbTableName;
-            datas['data'][updateID.textContent] = updateName.value
+            datas['data'][updateID.textContent.replace(/\s*/g,"")] = updateName.value.replace(/\s*/g,"");
             let response = await parent.psotLocalhostApi('/updateData',datas);
             if (response['returnObject'] == null){
                 setListSetting(await parent.psotLocalhostApi('/getList',DbTableName));
-                message.innerHTML = updateID.textContent+"編輯成功!";
+                message.innerHTML = updateID.textContent.replace(/\s*/g,"")+"編輯成功!";
                 $("div.alert").show();
                 $("#updateModal").modal("hide");
                 parent.window[DbTableName] = await parent.psotLocalhostApi('/getList',DbTableName);

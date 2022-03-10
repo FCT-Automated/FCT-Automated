@@ -109,20 +109,21 @@ async function run(event,apiValue){
                         }else{
                             mes = "查無此Api Function</br>"
                         }
-                        $("#message")[0].innerHTML += mes;
+                        $("#message")[0].innerHTML = mes + $("#message")[0].innerHTML;
                     }
                 }
             }else{
-                $("#message")[0].innerHTML += mes;
+                $("#message")[0].innerHTML = mes + $("#message")[0].innerHTML;
             }  
         }
         submit.innerHTML = "送出";
         submit.disabled = false;
     }
-    catch{
+    catch (e){
         submit.innerHTML = "送出";
         submit.disabled = false;
-        $("#message")[0].innerHTML += "請確認參數是否正確或目前是否可以使用API";
+        $("#message")[0].innerHTML = "請查看console的錯誤訊息!</br>" + $("#message")[0].innerHTML;
+        console.log(e);
     }
     
     
@@ -157,8 +158,13 @@ async function Login(mes,MemberAccount){
         LanguageID : document.getElementById("LanguageID").value,
         Other : document.getElementById("other").value
     }
+    let code;
     let response = await parent.apiJs.requestAPI(args,parent.apiUrl)
-    let code = response.Result;
+    if(response){
+        code = response.Result;
+    }else{
+        code = 1;
+    }
     if ( code == 0){
         if(document.title == 'script'){
             let data = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
@@ -169,7 +175,7 @@ async function Login(mes,MemberAccount){
         }
         mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入成功!! ]</br>"
     }else{
-        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入失敗 - Error Code："+code+"!! ]</br>";
+        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入失敗 - Error："+response+"!! ]</br>";
     }
     
     return mes;
@@ -196,7 +202,11 @@ async function SetPoints(mes,MemberAccount){
             Points : document.getElementById("Points").value
         }
         response = await parent.apiJs.requestSeamlessAPI(args,parent.seamlessApiUrl);
-        code = response.Result;
+        if(response){
+            code = response.Result;
+        }else{
+            code = 1;
+        }
         if ( code == 0){
             mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.Points+"]</br>"
         }
@@ -211,13 +221,17 @@ async function SetPoints(mes,MemberAccount){
             Points : document.getElementById("Points").value
         }
         response = await parent.apiJs.requestAPI(args,parent.apiUrl);
-        code = response.Result;
+        if(response){
+            code = response.Result;
+        }else{
+            code = 1;
+        }
         if ( code == 0){
             mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.AfterPoint+"，BankID："+response.BankID+"]</br>"
         }
     }
     if(code !=0){
-        mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 轉點失敗!! - Error Code："+code+"]</br>"
+        mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 轉點失敗!! - Error"+response+"]</br>"
     }
     
     return mes;
@@ -233,12 +247,17 @@ async function KickOut(mes,MemberAccount){
         AgentKey : AgentKey,
         MemberAccount : MemberAccount,
     }
+    let code;
     let response = await parent.apiJs.requestAPI(args,parent.apiUrl);
-    let code = response.Result;
+    if(response){
+        code = response.Result;
+    }else{
+        code = 1;
+    }
     if ( code == 0){
         mes = "Log:[ KickOut- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出成功!! ]</br>"
     }else{
-        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出失敗 - Error Code："+code+"!! ]</br>"
+        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出失敗 - Error："+response+"!! ]</br>"
     }
 
     return mes;

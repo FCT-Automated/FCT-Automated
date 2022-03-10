@@ -71,7 +71,7 @@
                 <div style="display: inline-block;"><select class="form-control GameID" id="DemoGameID"></select> </div>
                 <div style="display: inline-block;"><button type="button" id="demoBtn" class="btn btn-primary">開啟</button></div>
               </div>
-              <span class="text-danger" style="font-size: 12px; display: block; margin-bottom: 0px;">如無法開啟請先至設定確認是否有新增FCDEM的AgentKey</span>
+              <span class="text-danger" style="font-size: 12px; display: block; margin-bottom: 0px;">如無法開啟請先至QA環境確認是否有新增FCDEM的AgentKey!!!</span>
               <span class="text-primary" style="font-size: 12px; display: block; margin-bottom: 15px;">滑鼠點擊位置 請開啟上方Demo查看console並複製<br>注意:Demo的各設定會參考下方的數值</span>
               <hr class="my-2">
               <div class="form-group"> 
@@ -184,7 +184,7 @@
       let datas = {};
       datas['data'] = {};
       datas['tableName'] = "defaultWindowSize";
-      datas['data'][$("#gameWindows")[0].value] = $("#width")[0].value+","+$("#height")[0].value
+      datas['data'][$("#gameWindows")[0].value.replace(/\s*/g,"")] = ($("#width")[0].value+","+$("#height")[0].value).replace(/\s*/g,"")
       let response = await parent.psotLocalhostApi('/updateData',datas);
     }
     

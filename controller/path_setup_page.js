@@ -4,6 +4,9 @@ $(async function() {
     const updateBtn = document.getElementById('update');
     const exportBtn = document.getElementById("export");
     const filesInput = document.getElementById("files");
+    const env = document.getElementById("env");
+
+    env.innerHTML = parent.env
 
     setPathList();
 
@@ -88,22 +91,33 @@ $(async function() {
     }
 
     async function myImport(){
+        let mes = "";
         let reader = new FileReader();
         reader.readAsText(await filesInput.files[0]);
         reader.onload = async function(){
             let datas = JSON.parse(this.result);
             for(let key in datas){
                 let data ={};
-                data[key] = datas[key]
-                let response = await parent.psotLocalhostApi('/updatePath',[parent.env,data]);
-                if (response['returnObject'] == null){
-                    parent[key] = datas[key];
-                    message.innerHTML = "成功匯入!";
-                }else{
-                    message.innerHTML = key+"匯入失敗!";
-                    break
+                if(key == "chromePath" || key == "apiUrl" || key == "seamlessApiUrl"){
+                    data[key] = datas[key]
+                    let response = await parent.psotLocalhostApi('/updatePath',[parent.env,data]);
+                    if (response['returnObject'] == null){
+                        parent[key] = datas[key];
+                        mes += key+","
+                    }else{
+                        message.innerHTML = key+"匯入失敗!";
+                        break
+                    }
                 }
+                
+                
             }
+            if(mes ==""){
+                message.innerHTML = "匯入的資料不正確!!"
+            }else{
+                message.innerHTML = mes+"成功匯入!";
+            }
+            
             setPathList();
             $("div.alert").show();
         };

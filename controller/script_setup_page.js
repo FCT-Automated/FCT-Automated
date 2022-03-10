@@ -7,6 +7,7 @@ $(async function() {
     var unassigned = document.getElementById('unassigned');
     var defaultGameWindows = document.getElementById('defaultGameWindows');
     var notDefaultGameWindows = document.getElementById('notDefaultGameWindows');
+    var defaultWindowSizeUpdate = document.getElementById('defaultWindowSizeUpdate');
     var gameWindows = document.getElementById('gameWindows');
     
 
@@ -51,6 +52,7 @@ $(async function() {
     defaultGameWindows.addEventListener('change',function(){
         gameWindows.disabled = false;
         getDefaultWindowSize();
+        defaultWindowSizeUpdate.style.display = "block";
 
     });
 
@@ -58,6 +60,7 @@ $(async function() {
         gameWindows.disabled = true;
         $("#width")[0].value = "";
         $("#height")[0].value = "";
+        defaultWindowSizeUpdate.style.display = "none";
     });
 
     gameWindows.addEventListener('change',function(){
@@ -282,18 +285,28 @@ $(async function() {
                 if(await isAssign()){
                     event.preventDefault();
                     response = await parent.apiJs.requestAPI(args,parent.apiUrl)
-                    let object = {};
-                    if($("#assign")[0].checked){
-                        object['version'] = $("#version")[0].value;
+                    let code;
+                    if(response){
+                        code = response.Result;
                     }else{
-                        object['version'] = "";
+                        code = 1;
                     }
-                    if(defaultGameWindows.checked){
-                        object['width'] = $("#width")[0].value;
-                        object['height'] = $("#height")[0].value;
-                        await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object),parent.apiUrl,parent.seamlessApiUrl);
+                    if ( code == 0){
+                        let object = {};
+                        if($("#assign")[0].checked){
+                            object['version'] = $("#version")[0].value;
+                        }else{
+                            object['version'] = "";
+                        }
+                        if(defaultGameWindows.checked){
+                            object['width'] = $("#width")[0].value;
+                            object['height'] = $("#height")[0].value;
+                            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object),parent.apiUrl,parent.seamlessApiUrl);
+                        }else{
+                            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object),parent.apiUrl,parent.seamlessApiUrl);
+                        }
                     }else{
-                        await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object),parent.apiUrl,parent.seamlessApiUrl);
+                        mes = "登入失敗 - Error："+response
                     }
                 }
             }
@@ -328,7 +341,7 @@ $(async function() {
                     let value;
                     for (let i = 0; i < rowLength; i++){
                         key = (i+1).toString()+"_" +addTable.rows.item(i).cells[1].children[0].value 
-                        value = addTable.rows.item(i).cells[2].children[0].value.replaceAll(" ","")
+                        value = addTable.rows.item(i).cells[2].children[0].value.replace(/\s*/g,"")
                         if (value !="" || key.includes('refresh')){
                             data[eleName.value][key] = value
                         }else{
