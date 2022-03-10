@@ -31,7 +31,7 @@ async function isAttendCheck(isCheck){
     }else{
         eventlist.options.length = 0;
         eventlist.disabled=true
-        $("#message")[0].innerHTML += mes;
+        $("#message")[0].innerHTML = mes + $("#message")[0].innerHTML;
     }
     
 }

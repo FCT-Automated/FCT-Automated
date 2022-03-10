@@ -13,6 +13,7 @@ function setApiKey(params,agentKey,apiUrl){
             url: apiUrl+'/Key',
             method: 'POST',
             body: formData ,
+            timeout: 2000,
             agentOptions: {
                 rejectUnauthorized: false
             }
@@ -35,6 +36,7 @@ function setApiTools(getKey,apis,agentCode,currency,apiUrl){
             url: apiUrl+'/'+apis,
             method: 'POST',
             body: formData ,
+            timeout: 2000,
             agentOptions: {
                 rejectUnauthorized: false
             }
@@ -54,11 +56,12 @@ function apiSeamlessRequest(apis,params,seamlessApiUrl){
             url: seamlessApiUrl+'/'+apis,
             method: 'POST',
             body: formData ,
+            timeout: 2000,
             agentOptions: {
                 rejectUnauthorized: false
             }
         }
-        resolve(doRequest(postOptions))
+        resolve(postOptions)
     })
 }
 
@@ -67,8 +70,10 @@ function doRequest(postOptions) {
         request(postOptions,function(error, response, body){
             if (!error && response.statusCode == 200) {
                 resolve(JSON.parse(body))
+            }else if(error.code === 'ETIMEDOUT'){
+                reject("timedout");
             }else{
-                resolve("-Request Fail");
+                reject(error);
             }
         })
     })
@@ -122,11 +127,16 @@ async function requestAPI(args,apiUrl) {
             break
     }
     arg =  JSON.stringify(arg);
-    let keyOptions = await setApiKey(arg,args["AgentKey"],apiUrl)
-    let getKey = await doRequest(keyOptions)
-    //-----second request-----
-    let apisOptions = await setApiTools(getKey,args['API'],args['AgentCode'],args['Currency'],apiUrl)
-    return doRequest(apisOptions)
+    try{
+        let keyOptions = await setApiKey(arg,args["AgentKey"],apiUrl)
+        let getKey = await doRequest(keyOptions)
+        //-----second request-----
+        let apisOptions = await setApiTools(getKey,args['API'],args['AgentCode'],args['Currency'],apiUrl)
+        return doRequest(apisOptions)
+    }catch(err){
+        return err
+    }
+    
 }
 
 async function requestSeamlessAPI(args,seamlessApiUrl) {
@@ -135,7 +145,12 @@ async function requestSeamlessAPI(args,seamlessApiUrl) {
         Points : args['Points']
     })
     //-----request-----
-    return apiSeamlessRequest(args['API'],arg,seamlessApiUrl)
+    let apisOptions =  await apiSeamlessRequest(args['API'],arg,seamlessApiUrl);
+    try{
+        return doRequest(apisOptions);
+    }catch(err){
+        return err
+    }
 }
 
 module.exports.requestAPI = requestAPI;

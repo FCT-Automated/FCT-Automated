@@ -97,12 +97,23 @@ async function AutoScript(MemberAccounts,args,script,minute,apiUrl,seamlessApiUr
   let height = script['returnObject']['height'];
   let datas = script;
   let isStart_out = true;
+  var response;
   while(isStart_out){
       for(let MemberAccount of MemberAccounts){
         args['MemberAccount'] = MemberAccount;
         datas['user'] = args;
-        let response = await parent.apiJs.requestAPI(args,apiUrl)
-        if ( response.Result == 0){            
+        try{
+          response = await parent.apiJs.requestAPI(args,apiUrl)
+        }catch(err){
+          console.log(err)
+        }
+        let code;
+        if(response){
+          code = response.Result;
+        }else{
+          code = 1;
+        }
+        if ( code == 0){            
             if ( version!= ""){
               await page.goto(response.Url+"&version="+version);
             }else{
@@ -123,7 +134,7 @@ async function AutoScript(MemberAccounts,args,script,minute,apiUrl,seamlessApiUr
             }
             
         }else{
-            console.log("requestAPI errorCode:"+response.Result,args);
+            console.log("requestAPI error:"+response,args);
         }
       } 
   }
@@ -163,6 +174,7 @@ async function runScript(datas,page,apiUrl,seamlessApiUrl){
   
   for (let action in scripts){
     console.log(action.split("_")[1]+"-start");
+    let code;
     switch (action.split("_")[1]){
       case "wait":
         await wait(parseInt(scripts[action])*1000);
@@ -176,21 +188,39 @@ async function runScript(datas,page,apiUrl,seamlessApiUrl){
       case "setpoints-normal":
         user['API'] = 'SetPoints';
         user['Points'] = scripts[action];
-        response = await apiJs.requestAPI(user,apiUrl);
-        if(response.Result != 0){
-          console.log("setPoints Fail")
+        try{
+          response = await apiJs.requestAPI(user,apiUrl);
+        }catch(err){
+          console.log(err);
+        }
+        if(response){
+          code = response.Result;
         }else{
+          code = 1;
+        }
+        if(code == 0){
           console.log("setPoints Successfully")
+        }else{
+          console.log("setPoints Fail")          
         }
         break
       case "setpoints-seamless":
         user['API'] = 'SetJson';
         user['Points'] = scripts[action];
-        response =  await apiJs.requestSeamlessAPI(user,seamlessApiUrl);
-        if(response.Result != 0){
-          console.log("setPoints Fail")
+        try{
+          response =  await apiJs.requestSeamlessAPI(user,seamlessApiUrl);
+        }catch(err){
+          console.log(err);
+        }
+        if(response){
+          code = response.Result;
         }else{
+          code = 1;
+        }
+        if(code == 0){
           console.log("setPoints Successfully")
+        }else{
+          console.log("setPoints Fail")
         }
         break
       case "refresh":
