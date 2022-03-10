@@ -140,14 +140,14 @@ function getPathList(env){
     });
 }
 
-function getCMS(){
+function getWebManagementSystemDatas(env){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        client.hgetall('CMS', (error, result) => {
-            if (!error){
-                resv(result)  
+        client.hgetall(JSON.parse(env)+"WebManagementSystemDatas", (error, response) => {
+            if (response != null){
+                resv(response)  
             }else{
-                rej(error)
+                resv(response)
             }
         });
         
@@ -213,12 +213,13 @@ function updateData(datas){
     });
 }
 
-function updateCMS(data){
+function updateWebManagementSystemDatas(datas){
     return new Promise((resv, rej) => {
         let client = connectRedis(15);
-        let jsonObject= JSON.parse(data);
+        let env = JSON.parse(datas)[0];
+        let jsonObject= JSON.parse(datas)[1];
         try {
-            client.hmset('CMS',jsonObject);
+            client.hmset(env+"WebManagementSystemDatas",jsonObject);
             resv({'returnObject':null})
         }
         catch(error){
@@ -337,8 +338,8 @@ module.exports.updateScript = updateScript;
 module.exports.updatePath = updatePath;
 module.exports.getPathList = getPathList;
 
-module.exports.getCMS = getCMS;
-module.exports.updateCMS = updateCMS;
+module.exports.getWebManagementSystemDatas = getWebManagementSystemDatas;
+module.exports.updateWebManagementSystemDatas = updateWebManagementSystemDatas;
 
 
 

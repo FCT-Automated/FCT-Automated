@@ -1,12 +1,13 @@
 <head>
     <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" crossorigin="anonymous">
     <link rel="stylesheet" href="../bower_components/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
     <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <script src="../bower_components/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
     <script src="../bower_components/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-TW.js"></script>
-    <!-- <script src="../controller/publicMethod.js"></script>
-    <script src="../controller/api_and_script_page.js"></script> -->
+    <script src="../controller/publicMethod.js"></script>
+    <script src="../controller/betrecord_page.js"></script>
     <title>BetRecord</title>
   </head>
   <body>
@@ -14,20 +15,41 @@
       <div class="col">
         <form>
           <div>
-            <div class="form-group" style="display: inline-block; margin-right: 20px;"> 
+            <div class="form-group" style="display: inline-block; margin-right: 15px;"> 
+              <div style="display: inline-block;">
+                <label for="LoginUrl">後台登入網址：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <input class="form-control" style="width: 250px;" id="LoginUrl" aria-required="true" required>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="form-group" style="display: inline-block; margin-right: 15px;"> 
+              <div style="display: inline-block;">
+                <label for="betRecordUrl">投注紀錄網址：</label> 
+              </div>
+              <div style="display: inline-block;">
+                <input class="form-control" style="width: 250px;" id="betRecordUrl" aria-required="true" required>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="form-group" style="display: inline-block; margin-right: 15px;"> 
               <div style="display: inline-block;">
                 <label for="account">後台帳號：</label> 
               </div>
               <div style="display: inline-block;">
-                <input class="form-control" style="width: 150px;" id="account" aria-required="true" required>
+                <input class="form-control" style="width: 160px;" id="account" aria-required="true" required>
               </div>
             </div>
-            <div class="form-group" style="display: inline-block; margin-right: 20px;"> 
+            <div class="form-group" style="display: inline-block; margin-right: 15px;"> 
               <div style="display: inline-block;">
                 <label for="password">後台密碼：</label> 
               </div>
-              <div style="display: inline-block;">
-                <input class="form-control" style="width: 150px;" id="password" aria-required="true" required>
+              <div style="display: inline-block;" id="show_hide_password">
+                <input type="password" class="form-control" style="display: inline-block; width: 160px;"  id="password" aria-required="true" required>
+                <a href="" style="color:grey"><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
               </div>
             </div>             
             <div class="form-check" style="display: inline-block;">
