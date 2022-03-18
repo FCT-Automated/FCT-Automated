@@ -80,8 +80,10 @@ var server = http.createServer(async function(req, res) {
     //db14:Script
     else if(req.url=='/getKeys'){
         res.writeHead(200,{'Content-Type': 'application/json'});
-        res.write(JSON.stringify(await redis.getKeys()));
-        res.end();
+        req.on('data', async function(db){
+            res.write(JSON.stringify(await redis.getKeys(decoder.write(db))));
+            res.end();
+        });
     }else if(req.url=='/getScript'){
         res.writeHead(200,{'Content-Type': 'application/json'});
         req.on('data', async function(data){
@@ -90,20 +92,20 @@ var server = http.createServer(async function(req, res) {
         });
     }else if(req.url=='/addScript'){
         res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.addScript(decoder.write(data))));
+        req.on('data', async function(datas){
+            res.write(JSON.stringify(await redis.addScript(decoder.write(datas))));
             res.end();
         });
     }else if(req.url=='/delScript'){
         res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.delScript(decoder.write(data))));
+        req.on('data', async function(datas){
+            res.write(JSON.stringify(await redis.delScript(decoder.write(datas))));
             res.end();
         });
     }else if(req.url=='/updateScript'){
         res.writeHead(200,{'Content-Type': 'application/json'});
-        req.on('data', async function(data){
-            res.write(JSON.stringify(await redis.updateScript(decoder.write(data))));
+        req.on('data', async function(datas){
+            res.write(JSON.stringify(await redis.updateScript(decoder.write(datas))));
             res.end();
         });
     }

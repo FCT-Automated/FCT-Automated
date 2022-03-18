@@ -44,7 +44,7 @@ function api(){
 
 function script(){
     $('.scriptList').show()
-    setKeys(parent.scriptList,"list");
+    setKeys(parent.hangUpScriptList,"list");
     $('#API')[0].disabled = true
     $('.tip').show()
 
@@ -98,7 +98,7 @@ async function run(event,apiValue){
                         AgentKey : AgentKey,
                         LanguageID : document.getElementById("LanguageID").value
                     }
-                    let autoScriptList = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
+                    let autoScriptList = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,$("#list option:selected").text()]);
                     submit.innerHTML = "送出";
                     submit.disabled = false;
                     await parent.browser.AutoScript(MemberAccounts,args,autoScriptList,document.getElementById("multipleMin").value,parent.apiUrl,parent.seamlessApiUrl);
@@ -167,7 +167,7 @@ async function Login(mes,MemberAccount){
     }
     if ( code == 0){
         if(document.title == 'script'){
-            let data = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
+            let data = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,$("#list option:selected").text()]);
             data['user'] = args
             await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Script',data),parent.apiUrl,parent.seamlessApiUrl);
         }else{

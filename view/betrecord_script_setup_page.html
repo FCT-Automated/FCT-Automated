@@ -1,0 +1,163 @@
+<head>
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" crossorigin="anonymous">
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="../css/betrecord_script_setup_page.css">
+    <script src="../bower_components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+    <script src="../controller/publicMethod.js"></script>
+    <script src="../controller/betrecord_script_setup_page.js"></script>
+
+</head>
+
+<body>
+    <ul class="nav" style="position: relative; float: left;">
+        <li class="nav-item" style="margin-top: 10px;">
+            <div class="alert alert-success" role="alert" style="padding-top: 5px; padding-bottom: 5px; margin-bottom: 0px; display: none;">
+            <span id="message"></span>
+            </div>
+        </li>
+    </ul>
+
+    <div class="row" style="position: relative; width: 100%; margin: 0;">
+        <div class="tabs">
+            <!-- 驗證區塊 -->
+            <input type="radio" class="tabs__radio" name="tabs" id="tab1" checked>
+            <label for="tab1" class="tabs__label">設定驗證</label>
+            <div class="tabs__content" style="margin-top: 50px; position: absolute;">
+                <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#addModal" id="clickModal">
+                    <span class="fas fa-plus"></span>新增驗證
+                </button>
+                <table class="table table-hover" id="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">腳本名稱</th>
+                        <th scope="col">匯出</th>
+                        <th scope="col">編輯</th>
+                        <th scope="col">刪除</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 值區塊 -->
+            <input type="radio" class="tabs__radio" name="tabs" id="value">
+            <label for="value" class="tabs__label">設定值</label>
+            <div class="tabs__content" style="margin-top: 50px; position: absolute;">
+                <ul class="nav" style="position: relative; float: left;">
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#Modal2" id="clickModal2">
+                            <span class="fas fa-plus"></span>新增值
+                        </button>
+                    </li>
+                </ul>
+                <ul class="nav justify-content-end" style="position: relative; ">
+                    <li class="nav-item">
+                      <form style="display:none"><input type="file" id="files2" style="display:none"/></form>
+                      <button type="button" class="btn btn-primary" style="margin: 10px" id="importBtn2">
+                        Import
+                      </button>
+                    </li>
+                    <li class="nav-item">
+                      <button type="button" class="btn btn-primary" style="margin: 10px" id="exportBtn2">
+                        Export
+                      </button>
+                    </li>
+                </ul>
+                <table class="table table-hover" >
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">名稱</th>
+                        <th scope="col">匯出</th>
+                        <th scope="col">編輯</th>
+                        <th scope="col">刪除</th>
+                    </tr>
+                    </thead>
+                    <tbody id="listTable2">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增驗證的modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-hidden="true" >
+        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 100%; padding: 17px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增驗證</h5>
+                </div>
+                <form>
+                    <div class="modal-body">
+                        <div class="form-group"><span><span class="text-danger" style="font-size: 20px;">*</span>名稱：</span><input style="width: 100%;" placeholder="新增後此名稱不可再修改!" aria-required="true" id="name1" required></div>
+                        <button type="button" class="btn btn-primary" id="addComparisonRow">新增一般式</button>
+                        <button type="button" class="btn btn-primary" id="addIfRow">新增判斷式</button>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center; vertical-align: middle;" id='id'>編號</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='var1'>值名稱</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='operator'>運算子</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='var2'>值名稱</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='delBtn'>刪除</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table1">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="submit" class="btn btn-primary" id='addBtn'>確定新增</button>
+                        <button type="submit" class="btn btn-primary" id='updateBtn' style="display: none;">確定修改</button>
+                        <div><span id="addMessage"></span></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增值的modal -->
+    <div class="modal fade" id="Modal2" tabindex="-1" role="dialog" aria-hidden="true" >
+        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 100%; padding: 17px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增值</h5>
+                </div>
+                <form>
+                    <div class="modal-body">
+                        <div style="display: inline-block;" class="form-group"><span>url：</span><input style="width: 250px;" placeholder="輸入測試爬蟲之網址" id="url2" ></div>
+                        <button type="button" class="btn btn-primary" id="crawlerTest2">測試</button>
+                        <div class="form-group"><span><span class="text-danger" style="font-size: 20px;">*</span>名稱：</span><input style="width: 100%;" placeholder="新增後此名稱不可再修改!" aria-required="true" id="name2" required></div>
+                        <div><button type="button" class="btn btn-primary" id="addRow2">新增動作</button></div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center; vertical-align: middle;" id='id'>編號</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='method'>方法</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='element'>元素</th>
+                                    <th style="text-align: center; vertical-align: middle;" id='delBtn'>刪除</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table2">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="submit" class="btn btn-primary" id='addBtn2'>確定新增</button>
+                        <button type="submit" class="btn btn-primary" id='updateBtn2' style="display:none">確定修改</button>
+                        <div><span id="addMessage2"></span></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

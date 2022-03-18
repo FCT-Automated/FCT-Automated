@@ -3,6 +3,8 @@ const {net} = require('electron')
 const { saveAs } = require('file-saver');
 var apiJs = require('../controller/api');
 var browser = require('../controller/browser');
+var axios = require('axios');
+var cheerio = require("cheerio");
 
 var chromePath;
 var apiUrl;
@@ -13,8 +15,12 @@ var LanguageList;
 var QAAgentKeyList;
 var ReleaseAgentKeyList;
 var LiveAgentKeyList;
-var scriptList;
+var hangUpScriptList;
+var crawlerScriptList;
 var env;
+var hangUpDB = 14;
+var crawlerDB = 13;
+var token;
 
 
 
@@ -25,7 +31,8 @@ async function init(){
     QAAgentKeyList = await psotLocalhostApi('/getList','QAAgentKeyList');
     ReleaseAgentKeyList = await psotLocalhostApi('/getList','ReleaseAgentKeyList');
     LiveAgentKeyList = await psotLocalhostApi('/getList','LiveAgentKeyList');
-    scriptList = await getLocalhostApi('/getKeys');
+    hangUpScriptList = await psotLocalhostApi('/getKeys',hangUpDB);
+    crawlerScriptList = await psotLocalhostApi('/getKeys',crawlerDB);
     document.getElementById('myiframe').src ="api_and_script_page.html?api";
 }
 

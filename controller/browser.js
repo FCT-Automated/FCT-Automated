@@ -237,6 +237,7 @@ function wait(ms){
 }
 
 
+
 module.exports.createBrowser = createBrowser;
 module.exports.Normal = Normal;
 module.exports.Script = Script;

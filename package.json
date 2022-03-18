@@ -25,6 +25,7 @@
     "bootstrap": "^4.6.0",
     "bootstrap-datetimepicker": "^0.0.7",
     "bootstrap-table": "^1.18.2",
+    "cheerio": "^1.0.0-rc.10",
     "express.js": "^1.0.0",
     "file-saver": "^2.0.5",
     "jquery": "^3.5.1",

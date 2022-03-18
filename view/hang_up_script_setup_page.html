@@ -5,21 +5,21 @@
     <link rel="stylesheet" href="../bower_components/fontawesome-free/css/all.min.css">
     <script src="../bower_components/bootstrap-table/dist/bootstrap-table.min.js"></script>
     <script src="../controller/publicMethod.js"></script>
-    <script src="../controller/script_setup_page.js"></script>
-    <title>ScriptSetup</title>
+    <script src="../controller/hang_up_script_setup_page.js"></script>
     <script type="text/javascript">
       function filesInput(){
         $('#files').click();
       }
     </script>
+    <title>掛機</title>
 </head>
 
 <body>
   <ul class="nav" style="position: relative; float: left;">
     <li class="nav-item">
-      <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#addModal"
-        onclick='clickAddBtn()'>
-        <span class="fas fa-plus"></span>新增腳本
+      <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#addModal" 
+        id='clickAddBtn'>
+        <span class="fas fa-plus"></span>新增掛機腳本
       </button>
     </li>
     <li class="nav-item" style="margin-top: 10px;">
@@ -43,7 +43,7 @@
   </ul>
 
   <div class="row" style="position: relative; width: 100%; margin: 0;">
-    <table class="table table-hover" id="table">
+    <table class="table table-hover">
       <thead>
         <tr>
           <th scope="col">#</th>
@@ -53,12 +53,12 @@
           <th scope="col">刪除</th>
         </tr>
       </thead>
-      <tbody>
-      </tbody>
+      <tbody id="table">
+      </tbody >
     </table>
   </div>
 
-  <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-hidden="true" >
     <div class="modal-dialog modal-dialog-centered" >
       <div class="modal-content">
         <div class="modal-header">
@@ -123,13 +123,13 @@
                   <div class="form-group"><span><span class="text-danger" style="font-size: 20px;">*</span>遊戲長度：</span><input aria-required="true" id="height" required></div>
                 </div>
                 <div style="display: inline-block;">
-                  <button id="defaultWindowSizeUpdate" class="btn btn-outline-warning" type="button" onclick='clickdefaultWindowSizeUpdate()'>
+                  <button id="defaultWindowSizeUpdate" class="btn btn-outline-warning" type="button">
                     <span class="fas fa-save"></span> 變更預設
                   </button>
                 </div>
                 <hr class="my-3">
                 <div style="display: inline-block;">
-                  <div class="form-group"><span><span class="text-danger" style="font-size: 20px;">*</span>腳本名稱：</span><input style="width: 250px;" placeholder="腳本新增後此名稱不可再修改!" aria-required="true" id="name" required></div>
+                  <div class="form-group"><span><span class="text-danger" style="font-size: 20px;">*</span>腳本名稱：</span><input style="width: 250px;" placeholder="新增後此名稱不可再修改!" aria-required="true" id="name" required></div>
                 </div>
                 <div style="float: right;">
                   <button id="addRowBtn" class="btn btn-dark" type="button" >
@@ -160,35 +160,8 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript">
-    async function clickAddBtn(){
-      $("#addTable tr").remove(); 
-      $("#name")[0].disabled = false; 
-      $("#name")[0].value = ""; 
-      $("#version")[0].value = ""; 
-      $("#addMessage")[0].innerHTML = "";
-      $(".modal-title")[0].innerHTML = "新增腳本";
-      $("#addBtn")[0].innerHTML = "確定新增";
-      $("#unassigned")[0].checked = true;
-      $("#defaultGameWindows")[0].checked = true;
-      $("#width")[0].value = $("#gameWindows")[0].value.split(",")[0];
-      $("#height")[0].value = $("#gameWindows")[0].value.split(",")[1];
-      $("#version")[0].disabled = true;
-      $("#gameWindows")[0].disabled = false;
-      let defaultWindowSize = await parent.psotLocalhostApi('/getList','defaultWindowSize');
-      $("#width")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[0];
-      $("#height")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[1];
-    }
 
-    async function clickdefaultWindowSizeUpdate(){
-      let datas = {};
-      datas['data'] = {};
-      datas['tableName'] = "defaultWindowSize";
-      datas['data'][$("#gameWindows")[0].value.replace(/\s*/g,"")] = ($("#width")[0].value+","+$("#height")[0].value).replace(/\s*/g,"")
-      let response = await parent.psotLocalhostApi('/updateData',datas);
-    }
-    
-  </script>
+  
 </body>
 
 </html>

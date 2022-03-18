@@ -94,11 +94,12 @@ async function getList(tableName){
     });
 }
 
-function getScript(key){
+function getScript(datas){
+    var db = JSON.parse(datas)[0];
     return new Promise((resv, rej) => {
         let response = {'returnObject':{}}
-        let jsonObject= JSON.parse(key);
-        let client = connectRedis(14);
+        let jsonObject= JSON.parse(datas)[1];
+        let client = connectRedis(db);
         client.hgetall(jsonObject, (error, result) => {
             if (!error){
                 response['returnObject'] = result
@@ -246,9 +247,9 @@ function updatePath(datas){
     });
 }
 
-function getKeys(){
+function getKeys(db){
     return new Promise((resv, rej) => {
-        let client = connectRedis(14);
+        let client = connectRedis(JSON.parse(db));
         client.keys('*',(error,keys) => {
             if(!error){
                 resv(keys)
@@ -262,11 +263,14 @@ function getKeys(){
 }
 
 
-async function addScript(script){
-    var tableNames = await getKeys();    
+
+
+async function addScript(datas){
+    var db = JSON.parse(datas)[0];
+    var tableNames = await getKeys(db);    
     return new Promise((resv, rej) => {
-        let client = connectRedis(14);
-        let jsonObject= JSON.parse(script);
+        let client = connectRedis(db);
+        let jsonObject= JSON.parse(datas)[1];
         let tableName = Object.keys(jsonObject)[0];
         if (! tableNames.includes(tableName)){
             try {
@@ -284,10 +288,11 @@ async function addScript(script){
     });
 }
 
-function delScript(key){
+function delScript(datas){
+    var db = JSON.parse(datas)[0];
     return new Promise((resv, rej) => {
-        let client = connectRedis(14);
-        let jsonObject= JSON.parse(key);
+        let client = connectRedis(db);
+        let jsonObject= JSON.parse(datas)[1];
         client.del(jsonObject, (error, result) => {
             if (!error){
                 resv({'returnObject':null})
@@ -299,11 +304,12 @@ function delScript(key){
     
 }
 
-function updateScript(script){
+function updateScript(datas){
+    var db = JSON.parse(datas)[0];
     return new Promise((resv, rej) => {
-        let jsonObject= JSON.parse(script);
+        let jsonObject= JSON.parse(datas)[1];
         let tableName = Object.keys(jsonObject)[0];
-        let client = connectRedis(14);
+        let client = connectRedis(db);
         client.del(tableName, (error, result) => {
             if (!error){
                 try {
@@ -340,6 +346,7 @@ module.exports.getPathList = getPathList;
 
 module.exports.getWebManagementSystemDatas = getWebManagementSystemDatas;
 module.exports.updateWebManagementSystemDatas = updateWebManagementSystemDatas;
+
 
 
 

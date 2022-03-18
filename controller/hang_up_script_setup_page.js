@@ -1,17 +1,18 @@
 $(async function() {
     var addTable = document.getElementById('addTable');
-    var showTable = document.getElementById("table").getElementsByTagName('tbody')[0];
+    var showTable = document.getElementById("table");
     var message = document.getElementById("message");
     var DbTableName = document.title;
     var assign = document.getElementById('assign');
     var unassigned = document.getElementById('unassigned');
     var defaultGameWindows = document.getElementById('defaultGameWindows');
     var notDefaultGameWindows = document.getElementById('notDefaultGameWindows');
-    var defaultWindowSizeUpdate = document.getElementById('defaultWindowSizeUpdate');
     var gameWindows = document.getElementById('gameWindows');
     
 
     const addRowBtn = document.getElementById('addRowBtn');
+    const clickAddBtn = document.getElementById('clickAddBtn');
+    const defaultWindowSizeUpdate = document.getElementById('defaultWindowSizeUpdate');
     const demoBtn = document.getElementById('demoBtn');
     const addBtn = document.getElementById('addBtn');
     const exportBtn = document.getElementById("export");
@@ -65,12 +66,39 @@ $(async function() {
 
     gameWindows.addEventListener('change',function(){
         getDefaultWindowSize();
-    })
+    });
+
+    clickAddBtn.addEventListener('click',async function(){
+        $("#addTable tr").remove(); 
+        $("#name")[0].disabled = false; 
+        $("#name")[0].value = ""; 
+        $("#version")[0].value = ""; 
+        $("#addMessage")[0].innerHTML = "";
+        $(".modal-title")[0].innerHTML = "新增"+document.title+"腳本";
+        $("#addBtn")[0].innerHTML = "確定新增";
+        $("#unassigned")[0].checked = true;
+        $("#defaultGameWindows")[0].checked = true;
+        $("#width")[0].value = $("#gameWindows")[0].value.split(",")[0];
+        $("#height")[0].value = $("#gameWindows")[0].value.split(",")[1];
+        $("#version")[0].disabled = true;
+        $("#gameWindows")[0].disabled = false;
+        let defaultWindowSize = await parent.psotLocalhostApi('/getList','defaultWindowSize');
+        $("#width")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[0];
+        $("#height")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[1];
+    });
+
+    defaultWindowSizeUpdate.addEventListener('click',async function(){
+        let datas = {};
+        datas['data'] = {};
+        datas['tableName'] = "defaultWindowSize";
+        datas['data'][$("#gameWindows")[0].value.replace(/\s*/g,"")] = ($("#width")[0].value+","+$("#height")[0].value).replace(/\s*/g,"")
+        await parent.psotLocalhostApi('/updateData',datas);
+    });
 
     
     async function setListSetting(){
-        let obj = parent.scriptList;
-        $('#table tbody').empty();
+        let obj = parent.hangUpScriptList;
+        $('#table').empty();
         for (let key in obj){
             let rows = showTable.rows.length+1
             let row = showTable.insertRow(-1)
@@ -91,11 +119,10 @@ $(async function() {
             let exportBtnIcon = document.createElement('i');
             exportBtnIcon.className = "fas fa-file-download";
             exportSeparatelyBtn.className = "btn";
-            exportSeparatelyBtn.id = "delBtn"+String(rows);
             exportSeparatelyBtn.onclick = async function(){
                 var result = [];
                 result.push({});
-                let response = await parent.psotLocalhostApi('/getScript',obj[key])
+                let response = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,obj[key]])
                 result[0][obj[key]] = response['returnObject'];
                 let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
                 parent.saveAs(blob, obj[key]+".json");
@@ -109,7 +136,6 @@ $(async function() {
             updateBtnIcon.className = "fas fa-edit"
             updateBtn.className = "btn btn-default"
             updateBtn.type = "button"
-            updateBtn.id = "update"+String(rows)
             updateBtn.dataset.target="#addModal"
             updateBtn.dataset.toggle="modal"
             updateBtn.onclick = async function(){
@@ -119,7 +145,7 @@ $(async function() {
                 $("#name")[0].value = obj[key]; 
                 $("#addTable tr").remove();
                 addMessage.innerHTML = "";
-                let response = await parent.psotLocalhostApi('/getScript',obj[key])
+                let response = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,obj[key]])
                 for (let k in response['returnObject']){
                     let d = response['returnObject'][k];
                     if(k.includes("width") || k.includes("height") || k.includes("version")){
@@ -157,7 +183,6 @@ $(async function() {
             let delBtnIcon = document.createElement('i');
             delBtnIcon.className = "fas fa-trash-alt";
             delBtn.className = "btn";
-            delBtn.id = "delBtn"+String(rows);
             delBtn.onclick = async function(){delScript(obj[key],delBtn)} 
             delBtn.appendChild(delBtnIcon);
             del.appendChild(delBtn);
@@ -166,21 +191,18 @@ $(async function() {
     }
     
     async function delScript(key,delBtn){
-        let response = await parent.psotLocalhostApi('/delScript',key)
+        let response = await parent.psotLocalhostApi('/delScript',[parent.hangUpDB,key])
         if (response['returnObject'] == null){
-            let targetRow = parseInt(delBtn.id.split('delBtn')[1])
-            showTable.deleteRow(targetRow-1)
+            showTable.deleteRow($('#table tr').index(delBtn.parentElement.parentElement))
             let tableRows = showTable.rows;
             tableRows.forEach(function(ele,ind){
                 ind = ind + 1;
                 let target = ele.getElementsByTagName('td')[0]
-                document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
-                document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
                 target.innerHTML = String(ind)
                 
             })
             message.innerHTML = key+"刪除成功!";
-            parent.scriptList = await parent.getLocalhostApi('/getKeys');
+            parent.hangUpScriptList = await parent.psotLocalhostApi('/getKeys',parent.hangUpDB);
             $("div.alert").show();
         }
     }
@@ -212,7 +234,7 @@ $(async function() {
             }
             select.appendChild(opt)
         }
-        select.onchange = function(){actionListFunction(select)} 
+        select.onchange = function(){selectOption(select)} 
         action.appendChild(select) 
         //建立input
         let input = document.createElement('input')
@@ -239,7 +261,7 @@ $(async function() {
         delBtn.appendChild(btn)
     }
     
-    function actionListFunction(selectHtml){
+    function selectOption(selectHtml){
         let target = selectHtml.parentElement.parentElement.getElementsByTagName('td')[2].firstElementChild
         target.disabled = false
         target.value = "";
@@ -351,9 +373,9 @@ $(async function() {
                     if (Object.keys(data[eleName.value]).length == rowLength+3){
                         let response;
                         if($("#addBtn")[0].innerHTML.includes("修改")){
-                            response = await parent.psotLocalhostApi('/updateScript',data);
+                            response = await parent.psotLocalhostApi('/updateScript',[parent.hangUpDB,data]);
                             if (response['returnObject'] == null){
-                                parent.scriptList = await parent.getLocalhostApi('/getKeys');
+                                parent.hangUpScriptList = await parent.psotLocalhostApi('/getKeys',parent.hangUpDB);
                                 setListSetting();
                                 message.innerHTML = eleName.value+"修改成功!";
                                 $("div.alert").show();
@@ -362,9 +384,9 @@ $(async function() {
                                 addMessage.innerHTML = response['returnObject'];
                             }
                         }else{
-                            response = await parent.psotLocalhostApi('/addScript',data);
+                            response = await parent.psotLocalhostApi('/addScript',[parent.hangUpDB,data]);
                             if (response['returnObject'] == null){
-                                parent.scriptList = await parent.getLocalhostApi('/getKeys');
+                                parent.hangUpScriptList = await parent.psotLocalhostApi('/getKeys',parent.hangUpDB);
                                 setListSetting();
                                 message.innerHTML = eleName.value+"新增成功!";
                                 $("div.alert").show();
@@ -413,13 +435,13 @@ $(async function() {
 
     async function myExport(){
         var result = [];
-        for (const [index, value] of parent.scriptList.entries()){
-            let response = await parent.psotLocalhostApi('/getScript',value);
+        for (const [index, value] of parent.hangUpScriptList.entries()){
+            let response = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,value]);
             result.push({});
             result[index][value] = response['returnObject'];  
         }
         let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
-        parent.saveAs(blob, DbTableName+".json");
+        parent.saveAs(blob, DbTableName+"腳本.json");
     }
 
     async function myImport(){
@@ -428,17 +450,22 @@ $(async function() {
         reader.onload = async function(){
             var datas = JSON.parse(this.result);
             for (let data of datas){
-                if(!parent.scriptList.includes(Object.keys(data)[0])){
-                    let response = await parent.psotLocalhostApi('/addScript',data);
+                if(!parent.hangUpScriptList.includes(Object.keys(data)[0])){
+                    let response = await parent.psotLocalhostApi('/addScript',[parent.hangUpDB,data]);
                     if (response['returnObject'] != null){
                         message.innerHTML = Object.keys(data)[0]+"新增失敗!";
                         $("div.alert").show();
                         return;
                     }
-                }                
+                }else{
+                    message.innerHTML = Object.keys(data)[0]+"已存在!，請先刪除後匯入";
+                    $("div.alert").show();
+                    return;
+                }                  
             }
             message.innerHTML = "成功匯入!";
-            parent.scriptList = await parent.getLocalhostApi('/getKeys');
+            $("div.alert").show();
+            parent.hangUpScriptList = await parent.psotLocalhostApi('/getKeys',parent.hangUpDB);
             setListSetting();
         };
         $("form").get(1).reset()
@@ -449,5 +476,4 @@ $(async function() {
         $("#width")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[0];
         $("#height")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[1];
     }
-
 });

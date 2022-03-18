@@ -1,10 +1,4 @@
 $(function() {
-    var account = document.getElementById('account');
-    var password = document.getElementById('password');
-    var LoginUrl = document.getElementById('LoginUrl');
-    var betRecordUrl = document.getElementById('betRecordUrl');
-    const remember = document.getElementById('remember');
-
     getWebManagementSystemdatas();
     setList(parent.GameList,"GameID");
 
@@ -25,6 +19,10 @@ $(function() {
         if(remember.checked){
             saveWebManagementSystemdatas();
         }
+    });
+
+    submit.addEventListener('click',function(){
+        testConnect(account.value,password.value,LoginUrl.value);
     });
 
 })
@@ -51,30 +49,4 @@ async function saveWebManagementSystemdatas(){
         console.log(response['returnObject']);
     }
 
-}
-
-
-function testConnect(){
-    let accountAndPassword = {};
-    accountAndPassword['account'] = account.value;
-    accountAndPassword['password'] = password.value;
-    let option = {
-        headers: {'Content-Type': 'application/json'},
-        url: LoginUrl.value,
-        method: 'POST',
-        data: accountAndPassword
-    }
-    axios(option)
-        .then((result) => { 
-            parent.token =  result.data.returnObject.token ;
-            message.innerHTML = "連線成功!"
-            $("div.alert").show();
-        })
-        .catch((err) => { 
-            message.innerHTML = "連線失敗，請檢查帳號或密碼是否有誤或目前後台是否無法使用"; 
-            console.log(err);
-            $("div.alert").show();
-        })
-
-    
 }

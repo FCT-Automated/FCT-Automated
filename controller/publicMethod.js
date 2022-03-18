@@ -104,3 +104,29 @@ function setUpBrowerArgs(type,object){
         resv(datas);
     });
 }
+
+function testConnect(account,password,url){
+    let accountAndPassword = {};
+    accountAndPassword['account'] = account;
+    accountAndPassword['password'] = password;
+    let option = {
+        headers: {'Content-Type': 'application/json'},
+        url: url,
+        method: 'POST',
+        data: accountAndPassword
+    }
+    return new Promise((resv, rej) => {
+        parent.axios(option)
+        .then((result) => { 
+            parent.token =  result.data.returnObject.token ;
+            resv("ok")
+        })
+        .catch((err) => { 
+            console.log(err);
+            rej("faild")
+        })
+    });
+    
+
+    
+}
