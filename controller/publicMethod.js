@@ -105,7 +105,7 @@ function setUpBrowerArgs(type,object){
     });
 }
 
-function testConnect(account,password,url){
+function signIn(account,password,url){
     let accountAndPassword = {};
     accountAndPassword['account'] = account;
     accountAndPassword['password'] = password;
@@ -117,16 +117,108 @@ function testConnect(account,password,url){
     }
     return new Promise((resv, rej) => {
         parent.axios(option)
-        .then((result) => { 
-            parent.token =  result.data.returnObject.token ;
-            resv("ok")
+        .then(async function(result){ 
+            parent.token =  await result.data.returnObject.token ;
+            resv(result)
         })
         .catch((err) => { 
             console.log(err);
-            rej("faild")
+            rej(err)
         })
     });
-    
+}
 
+
+function getCurrentDateTime(){
+    let today = new Date();
+    return today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+' '+today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds()
+}
+
+
+//爬蟲方法
+
+function getSoup(url){
+    return new Promise((resv, rej) => {
+        let params = {
+            url:url,
+            method:'GET',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        }
+        parent.axios(params)
+        .then(result => {
+            resv(parent.cheerio.load(result.data));
+        })
+        .catch(error => {
+            rej(error);
+        })
+    });
+}
+
+function initLoadedCheerio(result,soup,element){
+    return soup(element);
+}
+
+function LoadedCheerio(result,soup,element){
+    return result(element);
+}
+
+function Text(result,soup,element){
+    return result.text();
+}
+
+function Find(result,soup,element){
+    return result.find(element);
+}
+
+function SumTheElementOfAnArray(result,soup,element){
+    let sum=0;
+    result.map((k,v) => sum+=parseFloat($(v).text().replace(",","")))
+    var m = Number((Math.abs(sum) * 100).toPrecision(15));
+    return Math.round(m) / 100 * Math.sign(sum);
     
 }
+
+function Index(result,soup,ind){
+    return result[ind];
+}
+
+function Html(result,soup,element){
+    return result.html();
+}
+
+function ToCheerio(result,soup,element){
+    return parent.cheerio.load(result);
+}
+
+//運算
+function IsEqualTo(var1,var2){
+    return var1 == var2;
+}
+
+function NotEqualTo(var1,var2){
+    return var1 != var2;
+}
+
+
+function GreaterThan(var1,var2){
+    return var1 > var2;
+}
+
+function GreaterThanOrEqualTo(var1,var2){
+    return var1 >= var2;
+}
+
+function LessThan(var1,var2){
+    return var1 < var2;
+}
+
+function LessThanOrEqualTo(var1,var2){
+    return var1 <= var2;
+}
+
+function Include(var1,var2){
+    return var1.includes(var2);
+}
+

@@ -15,29 +15,49 @@
       <div class="col">
         <form>
           <div>
-            <div class="form-group" style="display: inline-block; margin-right: 15px;"> 
+            <div class="form-group" style="display: inline-block; margin-right: 15px; width: 700px;"> 
               <div style="display: inline-block;">
-                <label for="LoginUrl">後台登入網址：</label> 
+                <span class="text-danger" style="font-size: 20px;">*</span><label for="SignInURL">SignInURL：</label> 
               </div>
+              <div style="display: inline-block; width: 500px;">
+                <input class="form-control" placeholder="請輸入後台SignIn的URL(F12開Network查看)"id="SignInURL" aria-required="true" required>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="form-group" style="display: inline-block; margin-right: 15px; width: 700px;"> 
               <div style="display: inline-block;">
-                <input class="form-control" style="width: 250px;" id="LoginUrl" aria-required="true" required>
+                <span class="text-danger" style="font-size: 20px;">*</span><label for="GetBetRecordListURL">GetBetRecordListURL：</label> 
+              </div>
+              <div style="display: inline-block; width: 500px;">
+                <input class="form-control" placeholder="請輸入後台投注紀錄GetBetRecordList的URL(F12開Network查看)" id="GetBetRecordListURL" aria-required="true" required>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="form-group" style="display: inline-block; margin-right: 15px; width: 700px;"> 
+              <div style="display: inline-block;">
+                <span class="text-danger" style="font-size: 20px;">*</span><label for="GetDetailURL">GetDetailURL：</label> 
+              </div>
+              <div style="display: inline-block; width: 500px;">
+                <input class="form-control" placeholder="請輸入後台投注紀錄GetDetailURL的URL(F12開Network查看)" id="GetDetailURL" aria-required="true" required>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="form-group" style="display: inline-block; margin-right: 15px; width: 700px;"> 
+              <div style="display: inline-block;">
+                <span class="text-danger" style="font-size: 20px;">*</span><label for="IgnoreGameMode">IgnoreGameMode：</label> 
+              </div>
+              <div style="display: inline-block; width: 500px;">
+                <input class="form-control" placeholder="請輸入GameMode編號(用,分隔)" id="IgnoreGameMode" aria-required="true" required>
               </div>
             </div>
           </div>
           <div>
             <div class="form-group" style="display: inline-block; margin-right: 15px;"> 
               <div style="display: inline-block;">
-                <label for="betRecordUrl">投注紀錄網址：</label> 
-              </div>
-              <div style="display: inline-block;">
-                <input class="form-control" style="width: 250px;" id="betRecordUrl" aria-required="true" required>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="form-group" style="display: inline-block; margin-right: 15px;"> 
-              <div style="display: inline-block;">
-                <label for="account">後台帳號：</label> 
+                <span class="text-danger" style="font-size: 20px;">*</span><label for="account">後台帳號：</label> 
               </div>
               <div style="display: inline-block;">
                 <input class="form-control" style="width: 160px;" id="account" aria-required="true" required>
@@ -45,7 +65,7 @@
             </div>
             <div class="form-group" style="display: inline-block; margin-right: 15px;"> 
               <div style="display: inline-block;">
-                <label for="password">後台密碼：</label> 
+                <span class="text-danger" style="font-size: 20px;">*</span><label for="password">後台密碼：</label> 
               </div>
               <div style="display: inline-block;" id="show_hide_password">
                 <input type="password" class="form-control" style="display: inline-block; width: 160px;"  id="password" aria-required="true" required>
@@ -66,46 +86,27 @@
           <div>
             <div class="form-group" style="display: inline-block; margin-right: 20px;"> 
               <div style="display: inline-block;">
-                <label for="AccountMembers">會員帳號：</label> 
+                <span class="text-danger" style="font-size: 20px;">*</span><label for="AccountMember">會員帳號：</label> 
               </div>
               <div style="display: inline-block;">
-                <input class="form-control" style="width: 200px;" id="AccountMembers" aria-required="true" required>
+                <input class="form-control" style="width: 200px;" id="AccountMember" aria-required="true" required>
               </div>
             </div> 
-  
-            <div class="form-group" style="display: inline-block;"> 
-              <div style="display: inline-block;">
-                <label for="BetRecordID">賽果編號：</label> 
-              </div>
-              <div style="display: inline-block;">
-                <input class="form-control" style="width: 200px;" id="BetRecordID">
-              </div>
-            </div> 
-          </div>
-          
-          <div>
+
             <div class="form-group" style="display: inline-block; margin-right: 20px;"> 
               <div style="display: inline-block;">
-                <label for="GameID">遊戲名稱：</label> 
+                <span class="text-danger" style="font-size: 20px;">*</span><label for="GameID">遊戲名稱：</label> 
               </div>
               <div style="display: inline-block;">
                 <select class="form-control GameID" style="width: 200px;" id="GameID"> </select> 
               </div>  
-            </div> 
-
-            <div class="form-group" style="display: inline-block; margin-right: 20px;"> 
-              <div style="display: inline-block;">
-                <label for="betRecordScript">腳本：</label> 
-              </div>
-              <div style="display: inline-block;">
-                <select class="form-control betRecordScript" style="width: 200px;" id="betRecordScript"> </select> 
-              </div>  
-            </div> 
+            </div>
+            
           </div>
 
           <div class="form-group field_SetPoints" style="margin-right: 20px;"> 
             <div style="display: inline-block;">
-              <label for="datetimepicker">創建時間：</label> 
+              <span class="text-danger" style="font-size: 20px;">*</span><label for="datetimepicker">創建時間：</label> 
             </div>
             <div style="display: inline-block;">
               <input type="text" id="datetimepicker">
@@ -115,9 +116,17 @@
               <input type="text" id="datetimepicker2">
             </div>
           </div>
+             
+          <div class="form-group" style="display: inline-block; margin-right: 20px;"> 
+            <div style="display: inline-block;">
+              <span class="text-danger" style="font-size: 20px;">*</span><label for="betRecordScript">驗證腳本：</label> 
+            </div>
+            <div style="display: inline-block;">
+              <select class="form-control betRecordScript" style="width: 200px;" id="betRecordScript"> </select> 
+            </div>  
+          </div> 
 
           <button type="submit" style="display: inline-block;" id="submit" class="btn btn-primary">送出</button>
-          <button type="button"  id="clearLog" class="btn btn-warning">清除log</button>
         </form>
         <hr>
       </div>
@@ -128,6 +137,22 @@
         <span id="message"></span>
       </div>
     </div>
+    <hr>
+    <div class="row">
+      <div class="col-sm">
+        賽果總數：<span id="total"></span>
+      </div>
+      <div class="col-sm">
+        完成： <span id="success"></span>
+      </div>
+      <div class="col-sm">
+        失敗(console會印賽果編號)：<span id="failed"></span>
+      </div>
+      <div class="col-sm">
+        忽略：<span id="ignore"></span>
+      </div>
+    </div>
+
     <script type="text/javascript">
         $('#datetimepicker').datetimepicker({
             language: 'zh-TW', //語言

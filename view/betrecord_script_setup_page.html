@@ -25,20 +25,37 @@
             <input type="radio" class="tabs__radio" name="tabs" id="tab1" checked>
             <label for="tab1" class="tabs__label">設定驗證</label>
             <div class="tabs__content" style="margin-top: 50px; position: absolute;">
-                <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#addModal" id="clickModal">
-                    <span class="fas fa-plus"></span>新增驗證
-                </button>
+                <ul class="nav" style="position: relative; float: left;">
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#Modal" id="clickModal">
+                            <span class="fas fa-plus"></span>新增驗證
+                        </button>
+                    </li>
+                </ul>
+                <ul class="nav justify-content-end" style="position: relative; ">
+                    <li class="nav-item">
+                      <form style="display:none"><input type="file" id="files" style="display:none"/></form>
+                      <button type="button" class="btn btn-primary" style="margin: 10px" id="importBtn">
+                        Import
+                      </button>
+                    </li>
+                    <li class="nav-item">
+                      <button type="button" class="btn btn-primary" style="margin: 10px" id="exportBtn">
+                        Export
+                      </button>
+                    </li>
+                </ul>
                 <table class="table table-hover" id="table">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">腳本名稱</th>
+                        <th scope="col">名稱</th>
                         <th scope="col">匯出</th>
                         <th scope="col">編輯</th>
                         <th scope="col">刪除</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="listTable">
                     </tbody>
                 </table>
             </div>
@@ -84,7 +101,7 @@
     </div>
 
     <!-- 新增驗證的modal -->
-    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-hidden="true" >
+    <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true" >
         <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 100%; padding: 17px;">
             <div class="modal-content">
                 <div class="modal-header">

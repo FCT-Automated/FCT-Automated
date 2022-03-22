@@ -72,10 +72,6 @@ function changeApi(curAPI){
     }
 }
 
-function getCurrentDateTime(){
-    let today = new Date();
-    return today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+' '+today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds()
-}
 
 //submit
 async function run(event,apiValue){

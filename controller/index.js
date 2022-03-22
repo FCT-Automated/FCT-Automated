@@ -17,9 +17,11 @@ var ReleaseAgentKeyList;
 var LiveAgentKeyList;
 var hangUpScriptList;
 var crawlerScriptList;
+var verificationFormulaList;
 var env;
 var hangUpDB = 14;
 var crawlerDB = 13;
+var verificationFormulaDB = 12;
 var token;
 
 
@@ -33,6 +35,7 @@ async function init(){
     LiveAgentKeyList = await psotLocalhostApi('/getList','LiveAgentKeyList');
     hangUpScriptList = await psotLocalhostApi('/getKeys',hangUpDB);
     crawlerScriptList = await psotLocalhostApi('/getKeys',crawlerDB);
+    verificationFormulaList = await psotLocalhostApi('/getKeys',verificationFormulaDB);
     document.getElementById('myiframe').src ="api_and_script_page.html?api";
 }
 

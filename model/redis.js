@@ -288,6 +288,7 @@ async function addScript(datas){
     });
 }
 
+
 function delScript(datas){
     var db = JSON.parse(datas)[0];
     return new Promise((resv, rej) => {
@@ -316,8 +317,8 @@ function updateScript(datas){
                     client.hmset(tableName,jsonObject[tableName]);
                     resv({'returnObject':null})
                 }
-                catch(error){
-                    rej(error)
+                catch(err){
+                    rej(err)
                 }
             }else{
                 rej(error)
