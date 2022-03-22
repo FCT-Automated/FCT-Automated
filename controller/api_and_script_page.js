@@ -175,7 +175,7 @@ async function Login(mes,MemberAccount){
         }
         mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入成功!! ]</br>"
     }else{
-        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入失敗 - Error："+response+"!! ]</br>";
+        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入失敗 - Error："+code+"!! ]</br>";
     }
     
     return mes;
@@ -231,7 +231,7 @@ async function SetPoints(mes,MemberAccount){
         }
     }
     if(code !=0){
-        mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 轉點失敗!! - Error"+response+"]</br>"
+        mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 轉點失敗!! - Error"+code+"]</br>"
     }
     
     return mes;
@@ -257,7 +257,7 @@ async function KickOut(mes,MemberAccount){
     if ( code == 0){
         mes = "Log:[ KickOut- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出成功!! ]</br>"
     }else{
-        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出失敗 - Error："+response+"!! ]</br>"
+        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出失敗 - Error："+code+"!! ]</br>"
     }
 
     return mes;
