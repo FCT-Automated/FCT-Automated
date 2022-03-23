@@ -401,7 +401,6 @@ async function updateMethod(Btn,obj,key,db){
         $("#table2 tr").remove();
         addMessage2.innerHTML = "";
         response= await parent.psotLocalhostApi('/getScript',[db,obj[key]]);
-        debugger
         for(const k of Object.keys(response['returnObject']).sort()){
             let d = response['returnObject'][k];
             addRow2Function(k.split("_")[1],d);   
@@ -473,11 +472,10 @@ function addRow2Function(key,value){
         }
     }else{
         opts={
-            "Find":"Find",
-            "Text":"Text",
-            "SumTheElementOfAnArray":"SumTheElementOfAnArray",
             "LoadedCheerio":"LoadedCheerio",
             "ToCheerio":"ToCheerio",
+            "SumTheElementOfAnArray":"SumTheElementOfAnArray",
+            "Text":"Text",           
             "Index":"Index",
             "Html":"Html"
         }
@@ -632,7 +630,7 @@ function selectOption(select){
     let target = select.parentElement.parentElement.getElementsByTagName('td')[2].firstElementChild
     target.disabled = true
     target.value = "";
-    if(select.value == "Find" || select.value == "initLoadedCheerio" || select.value == "LoadedCheerio" || select.value == "Index"){
+    if(select.value == "initLoadedCheerio" || select.value == "LoadedCheerio" || select.value == "Index"){
         target.disabled = false
     }
 }

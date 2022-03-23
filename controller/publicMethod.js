@@ -168,10 +168,6 @@ function Text(result,soup,element){
     return result.text();
 }
 
-function Find(result,soup,element){
-    return result.find(element);
-}
-
 function SumTheElementOfAnArray(result,soup,element){
     let sum=0;
     result.map((k,v) => sum+=parseFloat($(v).text().replace(",","")))
