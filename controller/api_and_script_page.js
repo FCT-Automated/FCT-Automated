@@ -2,20 +2,14 @@ $(function() {
     document.title = location.search.split("?")[1];
     window[document.title]();
     
-    var attend = document.getElementById('attend');
-    var notAttend = document.getElementById('notAttend');
-    var apiSelect = document.getElementById('API');
-    const submit = document.getElementById('submit');
-    const clearLog = document.getElementById('clearLog');
-
-    changeApi(apiSelect.value);
+    changeApi(API.value);
     setList(parent.CurrencyList,"Currency");
     setList(parent.GameList,"GameID");
     setList(parent.LanguageList,"LanguageID");
     setList(parent[parent.env+"AgentKeyList"],"AgentCode");
 
-    apiSelect.addEventListener('change', function(){
-        changeApi(apiSelect.value);
+    API.addEventListener('change', function(){
+        changeApi(API.value);
     });
 
     attend.addEventListener('change',function(){
@@ -27,7 +21,7 @@ $(function() {
     });
 
     submit.addEventListener("click",async function(event){ 
-        run(event,apiSelect.value);
+        run(event,$("form :visible").serializeArray());
     });
 
     clearLog.addEventListener("click",function(){
@@ -78,34 +72,34 @@ function getCurrentDateTime(){
 }
 
 //submit
-async function run(event,apiValue){
+async function run(event,formData){
     submit.disabled = true;
     submit.innerHTML = "處理中請稍等..";
     try{
         if(checkValidity()){
-            let MemberAccounts = document.getElementById("MemberAccount").value.split(",");
+            let MemberAccounts = formData_find("MemberAccount",formData).split(",");
             event.preventDefault();
             let mes = urlAndPathCheck();
             if(mes.length === 0){
-                var AgentCode = document.getElementById("AgentCode").value;
+                var AgentCode = formData_find("AgentCode",formData);
                 var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode]; 
                 if(document.title == 'script' && $("#multipleYes")[0].checked){
                     let args ={
                         API : "Login",
-                        Currency : document.getElementById("Currency").value,
-                        GameID : document.getElementById("GameID").value,
+                        Currency : formData_find("Currency",formData),
+                        GameID : formData_find("GameID",formData),
                         AgentCode : AgentCode,
                         AgentKey : AgentKey,
-                        LanguageID : document.getElementById("LanguageID").value
+                        LanguageID : formData_find("LanguageID",formData)
                     }
                     let autoScriptList = await parent.psotLocalhostApi('/getScript',$("#list option:selected").text());
                     submit.innerHTML = "送出";
                     submit.disabled = false;
-                    await parent.browser.AutoScript(MemberAccounts,args,autoScriptList,document.getElementById("multipleMin").value,parent.apiUrl,parent.seamlessApiUrl);
+                    await parent.browser.AutoScript(MemberAccounts,args,autoScriptList,formData_find("multipleMin",formData),parent.apiUrl,parent.seamlessApiUrl);
                 }else{
                     for(let MemberAccount of MemberAccounts){
-                        if(typeof window[apiValue] === "function"){
-                            mes = await window[apiValue](mes,MemberAccount);
+                        if(typeof window[API.value] === "function"){
+                            mes = await window[API.value](mes,MemberAccount,formData);
                         }else{
                             mes = "查無此Api Function</br>"
                         }
@@ -124,10 +118,12 @@ async function run(event,apiValue){
         submit.disabled = false;
         $("#message")[0].innerHTML = "請查看console的錯誤訊息!</br>" + $("#message")[0].innerHTML;
         console.log(e);
-    }
+    } 
     
-    
-    
+}
+
+function formData_find(target,formData){
+    return formData.find(o => o.name === target)['value'];
 }
 
 function checkValidity(){
@@ -145,18 +141,19 @@ function checkValidity(){
     }
 }
 
-async function Login(mes,MemberAccount){
-    var AgentCode = document.getElementById("AgentCode").value;
-    var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode];       
+//API
+async function Login(mes,MemberAccount,formData){
+    let AgentCode = formData_find("AgentCode",formData);
+    let AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode];       
     let args ={
         API : "Login",
-        Currency : document.getElementById("Currency").value,
-        GameID : document.getElementById("GameID").value,
-        AgentCode : document.getElementById("AgentCode").value,
+        Currency : formData_find("Currency",formData),
+        GameID : formData_find("GameID",formData),
+        AgentCode : AgentCode,
         AgentKey : AgentKey,
         MemberAccount : MemberAccount,
-        LanguageID : document.getElementById("LanguageID").value,
-        Other : document.getElementById("other").value
+        LanguageID : formData_find("LanguageID",formData),
+        Other : formData_find("other",formData)
     }
     let code;
     let response = await parent.apiJs.requestAPI(args,parent.apiUrl)
@@ -185,21 +182,21 @@ function wait(ms){
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-async function SetPoints(mes,MemberAccount){
+async function SetPoints(mes,MemberAccount,formData){
     let args;
     let response;
     let code;
-    let wallet = document.getElementById("Wallet");
-    var AgentCode = document.getElementById("AgentCode").value;
+    let wallet = formData_find("Wallet",formData);
+    var AgentCode = formData_find("AgentCode",formData);
     var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode];       
-    if (wallet.options[wallet.selectedIndex].id == "seamlessWallet"){
+    if (wallet === "單一錢包"){
         args = {
             API : 'SetJson',
-            Currency : document.getElementById("Currency").value,
+            Currency : formData_find("Currency",formData),
             AgentCode : AgentCode,
             AgentKey : AgentKey,
             MemberAccount : MemberAccount,
-            Points : document.getElementById("Points").value
+            Points : formData_find("Points",formData)
         }
         response = await parent.apiJs.requestSeamlessAPI(args,parent.seamlessApiUrl);
         if(response){
@@ -214,11 +211,11 @@ async function SetPoints(mes,MemberAccount){
     }else{
         args = {
             API : 'SetPoints',
-            Currency : document.getElementById("Currency").value,
+            Currency : formData_find("Currency",formData),
             AgentCode : AgentCode,
             AgentKey : AgentKey,
             MemberAccount : MemberAccount,
-            Points : document.getElementById("Points").value
+            Points : formData_find("Points",formData)
         }
         response = await parent.apiJs.requestAPI(args,parent.apiUrl);
         if(response){
@@ -237,12 +234,12 @@ async function SetPoints(mes,MemberAccount){
     return mes;
 }
 
-async function KickOut(mes,MemberAccount){
-    var AgentCode = document.getElementById("AgentCode").value;
+async function KickOut(mes,MemberAccount,formData){
+    var AgentCode = formData_find("AgentCode",formData);
     var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode];       
     let args ={
         API : 'KickOut',
-        Currency : document.getElementById("Currency").value,
+        Currency : formData_find("Currency",formData),
         AgentCode : AgentCode,
         AgentKey : AgentKey,
         MemberAccount : MemberAccount,

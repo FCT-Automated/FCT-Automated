@@ -26,7 +26,7 @@ async function init(){
     ReleaseAgentKeyList = await psotLocalhostApi('/getList','ReleaseAgentKeyList');
     LiveAgentKeyList = await psotLocalhostApi('/getList','LiveAgentKeyList');
     scriptList = await getLocalhostApi('/getKeys');
-    document.getElementById('myiframe').src ="api_and_script_page.html?api";
+    myiframe.src ="api_and_script_page.html?api";
 }
 
 function getLocalhostApi(path){
@@ -90,22 +90,22 @@ function psotLocalhostApi(path,data){
 }
 
 async function changePath(chengeEnv){
-    env = document.getElementById("env").value;
+    env = currentEnv.value;
     chromePath = await psotLocalhostApi('/getPath',[chengeEnv,'chromePath']);
     apiUrl = await psotLocalhostApi('/getPath',[chengeEnv,'apiUrl']);
     seamlessApiUrl = await psotLocalhostApi('/getPath',[chengeEnv,'seamlessApiUrl']);
-    document.getElementById('myiframe').contentWindow.location.reload(true);
+    myiframe.contentWindow.location.reload(true);
 }
 
 init();
 
 
 $(function() {
-    var changeEnv = document.getElementById("env");
+    var changeEnv = currentEnv;
     changeEnv.addEventListener('change', function(){
         changePath(changeEnv.value);
     });
 
-    env = document.getElementById("env").value;
+    env = currentEnv.value;
     changePath(env);
 })

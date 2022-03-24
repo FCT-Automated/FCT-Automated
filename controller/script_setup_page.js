@@ -1,19 +1,6 @@
 $(async function() {
-    var addTable = document.getElementById('addTable');
     var showTable = document.getElementById("table").getElementsByTagName('tbody')[0];
-    var message = document.getElementById("message");
     var DbTableName = document.title;
-    var assign = document.getElementById('assign');
-    var unassigned = document.getElementById('unassigned');
-    var defaultGameWindows = document.getElementById('defaultGameWindows');
-    var notDefaultGameWindows = document.getElementById('notDefaultGameWindows');
-    var defaultWindowSizeUpdate = document.getElementById('defaultWindowSizeUpdate');
-    var gameWindows = document.getElementById('gameWindows');
-    
-
-    const addRowBtn = document.getElementById('addRowBtn');
-    const demoBtn = document.getElementById('demoBtn');
-    const addBtn = document.getElementById('addBtn');
     const exportBtn = document.getElementById("export");
     const filesInput = document.getElementById("files");
 
@@ -25,8 +12,20 @@ $(async function() {
     });
 
     demoBtn.addEventListener('click', function(event){
-        let DemoID = document.getElementById("DemoGameID").value;
-        runDemoAccount(DemoID,event);
+        let args ={
+            API : 'GetDemoUrl',
+            Currency : "DEM",
+            GameID : DemoGameID.value,
+            LanguageID : 2,
+            AgentCode : "FCDEM",
+            AgentKey : parent[parent.env+"AgentKeyList"]["returnObject"]["FCDEM"]
+        }
+        let browerArgs = {
+            'version' : $("#assign")[0].checked ? $("#version")[0].value : "",
+            'width' : defaultGameWindows.checked ? $("#width")[0].value : "",
+            'height' : defaultGameWindows.checked ? $("#height")[0].value : ""
+        };
+        runDemoAccount(args,browerArgs,event);
     });
 
     addBtn.addEventListener('click',function(event){
@@ -67,124 +66,7 @@ $(async function() {
         getDefaultWindowSize();
     })
 
-    
-    async function setListSetting(){
-        let obj = parent.scriptList;
-        $('#table tbody').empty();
-        for (let key in obj){
-            let rows = showTable.rows.length+1
-            let row = showTable.insertRow(-1)
-            let id = row.insertCell(0)
-            let Name = row.insertCell(1)
-            let exportSeparately = row.insertCell(2)
-            let update = row.insertCell(3)
-            let del = row.insertCell(4)
-            id.innerHTML = String(rows)
-
-            let NameSpan = document.createElement('span')
-            NameSpan.id = obj[key]
-            NameSpan.innerHTML = obj[key]
-            Name.appendChild(NameSpan)
-
-            //export
-            let exportSeparatelyBtn = document.createElement('Button');
-            let exportBtnIcon = document.createElement('i');
-            exportBtnIcon.className = "fas fa-file-download";
-            exportSeparatelyBtn.className = "btn";
-            exportSeparatelyBtn.id = "delBtn"+String(rows);
-            exportSeparatelyBtn.onclick = async function(){
-                var result = [];
-                result.push({});
-                let response = await parent.psotLocalhostApi('/getScript',obj[key])
-                result[0][obj[key]] = response['returnObject'];
-                let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
-                parent.saveAs(blob, obj[key]+".json");
-            } 
-            exportSeparatelyBtn.appendChild(exportBtnIcon);
-            exportSeparately.appendChild(exportSeparatelyBtn);
-
-            //update
-            let updateBtn = document.createElement('Button')
-            let updateBtnIcon = document.createElement('i')
-            updateBtnIcon.className = "fas fa-edit"
-            updateBtn.className = "btn btn-default"
-            updateBtn.type = "button"
-            updateBtn.id = "update"+String(rows)
-            updateBtn.dataset.target="#addModal"
-            updateBtn.dataset.toggle="modal"
-            updateBtn.onclick = async function(){
-                $(".modal-title")[0].innerHTML = "修改腳本";
-                $("#addBtn")[0].innerHTML = "確定修改";
-                $("#name")[0].disabled = true; 
-                $("#name")[0].value = obj[key]; 
-                $("#addTable tr").remove();
-                addMessage.innerHTML = "";
-                let response = await parent.psotLocalhostApi('/getScript',obj[key])
-                for (let k in response['returnObject']){
-                    let d = response['returnObject'][k];
-                    if(k.includes("width") || k.includes("height") || k.includes("version")){
-                        $("#"+k)[0].value = d
-                        if(k === "version" && d === ""){
-                            $("#version")[0].disabled = true;
-                            $("#unassigned")[0].checked = true;
-                        }else{
-                            $("#assign")[0].checked = true;
-                            $("#version")[0].disabled = false;
-                        }
-                    }else{
-                        addRow(k.split("_")[1],d);
-                    }
-                    
-                }
-                $("#gameWindows option").each(function(i,item){
-                    if(item.value.split(",")[0] === $("#width")[0].value && item.value.split(",")[1] === $("#height")[0].value){
-                        gameWindows.disabled = false
-                        defaultGameWindows.checked = true
-                        item.selected = true
-                        return false;
-                    }else{
-                        gameWindows.disabled = true
-                        notDefaultGameWindows.checked = true
-                    }
-                });
-
-            } 
-            updateBtn.appendChild(updateBtnIcon)
-            update.appendChild(updateBtn)
-
-            //del
-            let delBtn = document.createElement('Button');
-            let delBtnIcon = document.createElement('i');
-            delBtnIcon.className = "fas fa-trash-alt";
-            delBtn.className = "btn";
-            delBtn.id = "delBtn"+String(rows);
-            delBtn.onclick = async function(){delScript(obj[key],delBtn)} 
-            delBtn.appendChild(delBtnIcon);
-            del.appendChild(delBtn);
-        }
-
-    }
-    
-    async function delScript(key,delBtn){
-        let response = await parent.psotLocalhostApi('/delScript',key)
-        if (response['returnObject'] == null){
-            let targetRow = parseInt(delBtn.id.split('delBtn')[1])
-            showTable.deleteRow(targetRow-1)
-            let tableRows = showTable.rows;
-            tableRows.forEach(function(ele,ind){
-                ind = ind + 1;
-                let target = ele.getElementsByTagName('td')[0]
-                document.getElementById("update"+String(target.innerHTML)).id = "update"+String(ind)
-                document.getElementById("delBtn"+String(target.innerHTML)).id = "delBtn"+String(ind)
-                target.innerHTML = String(ind)
-                
-            })
-            message.innerHTML = key+"刪除成功!";
-            parent.scriptList = await parent.getLocalhostApi('/getKeys');
-            $("div.alert").show();
-        }
-    }
-
+    //innerlist
     function addRow(key,value){
         let rows = addTable.rows.length
         let row = addTable.insertRow(-1)
@@ -202,7 +84,6 @@ $(async function() {
             "setpoints-seamless":"轉點-單一錢包",
             "refresh":"重整"
         }
-        select.id ="actionList"+String(rows+1)
         for (const [k, v] of Object.entries(opts)) {
             let opt = document.createElement('option')
             opt.value = k
@@ -216,7 +97,6 @@ $(async function() {
         action.appendChild(select) 
         //建立input
         let input = document.createElement('input')
-        input.id = "actionText"+String(rows+1)
         input.placeholder = "請輸入座標位置> {x: ,y: }"
         input.required = true;
         if(key == "refresh"){
@@ -232,13 +112,12 @@ $(async function() {
         let btn = document.createElement('Button')
         let btnicon = document.createElement('i')
         btn.className = "btn"
-        btn.id = "delRowBtn"+String(rows+1)
         btn.onclick = function(){delRowFunction(btn)} 
         btnicon.className = "fas fa-trash-alt"
         btn.appendChild(btnicon)
         delBtn.appendChild(btn)
     }
-    
+
     function actionListFunction(selectHtml){
         let target = selectHtml.parentElement.parentElement.getElementsByTagName('td')[2].firstElementChild
         target.disabled = false
@@ -267,56 +146,26 @@ $(async function() {
                 break
         }
     }
-    
-    async function runDemoAccount(DemoID,event){
-        let mes = urlAndPathCheck();
-        var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"]["FCDEM"];
-        let response; 
-        if(AgentKey){
-            let args ={
-                API : 'GetDemoUrl',
-                Currency : "DEM",
-                GameID : DemoID,
-                LanguageID : 2,
-                AgentCode : "FCDEM",
-                AgentKey : AgentKey
-            } 
-            if(mes.length === 0){
-                if(await isAssign()){
-                    event.preventDefault();
-                    response = await parent.apiJs.requestAPI(args,parent.apiUrl)
-                    let code;
-                    if(response){
-                        code = response.Result;
-                    }else{
-                        code = 1;
-                    }
-                    if ( code == 0){
-                        let object = {};
-                        if($("#assign")[0].checked){
-                            object['version'] = $("#version")[0].value;
-                        }else{
-                            object['version'] = "";
-                        }
-                        if(defaultGameWindows.checked){
-                            object['width'] = $("#width")[0].value;
-                            object['height'] = $("#height")[0].value;
-                            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object),parent.apiUrl,parent.seamlessApiUrl);
-                        }else{
-                            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",object),parent.apiUrl,parent.seamlessApiUrl);
-                        }
-                    }else{
-                        mes = "登入失敗 - Error："+response
-                    }
+
+    async function runDemoAccount(args,browerArgs,event){
+        let mes = urlAndPathCheck(); 
+        if(args.AgentKey){
+            if(mes.length === 0 && await isAssign()){
+                event.preventDefault();
+                let response = await parent.apiJs.requestAPI(args,parent.apiUrl);
+                let code = returnResponseCode(response);
+                if ( code == 0){
+                    await parent.browser.createBrowser(response.Url,await setUpBrowerArgs("Demo",browerArgs),parent.apiUrl,parent.seamlessApiUrl);
+                }else{
+                    mes = "登入失敗 - Error："+code
                 }
             }
         }else{
             mes = "FCDEM - 未查詢到此AgentKey，請先至設定新增!!"
         }
-        
         addMessage.innerHTML = mes;
     }
-    
+
     async function addScript(event){
         if(await isAssign()){
             if($("#name")[0].checkValidity() && $("#width")[0].checkValidity() && $("#height")[0].checkValidity()){
@@ -324,10 +173,6 @@ $(async function() {
                 let rowLength = addTable.rows.length;
                 if (rowLength !=0) {
                     let eleName = document.getElementById('name');
-                    let width = document.getElementById('width');
-                    let height = document.getElementById('height');
-                    let addMessage = document.getElementById("addMessage");
-                    let version = document.getElementById("version");
                     let data = {};
                     data[eleName.value] = {};
                     data[eleName.value]['width'] = width.value;
@@ -382,17 +227,13 @@ $(async function() {
             }
         }
     }
-    
+
     function delRowFunction(btnHtml){
-        let targetRow = parseInt(btnHtml.id.split('delRowBtn')[1])-1
-        addTable.deleteRow(targetRow)
-        let context = ["actionList","actionText","delRowBtn"];
+        let delRowInd =$("#addTable tr").index(btnHtml.parentElement.parentElement);
+        addTable.deleteRow(delRowInd);
         Object.keys(addTable.rows).forEach(function(ind){
             var index = parseInt(ind);
             var target = addTable.rows[index].getElementsByTagName('td')[0]
-            context.forEach(function(ele){
-                $("#"+ele+String(target.innerHTML)).attr("id",ele+String(index+1));
-            });
             target.innerHTML = String(index+1)
         })
     }
@@ -411,6 +252,135 @@ $(async function() {
         });
     }
 
+     async function getDefaultWindowSize(){
+        let defaultWindowSize = await parent.psotLocalhostApi('/getList','defaultWindowSize');
+        $("#width")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[0];
+        $("#height")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[1];
+    }
+
+    function returnResponseCode(response){
+        if(response){
+            return response.Result;
+        }else{
+            return 1;
+        }
+    }
+
+    // outerlist
+
+    async function setListSetting(){
+        let obj = parent.scriptList;
+        $('#table tbody').empty();
+        for (let key in obj){
+            let rows = showTable.rows.length+1
+            let row = showTable.insertRow(-1)
+            let id = row.insertCell(0)
+            let Name = row.insertCell(1)
+            let exportSeparately = row.insertCell(2)
+            let update = row.insertCell(3)
+            let del = row.insertCell(4)
+            id.innerHTML = String(rows)
+
+            let NameSpan = document.createElement('span')
+            NameSpan.innerHTML = obj[key]
+            Name.appendChild(NameSpan)
+
+            //export
+            let exportSeparatelyBtn = document.createElement('Button');
+            let exportBtnIcon = document.createElement('i');
+            exportBtnIcon.className = "fas fa-file-download";
+            exportSeparatelyBtn.className = "btn";
+            exportSeparatelyBtn.onclick = async function(){exportSeparatelyMethod(obj,key)}
+            exportSeparatelyBtn.appendChild(exportBtnIcon);
+            exportSeparately.appendChild(exportSeparatelyBtn);
+
+            //update
+            let updateBtn = document.createElement('Button')
+            let updateBtnIcon = document.createElement('i')
+            updateBtnIcon.className = "fas fa-edit"
+            updateBtn.className = "btn btn-default"
+            updateBtn.type = "button"
+            updateBtn.dataset.target="#addModal"
+            updateBtn.dataset.toggle="modal"
+            updateBtn.onclick = async function(){updateMethod(obj,key)}
+            updateBtn.appendChild(updateBtnIcon)
+            update.appendChild(updateBtn)
+
+            //del
+            let delBtn = document.createElement('Button');
+            let delBtnIcon = document.createElement('i');
+            delBtnIcon.className = "fas fa-trash-alt";
+            delBtn.className = "btn";
+            delBtn.onclick = async function(){delScript(obj[key],delBtn)} 
+            delBtn.appendChild(delBtnIcon);
+            del.appendChild(delBtn);
+        }
+
+    }
+
+    async function delScript(key,delBtn){
+        let response = await parent.psotLocalhostApi('/delScript',key)
+        if (response['returnObject'] == null){
+            showTable.deleteRow($(showTable.getElementsByTagName('tr')).index(delBtn.parentElement.parentElement))
+            let tableRows = showTable.rows;
+            tableRows.forEach(function(ele,ind){
+                ind = ind + 1;
+                let target = ele.getElementsByTagName('td')[0]
+                target.innerHTML = String(ind)
+            })
+            message.innerHTML = key+"刪除成功!";
+            parent.scriptList = await parent.getLocalhostApi('/getKeys');
+            $("div.alert").show();
+        }
+    }
+
+    //// outerlist_onclick
+    async function exportSeparatelyMethod(obj,key){
+        let result = [];
+        result.push({});
+        let response = await parent.psotLocalhostApi('/getScript',obj[key])
+        result[0][obj[key]] = response['returnObject'];
+        let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
+        parent.saveAs(blob, obj[key]+".json");
+    }
+
+    async function updateMethod(obj,key){
+        $(".modal-title")[0].innerHTML = "修改腳本";
+        $("#addBtn")[0].innerHTML = "確定修改";
+        $("#name")[0].disabled = true; 
+        $("#name")[0].value = obj[key]; 
+        $("#addTable tr").remove();
+        addMessage.innerHTML = "";
+        let response = await parent.psotLocalhostApi('/getScript',obj[key])
+        for (let k in response['returnObject']){
+            let d = response['returnObject'][k];
+            if(k.includes("width") || k.includes("height") || k.includes("version")){
+                $("#"+k)[0].value = d
+                if(k === "version" && d === ""){
+                    $("#version")[0].disabled = true;
+                    $("#unassigned")[0].checked = true;
+                }else{
+                    $("#assign")[0].checked = true;
+                    $("#version")[0].disabled = false;
+                }
+            }else{
+                addRow(k.split("_")[1],d);
+            }
+            
+        }
+        $("#gameWindows option").each(function(i,item){
+            if(item.value.split(",")[0] === $("#width")[0].value && item.value.split(",")[1] === $("#height")[0].value){
+                gameWindows.disabled = false
+                defaultGameWindows.checked = true
+                item.selected = true
+                return false;
+            }else{
+                gameWindows.disabled = true
+                notDefaultGameWindows.checked = true
+            }
+        });
+    }
+    
     async function myExport(){
         var result = [];
         for (const [index, value] of parent.scriptList.entries()){
@@ -442,12 +412,6 @@ $(async function() {
             setListSetting();
         };
         $("form").get(1).reset()
-    }
-
-    async function getDefaultWindowSize(){
-        let defaultWindowSize = await parent.psotLocalhostApi('/getList','defaultWindowSize');
-        $("#width")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[0];
-        $("#height")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[1];
     }
 
 });

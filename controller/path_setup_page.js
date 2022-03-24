@@ -1,10 +1,8 @@
 $(async function() {
     var showTable = document.getElementById("table").getElementsByTagName('tbody')[0];
-    var message = document.getElementById("message");
     const updateBtn = document.getElementById('update');
     const exportBtn = document.getElementById("export");
     const filesInput = document.getElementById("files");
-    const env = document.getElementById("env");
 
     env.innerHTML = parent.env
 
