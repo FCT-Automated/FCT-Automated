@@ -117,8 +117,12 @@ function signIn(account,password,url){
     return new Promise((resv, rej) => {
         parent.axios(option)
         .then(async function(result){ 
-            parent.token =  await result.data.returnObject.token ;
-            resv(result)
+            if(result.data.errorMessage == null){
+                parent.token =  await result.data.returnObject.token ;
+                resv(result)
+            }else{
+                rej(result.data.errorMessage)
+            }
         })
         .catch((err) => { 
             console.log(err);
