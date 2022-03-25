@@ -1,7 +1,7 @@
 {
   "name": "ver.20220325",
   "version": "2022.03.25",
-  "description": "",
+  "description": "QAtools",
   "main": "./controller/main.js",
   "scripts": {
     "start": "electron .",
