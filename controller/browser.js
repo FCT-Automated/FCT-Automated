@@ -15,7 +15,7 @@ async function createBrowser(url,datas,apiUrl,seamlessApiUrl) {
 }
 
 async function Demo(url,object,browserArgs,apiUrl,seamlessApiUrl){
-  if(object['width'] === undefined){
+  if(object['width'] === ""){
     browserArgs["defaultViewport"] = null
     let page = await openBrowser(browserArgs);
     await page.goto(url+"&version="+object['version']);

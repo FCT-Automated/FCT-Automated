@@ -13,6 +13,9 @@
       "target": [
         "zip"
       ]
+    },
+    "mac":{
+      "category": "your.app.category.type"
     }
   },
   "keywords": [],
