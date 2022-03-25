@@ -1,5 +1,4 @@
 $(async function() {
-    var showTable = document.getElementById("table").getElementsByTagName('tbody')[0];
     var DbTableName = document.title;
     const exportBtn = document.getElementById("export");
     const filesInput = document.getElementById("files");
@@ -12,7 +11,20 @@ $(async function() {
     });
 
     demoBtn.addEventListener('click', function(event){
-        runDemoAccount(DemoGameID.value,event);
+        let args ={
+            API : 'GetDemoUrl',
+            Currency : "DEM",
+            GameID : DemoGameID.value,
+            LanguageID : 2,
+            AgentCode : "FCDEM",
+            AgentKey : parent[parent.env+"AgentKeyList"]["returnObject"]["FCDEM"]
+        }
+        let browerArgs = {
+            'version' : $("#assign")[0].checked ? $("#version")[0].value : "",
+            'width' : defaultGameWindows.checked ? $("#width")[0].value : "",
+            'height' : defaultGameWindows.checked ? $("#height")[0].value : ""
+        };
+        runDemoAccount(args,browerArgs,event);
     });
 
     addBtn.addEventListener('click',function(event){
@@ -80,117 +92,6 @@ $(async function() {
         await parent.psotLocalhostApi('/updateData',datas);
     });
 
-    
-    async function setListSetting(){
-        let obj = parent.hangUpScriptList;
-        $('#table').empty();
-        for (let key in obj){
-            let rows = showTable.rows.length+1
-            let row = showTable.insertRow(-1)
-            let id = row.insertCell(0)
-            let Name = row.insertCell(1)
-            let exportSeparately = row.insertCell(2)
-            let update = row.insertCell(3)
-            let del = row.insertCell(4)
-            id.innerHTML = String(rows)
-
-            let NameSpan = document.createElement('span')
-            NameSpan.id = obj[key]
-            NameSpan.innerHTML = obj[key]
-            Name.appendChild(NameSpan)
-
-            //export
-            let exportSeparatelyBtn = document.createElement('Button');
-            let exportBtnIcon = document.createElement('i');
-            exportBtnIcon.className = "fas fa-file-download";
-            exportSeparatelyBtn.className = "btn";
-            exportSeparatelyBtn.onclick = async function(){
-                var result = [];
-                result.push({});
-                let response = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,obj[key]])
-                result[0][obj[key]] = response['returnObject'];
-                let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
-                parent.saveAs(blob, obj[key]+".json");
-            } 
-            exportSeparatelyBtn.appendChild(exportBtnIcon);
-            exportSeparately.appendChild(exportSeparatelyBtn);
-
-            //update
-            let updateBtn = document.createElement('Button')
-            let updateBtnIcon = document.createElement('i')
-            updateBtnIcon.className = "fas fa-edit"
-            updateBtn.className = "btn btn-default"
-            updateBtn.type = "button"
-            updateBtn.dataset.target="#addModal"
-            updateBtn.dataset.toggle="modal"
-            updateBtn.onclick = async function(){
-                $(".modal-title")[0].innerHTML = "修改腳本";
-                $("#addBtn")[0].innerHTML = "確定修改";
-                $("#name")[0].disabled = true; 
-                $("#name")[0].value = obj[key]; 
-                $("#addTable tr").remove();
-                addMessage.innerHTML = "";
-                let response = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,obj[key]])
-                for (let k in response['returnObject']){
-                    let d = response['returnObject'][k];
-                    if(k.includes("width") || k.includes("height") || k.includes("version")){
-                        $("#"+k)[0].value = d
-                        if(k === "version" && d === ""){
-                            $("#version")[0].disabled = true;
-                            $("#unassigned")[0].checked = true;
-                        }else{
-                            $("#assign")[0].checked = true;
-                            $("#version")[0].disabled = false;
-                        }
-                    }else{
-                        addRow(k.split("_")[1],d);
-                    }
-                    
-                }
-                $("#gameWindows option").each(function(i,item){
-                    if(item.value.split(",")[0] === $("#width")[0].value && item.value.split(",")[1] === $("#height")[0].value){
-                        gameWindows.disabled = false
-                        defaultGameWindows.checked = true
-                        item.selected = true
-                        return false;
-                    }else{
-                        gameWindows.disabled = true
-                        notDefaultGameWindows.checked = true
-                    }
-                });
-
-            } 
-            updateBtn.appendChild(updateBtnIcon)
-            update.appendChild(updateBtn)
-
-            //del
-            let delBtn = document.createElement('Button');
-            let delBtnIcon = document.createElement('i');
-            delBtnIcon.className = "fas fa-trash-alt";
-            delBtn.className = "btn";
-            delBtn.onclick = async function(){delScript(obj[key],delBtn)} 
-            delBtn.appendChild(delBtnIcon);
-            del.appendChild(delBtn);
-        }
-
-    }
-    
-    async function delScript(key,delBtn){
-        let response = await parent.psotLocalhostApi('/delScript',[parent.hangUpDB,key])
-        if (response['returnObject'] == null){
-            showTable.deleteRow($('#table tr').index(delBtn.parentElement.parentElement))
-            let tableRows = showTable.rows;
-            tableRows.forEach(function(ele,ind){
-                ind = ind + 1;
-                let target = ele.getElementsByTagName('td')[0]
-                target.innerHTML = String(ind)
-                
-            })
-            message.innerHTML = key+"刪除成功!";
-            parent.hangUpScriptList = await parent.psotLocalhostApi('/getKeys',parent.hangUpDB);
-            $("div.alert").show();
-        }
-    }
 
     function addRow(key,value){
         let rows = addTable.rows.length
@@ -293,7 +194,7 @@ $(async function() {
 
     async function addScript(event){
         if(await isAssign()){
-            if(name.checkValidity() && width.checkValidity() && height.checkValidity()){
+            if($("#name")[0].checkValidity() && width.checkValidity() && height.checkValidity()){
                 event.preventDefault();
                 let rowLength = addTable.rows.length;
                 if (rowLength !=0) {
@@ -391,11 +292,10 @@ $(async function() {
         }
     }
 
-    // outerlist
 
     async function setListSetting(){
-        let obj = parent.scriptList;
-        $('#table tbody').empty();
+        let obj = parent.hangUpScriptList;
+        $('#showTable').empty();
         for (let key in obj){
             let rows = showTable.rows.length+1
             let row = showTable.insertRow(-1)
@@ -444,7 +344,7 @@ $(async function() {
     }
 
     async function delScript(key,delBtn){
-        let response = await parent.psotLocalhostApi('/delScript',key)
+        let response = await parent.psotLocalhostApi('/delScript',[parent.hangUpDB,key])
         if (response['returnObject'] == null){
             showTable.deleteRow($(showTable.getElementsByTagName('tr')).index(delBtn.parentElement.parentElement))
             let tableRows = showTable.rows;
@@ -454,16 +354,15 @@ $(async function() {
                 target.innerHTML = String(ind)
             })
             message.innerHTML = key+"刪除成功!";
-            parent.scriptList = await parent.getLocalhostApi('/getKeys');
+            parent.hangUpScriptList = await parent.psotLocalhostApi('/getKeys',parent.hangUpDB);
             $("div.alert").show();
         }
     }
 
-    //// outerlist_onclick
     async function exportSeparatelyMethod(obj,key){
         let result = [];
         result.push({});
-        let response = await parent.psotLocalhostApi('/getScript',obj[key])
+        let response = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,obj[key]])
         result[0][obj[key]] = response['returnObject'];
         let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
         parent.saveAs(blob, obj[key]+".json");
@@ -476,7 +375,7 @@ $(async function() {
         $("#name")[0].value = obj[key]; 
         $("#addTable tr").remove();
         addMessage.innerHTML = "";
-        let response = await parent.psotLocalhostApi('/getScript',obj[key])
+        let response = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,obj[key]])
         for (let k in response['returnObject']){
             let d = response['returnObject'][k];
             if(k.includes("width") || k.includes("height") || k.includes("version")){
@@ -542,11 +441,5 @@ $(async function() {
             setListSetting();
         };
         $("form").get(1).reset()
-    }
-
-    async function getDefaultWindowSize(){
-        let defaultWindowSize = await parent.psotLocalhostApi('/getList','defaultWindowSize');
-        $("#width")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[0];
-        $("#height")[0].value = defaultWindowSize["returnObject"][$("#gameWindows")[0].value].split(",")[1];
     }
 });

@@ -11,6 +11,7 @@
 </head>
 
 <body>
+    <div><span style="color: red;">!!使用匯入注意事項：請先匯入爬蟲腳本再匯入驗證腳本!!</span></div>
     <ul class="nav" style="position: relative; float: left;">
         <li class="nav-item" style="margin-top: 10px;">
             <div class="alert alert-success" role="alert" style="padding-top: 5px; padding-bottom: 5px; margin-bottom: 0px; display: none;">
@@ -36,12 +37,12 @@
                     <li class="nav-item">
                       <form style="display:none"><input type="file" id="files" style="display:none"/></form>
                       <button type="button" class="btn btn-primary" style="margin: 10px" id="importBtn">
-                        Import
+                        驗證腳本Import
                       </button>
                     </li>
                     <li class="nav-item">
                       <button type="button" class="btn btn-primary" style="margin: 10px" id="exportBtn">
-                        Export
+                        驗證腳本Export
                       </button>
                     </li>
                 </ul>
@@ -65,7 +66,7 @@
             <div class="tabs__content" style="margin-top: 50px; position: absolute;">
                 <ul class="nav" style="position: relative; float: left;">
                     <li class="nav-item">
-                        <button type="button" class="btn btn-primary" style="margin: 10px" data-toggle="modal" data-target="#Modal2" id="clickModal2">
+                        <button type="button" class="btn btn-info" style="margin: 10px" data-toggle="modal" data-target="#Modal2" id="clickModal2">
                             <span class="fas fa-plus"></span>新增爬蟲
                         </button>
                     </li>
@@ -73,13 +74,13 @@
                 <ul class="nav justify-content-end" style="position: relative; ">
                     <li class="nav-item">
                       <form style="display:none"><input type="file" id="files2" style="display:none"/></form>
-                      <button type="button" class="btn btn-primary" style="margin: 10px" id="importBtn2">
-                        Import
+                      <button type="button" class="btn btn-info" style="margin: 10px" id="importBtn2">
+                        爬蟲腳本Import
                       </button>
                     </li>
                     <li class="nav-item">
-                      <button type="button" class="btn btn-primary" style="margin: 10px" id="exportBtn2">
-                        Export
+                      <button type="button" class="btn btn-info" style="margin: 10px" id="exportBtn2">
+                        爬蟲腳本Export
                       </button>
                     </li>
                 </ul>
