@@ -15,29 +15,22 @@ $(async function() {
     document.title = main+"List"
     document.body.innerHTML = document.body.innerHTML.replace(/name/g,replace[main]);
 
-    const add = document.getElementById('add');
-    const update = document.getElementById('update');
     const inputSearch = document.getElementById("search");
     const exportBtn = document.getElementById("export");
     const filesInput = document.getElementById("files");
 
     var DbTableName = document.title;
-    var message = document.getElementById("message");
     var showTable = document.getElementById("table").getElementsByTagName('tbody')[0];
     
     setListSetting(await parent.psotLocalhostApi('/getList',DbTableName));
     
 
     add.addEventListener('click',function(e){
-        let addId = document.getElementById('addId');
-        let addName = document.getElementById('addName');
-        addData(addId,addName,e);
+        addData(e);
     });
 
     update.addEventListener('click',function(e){
-        let updateID = document.getElementById('updateID');
-        let updateName = document.getElementById('updateName');
-        updateData(updateID,updateName,e);
+        updateData(e);
     });
 
     inputSearch.addEventListener('keyup',function(){
@@ -136,7 +129,7 @@ $(async function() {
         }
     }
     
-    async function addData(addId,addName,e){
+    async function addData(e){
         if(addId.checkValidity() && addName.checkValidity()){
             e.preventDefault();
             let key = addId.value.replace(/\s*/g,"");;
@@ -161,7 +154,7 @@ $(async function() {
         }
     }
 
-    async function updateData(updateID,updateName,e){
+    async function updateData(e){
         if(updateName.checkValidity()){
             e.preventDefault();
             let datas = {};

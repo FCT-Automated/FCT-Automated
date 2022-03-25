@@ -2,7 +2,7 @@ $(function() {
     getWebManagementSystemdatas();
     setList(parent.GameList,"GameID");
     setKeys(parent.verificationFormulaList,"betRecordScript");
-    
+    var isExit = false;
 
     $("#show_hide_password a").on('click', function(event) {
         event.preventDefault();
@@ -23,39 +23,135 @@ $(function() {
         }
     });
 
+    exitBtn.addEventListener('click',function(){
+        parent.BetRecordVerificationisExit = true;
+    });
+
     submit.addEventListener('click',async function(event){
-        event.preventDefault();     
-        failed.innerHTML = 0;
-        success.innerHTML = 0;
-        total.innerHTML = 0;
-        ignore.innerHTML = 0;
-        let script = await getBetRecordScript();
-        let result  = await signIn(account.value,password.value,SignInURL.value);
-        if(result.status == 200 ){
-            message.innerHTML = account.value +" - "+getCurrentDateTime() + " - 成功登入後台!"
-            let betRecordList = await getBetRecordList();
-            for(let betRecord of betRecordList){
-                if(!IgnoreGameMode.value.split(",").includes(betRecord.gameMode.toString())){
-                    let detailUrl= await getDetail(betRecord.recordID);
-                    let soup = await getSoup(detailUrl);
-                    let isFault = await runScript(script,soup);
-                    if(isFault){
-                        failed.innerHTML = parseInt(failed.innerHTML)+1;
-                        console.log(betRecord.recordID)
-                    }else{
-                        success.innerHTML = parseInt(success.innerHTML)+1;
-                    }
-                }else{
-                    ignore.innerHTML = parseInt(ignore.innerHTML)+1;
-                }
-                
+        if(SignInURL.checkValidity() && GetBetRecordListURL.checkValidity() && 
+        GetDetailURL.checkValidity() && IgnoreGameMode.checkValidity() && 
+        account.checkValidity() && password.checkValidity() &&
+        AccountMember.checkValidity() && fromDatetimepicker.checkValidity() &&
+        toDatetimepicker.checkValidity()){
+            let form = $('form').serializeArray();
+            let mes = "----完成----</br>";
+            //lock
+            submit.disabled = true;
+            submit.innerHTML = "已開始執行..";
+            window.parent.document.getElementById("navbarNavAltMarkup").style.pointerEvents = "none";
+            window.parent.document.getElementById("currentEnv").disabled = true;
+            remember.disabled = true;
+            for(const field of form){
+                document.getElementById(field.name).disabled = true;
             }
-        }else{
-            message.innerHTML = "請查看console錯誤"
+            //
+            event.preventDefault();
+            message.innerHTML = ""; 
+            failedRecordID.innerHTML = "";    
+            exception.innerHTML = 0;
+            failed.innerHTML = 0;
+            success.innerHTML = 0;
+            total.innerHTML = 0;
+            ignore.innerHTML = 0;
+            try{
+                await run();
+            }catch(err){
+                console.log(err);
+                mes = "----非正常結束----，請查看developer tools console</br>"
+            }
+            //unlock
+            exitBtn.style.display = "none"
+            submit.innerHTML = "送出";
+            submit.disabled = false;
+            window.parent.document.getElementById("currentEnv").disabled = false;
+            window.parent.document.getElementById("navbarNavAltMarkup").style.pointerEvents = "auto";
+            remember.disabled = false;
+            for(const field of form){
+                document.getElementById(field.name).disabled = false;
+            }
+            parent.BetRecordVerificationisExit = false
+            //
+            message.innerHTML += mes;
         }
     });
 
 })
+
+async function run(){
+    let script = await getBetRecordScript();
+    let result  = await signIn(account.value,password.value,SignInURL.value);
+    if(result.status == 200 ){
+        message.innerHTML = account.value +" - "+getCurrentDateTime() + " - 成功登入後台!</br>"
+        message.innerHTML += "開始爬賽果資料...</br>" 
+        let response = await getBetRecordList();
+        if(response.isSuccess){
+            message.innerHTML += "賽果資料撈取完畢</br>"
+            if(response.returnObject.total != 0){
+                message.innerHTML += "開始驗證賽果...</br>" 
+                exitBtn.style.display = "inline-block";
+                for(let betRecord of response.returnObject.betRecordList){
+                    if(!parent.BetRecordVerificationisExit){
+                        try{
+                            await runVerification(betRecord,script);
+                        }catch(error){
+                            if(error.message == "Request failed with status code 401" ){
+                                for(let i = 0 ; i<3 ; i++ ){
+                                    message.innerHTML += "重新登入中..</br>"
+                                    result  = await signIn(account.value,password.value,SignInURL.value);
+                                    if(result.status == 200 ){
+                                        message.innerHTML += account.value +" - "+getCurrentDateTime() + " - 成功重新登入後台! - 繼續驗證賽果</br>"
+                                        await runVerification(betRecord,script);
+                                        break
+                                    }else{
+                                        message.innerHTML += account.value +" - "+getCurrentDateTime() + " - 登入失敗第"+i+1+"/3次"
+                                        if(i == 2){
+                                            exceptionErrorMes(betRecord,error);
+                                        }
+                                    }
+                                }
+                            }else{
+                                exceptionErrorMes(betRecord,error);
+                            }
+                        }
+                    }else{
+                        message.innerHTML += "----強制結束----</br>"
+                        break
+                    }
+                    
+                }
+            }else{
+                message.innerHTML += "查無賽果!!</br>" 
+            }   
+        }else{
+            message.innerHTML += response.errorMessage+"</br>" 
+        }   
+    }else{
+        message.innerHTML = account.value +" - "+getCurrentDateTime() + " - 登入失敗，請查看developer tools console</br>"
+    }
+}
+
+async function runVerification(betRecord,script){
+    if(!IgnoreGameMode.value.split(",").includes(betRecord.gameMode.toString())){
+        let detailUrl= await getDetail(betRecord.recordID);
+        let soup = await getSoup(detailUrl);
+        let isFault = await runScript(script,soup);
+        if(isFault){
+            failed.innerHTML = parseInt(failed.innerHTML)+1;
+            failedRecordID.innerHTML += betRecord.recordID+"</br>"
+        }else{
+            success.innerHTML = parseInt(success.innerHTML)+1;
+        }
+    }else{
+        ignore.innerHTML = parseInt(ignore.innerHTML)+1;
+    }
+}
+
+function exceptionErrorMes(betRecord,error){
+    console.log(betRecord.recordID)
+    console.log(error)
+    exception.innerHTML = parseInt(exception.innerHTML)+1;
+    message.innerHTML += betRecord.recordID+"-非預期錯誤，請查看developer tools console</br>"
+}
 
 async function getWebManagementSystemdatas(){
     let response= await parent.psotLocalhostApi('/getWebManagementSystemDatas',parent.env);
@@ -97,7 +193,7 @@ async function getDetail(recordID){
 
 async function getBetRecordList(){
     let payload = {
-        "createTime":[datetimepicker.value,datetimepicker2.value],
+        "createTime":[fromDatetimepicker.value,toDatetimepicker.value],
         "gameID":GameID.value,
         "gameMode":[null],
         "memberAccount":AccountMember.value,
@@ -105,10 +201,12 @@ async function getBetRecordList(){
         "pageSize":"10"
     };
     let result = await requestWebApi(GetBetRecordListURL.value,payload);
-    payload["pageSize"] = await result.data.returnObject.total.toString();
-    total.innerHTML = payload["pageSize"];
-    result = await requestWebApi(GetBetRecordListURL.value,payload);
-    return(result.data.returnObject.betRecordList);
+    if(result.data.returnObject.total != 0){
+        payload["pageSize"] = await result.data.returnObject.total.toString();
+        total.innerHTML = payload["pageSize"];
+        result = await requestWebApi(GetBetRecordListURL.value,payload);
+    }
+    return(result.data);
 }
 
 
@@ -127,9 +225,9 @@ function requestWebApi(url,datas){
         .then(async function(result){ 
             resv(result)
         })
-        .catch((err) => { 
-            console.log(err);
+        .catch((err) => {
             rej(err)
+            
         })
     });
 }

@@ -79,14 +79,10 @@ function doRequest(postOptions) {
     })
 }
 
-async function parseOtherParam(args,arg){
+async function parseOtherParam(otherObject,arg){
     return new Promise((resv, rej) => {
-        if(args["Other"]){
-            for(let other of args["Other"].split(",")){
-                let key = other.split(":")[0];
-                let value = other.split(key+":")[1];
-                arg[key] = value;
-            }
+        for(const k in otherObject){
+            arg[k] = otherObject[k]
         }
         resv(arg);
     });
@@ -101,7 +97,7 @@ async function requestAPI(args,apiUrl) {
                 GameID : args['GameID'],
                 LanguageID : args['LanguageID']
             }
-            arg = await parseOtherParam(args,arg);
+            arg = await parseOtherParam(args['Other'],arg);
             break
         case 'SetPoints':
             arg = {
@@ -109,13 +105,13 @@ async function requestAPI(args,apiUrl) {
                 AllOut : 0,
                 Points : args['Points']
             }
-            arg = await parseOtherParam(args,arg);          
+            arg = await parseOtherParam(args['Other'],arg);          
             break
         case 'KickOut':
             arg = {
                 MemberAccount : args['MemberAccount']
             }
-            arg = await parseOtherParam(args,arg);
+            arg = await parseOtherParam(args['Other'],arg);
             break
         case 'GetEvents':
             break
@@ -140,10 +136,13 @@ async function requestAPI(args,apiUrl) {
 }
 
 async function requestSeamlessAPI(args,seamlessApiUrl) {
-    var arg = JSON.stringify({
+    var arg
+    arg = {
         MemberAccount : args['MemberAccount'],
         Points : args['Points']
-    })
+    }
+    arg = await parseOtherParam(args['Other'],arg);
+    arg = JSON.stringify(arg);
     //-----request-----
     let apisOptions =  await apiSeamlessRequest(args['API'],arg,seamlessApiUrl);
     try{

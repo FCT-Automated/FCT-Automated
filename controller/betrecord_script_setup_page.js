@@ -3,8 +3,24 @@ $(async function() {
     setOuterList(parent.crawlerScriptList,listTable2,parent.crawlerDB);
     setOuterList(parent.verificationFormulaList,listTable,parent.verificationFormulaDB);
 
-    addRow2.addEventListener('click',function(){
-        addRow2Function(null,null);
+    //驗證相關
+
+    updateBtn.addEventListener('click',function(event){
+        updateScript(event);
+    })
+
+    clickModal.addEventListener('click',function(){
+        $("#table1 tr").remove();
+        $("#name1")[0].disabled = false; 
+        $("#name1")[0].value = ""; 
+        $("#addMessage")[0].innerHTML = "";
+        $("#addBtn")[0].innerHTML = "確定新增";
+        updateBtn.style.display = "none";
+        addBtn.style.display = "block";
+    });
+
+    addBtn.addEventListener('click',function(event){
+        addScript(event);
     });
 
     addComparisonRow.addEventListener('click',function(){
@@ -13,6 +29,24 @@ $(async function() {
 
     addIfRow.addEventListener('click',function(){
         ["if","then"].forEach(type => addRowFunction(null,null,null,null,null,type));
+    });
+
+    importBtn.addEventListener('click',function(){
+        $('#files').click();
+    });
+
+    files.onchange = function(){
+        myImport();
+    }
+
+    exportBtn.addEventListener('click',function(){
+        myExport();
+    });
+
+    //爬蟲相關
+
+    addRow2.addEventListener('click',function(){
+        addRow2Function(null,null);
     });
 
     crawlerTest2.addEventListener('click',async function(){
@@ -29,26 +63,8 @@ $(async function() {
         addScript2(event);
     });
 
-    addBtn.addEventListener('click',function(event){
-        addScript(event);
-    });
-
     updateBtn2.addEventListener('click',function(event){
         updateScript2(event);
-    });
-
-    updateBtn.addEventListener('click',function(event){
-        updateScript(event);
-    })
-
-    clickModal.addEventListener('click',function(){
-        $("#table1 tr").remove();
-        $("#name1")[0].disabled = false; 
-        $("#name1")[0].value = ""; 
-        $("#addMessage")[0].innerHTML = "";
-        $("#addBtn")[0].innerHTML = "確定新增";
-        updateBtn.style.display = "none";
-        addBtn.style.display = "block";
     });
 
     clickModal2.addEventListener('click',function(){
@@ -73,56 +89,216 @@ $(async function() {
     exportBtn2.addEventListener('click',function(){
         myExport2();
     });
-    ///
-    importBtn.addEventListener('click',function(){
-        $('#files').click();
-    });
-
-    files.onchange = function(){
-        myImport();
-    }
-
-    exportBtn.addEventListener('click',function(){
-        myExport();
-    });
-
+  
 });
 
-async function myImport2(){
-    let reader = new FileReader();
-    reader.readAsText(await files2.files[0]);
-    reader.onload = async function(){
-        var datas = JSON.parse(this.result);
-        for (let data of datas){
-            if(!parent.crawlerScriptList.includes(Object.keys(data)[0])){
-                let response = await parent.psotLocalhostApi('/addScript',[parent.crawlerDB,data]);
-                if (response['returnObject'] != null){
-                    message.innerHTML = Object.keys(data)[0]+"新增失敗!";
-                    $("div.alert").show();
-                    return;
+//驗證相關
+
+async function addScript(event){
+    if(name1.checkValidity()){
+        event.preventDefault();
+        let rowLength = table1.rows.length;
+        if(rowLength > 0){
+            let data = {};
+            data[name1.value] = {"comparisonMethod":[],"ifMethod":[]};
+            for (let i = 0; i < rowLength; i++){
+                let isIf= table1.rows.item(i).innerHTML.includes("if");
+                let isThen= table1.rows.item(i).innerHTML.includes("then");
+                if(isIf){
+                    data[name1.value]["ifMethod"].push({
+                        "if":setVerificationData(i,""),
+                        "then":setVerificationData(i,"then")
+                    });
+                }else if(!isThen){
+                    data[name1.value]["comparisonMethod"].push(setVerificationData(i,""));
                 }
-            }else{
-                message.innerHTML = Object.keys(data)[0]+"已存在!，請先刪除後匯入";
+            }
+            data[name1.value] = {
+                "comparisonMethod":JSON.stringify(data[name1.value]["comparisonMethod"]),
+                "ifMethod":JSON.stringify(data[name1.value]["ifMethod"])
+            };            
+            let response;
+            response = await parent.psotLocalhostApi('/addScript',[parent.verificationFormulaDB,data]);
+            if (response['returnObject'] == null){
+                parent.verificationFormulaList = await parent.psotLocalhostApi('/getKeys',parent.verificationFormulaDB);
+                setOuterList(parent.verificationFormulaList,listTable,parent.verificationFormulaDB);
+                message.innerHTML = name1.value+"新增成功!";
                 $("div.alert").show();
-                return;
-            }           
+                $("#Modal").modal("hide");
+            }else{
+                addMessage.innerHTML = response['returnObject'];
+                
+            }
+        }else{
+            addMessage.innerHTML = "至少新增一列!";
         }
-        message.innerHTML = "成功匯入!";
-        $("div.alert").show();
-        parent.crawlerScriptList = await parent.psotLocalhostApi('/getKeys',parent.crawlerDB);
-        setOuterList(parent.crawlerScriptList,listTable2,parent.crawlerDB);
-    };
+        
+    }
 }
 
-async function myExport2(){
-    var result = [];
-    for (const [index, value] of parent.crawlerScriptList.entries()){
-        let response = await parent.psotLocalhostApi('/getScript',[parent.crawlerDB,value]);
-        result.push({});
-        result[index][value] = response['returnObject'];  
+function addRowFunction(var1Select,operatorSelect,var2Select,textareaValue1,textareaValue2,type){
+    let rows = table1.rows.length
+    let row = table1.insertRow(-1)
+    let id = row.insertCell(0)
+    let var1 = row.insertCell(1)
+    let operator = row.insertCell(2)
+    let var2 = row.insertCell(3)
+    let delBtn = row.insertCell(4)
+    let ifRow = table1.outerHTML.match(/if/g)
+    if(ifRow==null){
+        ifRow = 0;
+    }else{
+        ifRow = ifRow.length;
     }
-    let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
-    parent.saveAs(blob, "驗證腳本.json");
+    id.innerHTML = String(rows-ifRow+1)
+    ////
+    if(type != null){
+        var1.prepend(type)
+    }
+    let select2 = document.createElement('select')
+    let opts2 = {};
+    parent.crawlerScriptList.forEach((v)=>{
+        opts2[v] = v;
+    });
+    opts2["Other"] = "其他(自填)";
+    setSelect(opts2,select2,var1Select);
+    select2.style.maxWidth = "120px";
+    select2.onchange = function(){isSelectOther(select2)} 
+    var1.appendChild(select2)
+    let textarea = document.createElement('textarea');
+    if(select2.value == "Other"){
+        textarea.style.display = "block";
+        textarea.innerHTML = textareaValue1
+    }else{
+        textarea.style.display = "none";
+        textarea.innerHTML = "";
+    }
+    var1.appendChild(textarea)
+    ////
+    let select3 = document.createElement('select')
+    let opts3={
+        "IsEqualTo":"==",
+        "NotEqualTo":"!=",
+        "GreaterThan":">",
+        "GreaterThanOrEqualTo":">=",
+        "LessThan":"<",
+        "LessThanOrEqualTo":"<=",
+        "Include":"包含(Include)"
+    }
+    setSelect(opts3,select3,operatorSelect);
+    operator.appendChild(select3)
+    ////
+    let select4 = document.createElement('select')
+    setSelect(opts2,select4,var2Select);
+    select4.style.maxWidth = "120px";
+    select4.onchange = function(){isSelectOther(select4)} 
+    var2.appendChild(select4)
+    let textarea2 = document.createElement('textarea');
+    if(select4.value == "Other"){
+        textarea2.style.display = "block";
+        textarea2.innerHTML = textareaValue2
+    }else{
+        textarea2.style.display = "none";
+        textarea2.innerHTML = "";
+    }
+    var2.appendChild(textarea2)
+    //建立delBtn
+    let btn = document.createElement('Button')
+    let btnicon = document.createElement('i')
+    btn.className = "btn"
+    if(type == "if"){
+        id.rowSpan = "2";
+        delBtn.rowSpan = "2";
+    }
+    btnicon.className = "fas fa-trash-alt"
+    btn.appendChild(btnicon)
+    btn.onclick = function(){delRowFunction(btn)}
+    delBtn.appendChild(btn)
+    if(type == "then"){
+        id.remove();
+        delBtn.remove();   
+    }
+
+}
+
+function delRowFunction(btnHtml){
+    let delRowInd =$("#table1 tr").index(btnHtml.parentElement.parentElement);
+    for(let i= delRowInd+1; i<table1.rows.length; i++){
+        let target = $("#table1 tr")[i].getElementsByTagName('td');
+        if(target.length == 5) {
+            target[0].innerHTML = String(parseInt(target[0].innerHTML)-1)
+        }
+        
+    }
+    
+    let netElement = btnHtml.parentElement.parentElement.nextElementSibling;
+    if(netElement != null){
+        if(netElement.getElementsByTagName("td").length != 5){
+            table1.deleteRow(delRowInd);
+        }
+    }
+        
+    table1.deleteRow(delRowInd);
+    
+}
+
+async function updateScript(event){
+    event.preventDefault();
+    let rowLength = table1.rows.length;
+    if(rowLength > 0){
+        let data = {};
+        data[name1.value] = {"comparisonMethod":[],"ifMethod":[]};
+        for (let i = 0; i < rowLength; i++){
+            let isIf= table1.rows.item(i).innerHTML.includes("if");
+            let isThen= table1.rows.item(i).innerHTML.includes("then");
+            if(isIf){
+                data[name1.value]["ifMethod"].push({
+                    "if":setVerificationData(i,""),
+                    "then":setVerificationData(i,"then")
+                });
+            }else if(!isThen){
+                data[name1.value]["comparisonMethod"].push(setVerificationData(i,""));
+            }
+        }
+        data[name1.value] = {
+            "comparisonMethod":JSON.stringify(data[name1.value]["comparisonMethod"]),
+            "ifMethod":JSON.stringify(data[name1.value]["ifMethod"])
+        };            
+        let response;
+        response = await parent.psotLocalhostApi('/updateScript',[parent.verificationFormulaDB,data]);
+        if (response['returnObject'] == null){
+            parent.verificationFormulaList = await parent.psotLocalhostApi('/getKeys',parent.verificationFormulaDB);
+            setOuterList(parent.verificationFormulaList,listTable,parent.verificationFormulaDB);
+            message.innerHTML = name1.value+"修改成功!";
+            $("div.alert").show();
+            $("#Modal").modal("hide");
+        }else{
+            addMessage.innerHTML = response['returnObject'];
+        }
+    }else{
+        addMessage.innerHTML = "至少新增一列!";
+    }
+    
+    
+}
+
+function isSelectOther(select){
+    if(select.value == "Other"){
+        select.nextElementSibling.style.display = "block";
+    }else{
+        select.nextElementSibling.style.display = "none";
+    }
+}
+
+function setVerificationData(i,type){
+    return {
+        "var1": type == "then" ? table1.rows.item(i+1).cells[0].children[0].value :table1.rows.item(i).cells[1].children[0].value,
+        "textarea1": type == "then" ? table1.rows.item(i+1).cells[0].children[1].value : table1.rows.item(i).cells[1].children[1].value,
+        "operator": type == "then" ? table1.rows.item(i+1).cells[1].children[0].value : table1.rows.item(i).cells[2].children[0].value,
+        "var2": type == "then" ? table1.rows.item(i+1).cells[2].children[0].value : table1.rows.item(i).cells[3].children[0].value,
+        "textarea2": type == "then" ? table1.rows.item(i+1).cells[2].children[1].value : table1.rows.item(i).cells[3].children[1].value
+    }
+    
 }
 
 async function myImport(){
@@ -159,12 +335,13 @@ async function myExport(){
         result[index][value] = response['returnObject'];  
     }
     let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
-    parent.saveAs(blob, "值腳本.json");
+    parent.saveAs(blob, "驗證腳本.json");
 }
 
+//爬蟲相關
 
 async function addScript2(event){
-    if($("#name2")[0].checkValidity()){
+    if(name2.checkValidity()){
         event.preventDefault();
         let rowLength = table2.rows.length;
         let data = {};
@@ -190,124 +367,65 @@ async function addScript2(event){
     }
 }
 
-async function addScript(event){
-    if($("#name1")[0].checkValidity()){
-        if(table1.rows.length > 0){
-            event.preventDefault();
-            let rowLength = table1.rows.length;
-            let data = {};
-            let datas = {};
-            data[name1.value] = {"comparisonMethod":[],"ifMethod":[]};
-            for (let i = 0; i < rowLength; i++){
-                let isIf= table1.rows.item(i).innerHTML.includes("if");
-                let isThen= table1.rows.item(i).innerHTML.includes("then");
-                if(isIf){
-                    data[name1.value]["ifMethod"].push({
-                        "if":{
-                            "var1":table1.rows.item(i).cells[1].children[0].value,
-                            "textarea1":table1.rows.item(i).cells[1].children[1].value,
-                            "operator":table1.rows.item(i).cells[2].children[0].value,
-                            "var2":table1.rows.item(i).cells[3].children[0].value,
-                            "textarea2":table1.rows.item(i).cells[3].children[1].value
-                        },
-                        "then":{
-                            "var1":table1.rows.item(i+1).cells[0].children[0].value,
-                            "textarea1":table1.rows.item(i+1).cells[0].children[1].value,
-                            "operator":table1.rows.item(i+1).cells[1].children[0].value,
-                            "var2":table1.rows.item(i+1).cells[2].children[0].value,
-                            "textarea2":table1.rows.item(i+1).cells[2].children[1].value
-                        }
-                    });
-                }else if(!isThen){
-                    data[name1.value]["comparisonMethod"].push({
-                        "var1":table1.rows.item(i).cells[1].children[0].value,
-                        "textarea1":table1.rows.item(i).cells[1].children[1].value,
-                        "operator":table1.rows.item(i).cells[2].children[0].value,
-                        "var2":table1.rows.item(i).cells[3].children[0].value,
-                        "textarea2":table1.rows.item(i).cells[3].children[1].value
-                    });
-                }
-            }
-            datas[name1.value] = {
-                "comparisonMethod":JSON.stringify(data[name1.value]["comparisonMethod"]),
-                "ifMethod":JSON.stringify(data[name1.value]["ifMethod"])
-            };            
-            let response;
-            response = await parent.psotLocalhostApi('/addScript',[parent.verificationFormulaDB,datas]);
-            if (response['returnObject'] == null){
-                parent.verificationFormulaList = await parent.psotLocalhostApi('/getKeys',parent.verificationFormulaDB);
-                setOuterList(parent.verificationFormulaList,listTable,parent.verificationFormulaDB);
-                message.innerHTML = name1.value+"新增成功!";
-                $("div.alert").show();
-                $("#Modal").modal("hide");
-            }else{
-                addMessage.innerHTML = response['returnObject'];
-                
-            }
-        }else{
-            addMessage.innerHTML = "至少新增一列!";
+function addRow2Function(key,value){
+    let rows = table2.rows.length
+    let row = table2.insertRow(-1)
+    let id = row.insertCell(0)
+    let method = row.insertCell(1)
+    let element = row.insertCell(2)
+    
+    id.innerHTML = String(rows+1)
+    let select = document.createElement('select')
+    var opts;
+    if(key == "initLoadedCheerio"){
+        opts={
+            "initLoadedCheerio":"initLoadedCheerio"
         }
-        
+    }else{
+        opts={
+            "LoadedCheerio":"LoadedCheerio",
+            "ToCheerio":"ToCheerio",
+            "SumTheElementOfAnArray":"SumTheElementOfAnArray",
+            "Text":"Text",           
+            "Index":"Index",
+            "Html":"Html"
+        }
+        //建立delBtn
+        let delBtn = row.insertCell(3)
+        let btn = document.createElement('Button')
+        let btnicon = document.createElement('i')
+        btn.className = "btn"
+        btnicon.className = "fas fa-trash-alt"
+        btn.appendChild(btnicon)
+        btn.onclick = function(){delRow2Function(btn)} 
+        delBtn.appendChild(btn)
     }
+    setSelect(opts,select,key)
+    select.style.maxWidth = "180px";
+    select.onchange = function(){selectOption(select)} 
+    method.appendChild(select) 
+    ////
+    let textarea = document.createElement('textarea')
+    textarea.style.width = "100%";
+    element.appendChild(textarea)
+    selectOption(select)
+    textarea.value = value;
+    
 }
 
-async function updateScript(event){
-    event.preventDefault();
-    let rowLength = table1.rows.length;
-    let data = {};
-    let datas = {};
-    data[name1.value] = {"comparisonMethod":[],"ifMethod":[]};
-    for (let i = 0; i < rowLength; i++){
-        let isIf= table1.rows.item(i).innerHTML.includes("if");
-        let isThen= table1.rows.item(i).innerHTML.includes("then");
-        if(isIf){
-            data[name1.value]["ifMethod"].push({
-                "if":{
-                    "var1":table1.rows.item(i).cells[1].children[0].value,
-                    "textarea1":table1.rows.item(i).cells[1].children[1].value,
-                    "operator":table1.rows.item(i).cells[2].children[0].value,
-                    "var2":table1.rows.item(i).cells[3].children[0].value,
-                    "textarea2":table1.rows.item(i).cells[3].children[1].value
-                },
-                "then":{
-                    "var1":table1.rows.item(i+1).cells[0].children[0].value,
-                    "textarea1":table1.rows.item(i+1).cells[0].children[1].value,
-                    "operator":table1.rows.item(i+1).cells[1].children[0].value,
-                    "var2":table1.rows.item(i+1).cells[2].children[0].value,
-                    "textarea2":table1.rows.item(i+1).cells[2].children[1].value
-                }
-            });
-        }else if(!isThen){
-            data[name1.value]["comparisonMethod"].push({
-                "var1":table1.rows.item(i).cells[1].children[0].value,
-                "textarea1":table1.rows.item(i).cells[1].children[1].value,
-                "operator":table1.rows.item(i).cells[2].children[0].value,
-                "var2":table1.rows.item(i).cells[3].children[0].value,
-                "textarea2":table1.rows.item(i).cells[3].children[1].value
-            });
-        }
-    }
-    datas[name1.value] = {
-        "comparisonMethod":JSON.stringify(data[name1.value]["comparisonMethod"]),
-        "ifMethod":JSON.stringify(data[name1.value]["ifMethod"])
-    };            
-    let response;
-    response = await parent.psotLocalhostApi('/updateScript',[parent.verificationFormulaDB,datas]);
-    if (response['returnObject'] == null){
-        parent.verificationFormulaList = await parent.psotLocalhostApi('/getKeys',parent.verificationFormulaDB);
-        setOuterList(parent.verificationFormulaList,listTable,parent.verificationFormulaDB);
-        message.innerHTML = name1.value+"修改成功!";
-        $("div.alert").show();
-        $("#Modal").modal("hide");
-    }else{
-        addMessage.innerHTML = response['returnObject'];
-    }
-    
+function delRow2Function(btnHtml){
+    let delRowInd =$("#table2 tr").index(btnHtml.parentElement.parentElement);
+    table2.deleteRow(delRowInd)
+    Object.keys(table2.rows).forEach(function(ind){
+        var index = parseInt(ind);
+        var target = table2.rows[index].getElementsByTagName('td')[0]
+        target.innerHTML = String(index+1)
+    })
 }
 
 async function updateScript2(event){
     event.preventDefault();
-    let rowLength = table1.rows.length;
+    let rowLength = table2.rows.length;
     let data = {};
     data[name2.value] = {};
     let key;
@@ -331,6 +449,55 @@ async function updateScript2(event){
     
 }
 
+function selectOption(select){
+    let target = select.parentElement.parentElement.getElementsByTagName('td')[2].firstElementChild
+    target.disabled = true
+    target.value = "";
+    if(select.value == "initLoadedCheerio" || select.value == "LoadedCheerio" || select.value == "Index"){
+        target.disabled = false
+    }
+}
+
+async function myImport2(){
+    let reader = new FileReader();
+    reader.readAsText(await files2.files[0]);
+    reader.onload = async function(){
+        var datas = JSON.parse(this.result);
+        for (let data of datas){
+            if(!parent.crawlerScriptList.includes(Object.keys(data)[0])){
+                let response = await parent.psotLocalhostApi('/addScript',[parent.crawlerDB,data]);
+                if (response['returnObject'] != null){
+                    message.innerHTML = Object.keys(data)[0]+"新增失敗!";
+                    $("div.alert").show();
+                    return;
+                }
+            }else{
+                message.innerHTML = Object.keys(data)[0]+"已存在!，請先刪除後匯入";
+                $("div.alert").show();
+                return;
+            }           
+        }
+        message.innerHTML = "成功匯入!";
+        $("div.alert").show();
+        parent.crawlerScriptList = await parent.psotLocalhostApi('/getKeys',parent.crawlerDB);
+        setOuterList(parent.crawlerScriptList,listTable2,parent.crawlerDB);
+    };
+}
+
+async function myExport2(){
+    var result = [];
+    for (const [index, value] of parent.crawlerScriptList.entries()){
+        let response = await parent.psotLocalhostApi('/getScript',[parent.crawlerDB,value]);
+        result.push({});
+        result[index][value] = response['returnObject'];  
+    }
+    let blob = new Blob([JSON.stringify(result)], {type: "text/plain;charset=utf-8"});
+    parent.saveAs(blob, "爬蟲腳本.json");
+}
+
+
+
+//最外層list相關
 
 async function setOuterList(list,tables,db){
     let obj = list;
@@ -346,7 +513,6 @@ async function setOuterList(list,tables,db){
         id.innerHTML = String(rows)
 
         let NameSpan = document.createElement('span')
-        NameSpan.id = obj[key]
         NameSpan.innerHTML = obj[key]
         Name.appendChild(NameSpan)
 
@@ -456,193 +622,7 @@ async function delScript(key,delBtn,tables,db){
     }
 }
 
-function addRow2Function(key,value){
-    let rows = table2.rows.length
-    let row = table2.insertRow(-1)
-    let id = row.insertCell(0)
-    let method = row.insertCell(1)
-    let element = row.insertCell(2)
-    
-    id.innerHTML = String(rows+1)
-    let select = document.createElement('select')
-    var opts;
-    if(key == "initLoadedCheerio"){
-        opts={
-            "initLoadedCheerio":"initLoadedCheerio"
-        }
-    }else{
-        opts={
-            "LoadedCheerio":"LoadedCheerio",
-            "ToCheerio":"ToCheerio",
-            "SumTheElementOfAnArray":"SumTheElementOfAnArray",
-            "Text":"Text",           
-            "Index":"Index",
-            "Html":"Html"
-        }
-        //建立delBtn
-        let delBtn = row.insertCell(3)
-        let btn = document.createElement('Button')
-        let btnicon = document.createElement('i')
-        btn.className = "btn"
-        btnicon.className = "fas fa-trash-alt"
-        btn.appendChild(btnicon)
-        btn.onclick = function(){delRow2Function(btn)} 
-        delBtn.appendChild(btn)
-    }
-    for (const [k, v] of Object.entries(opts)) {
-        let opt = document.createElement('option')
-        opt.value = k
-        opt.innerHTML = v
-        if( key == k ){
-            opt.selected = "selected";
-        }
-        select.appendChild(opt)
-    }
-    select.style.maxWidth = "180px";
-    select.onchange = function(){selectOption(select)} 
-    method.appendChild(select) 
-    ////
-    let textarea = document.createElement('textarea')
-    textarea.style.width = "100%";
-    element.appendChild(textarea)
-    selectOption(select)
-    textarea.value = value;
-    
-}
-
-function addRowFunction(var1Select,operatorSelect,var2Select,textareaValue1,textareaValue2,type){
-    let rows = table1.rows.length
-    let row = table1.insertRow(-1)
-    let id = row.insertCell(0)
-    let var1 = row.insertCell(1)
-    let operator = row.insertCell(2)
-    let var2 = row.insertCell(3)
-    let delBtn = row.insertCell(4)
-    let ifRow = table1.outerHTML.match(/if/g)
-    if(ifRow==null){
-        ifRow = 0;
-    }else{
-        ifRow = ifRow.length;
-    }
-    id.innerHTML = String(rows-ifRow+1)
-    ////
-    if(type != null){
-        var1.prepend(type)
-    }
-    let select2 = document.createElement('select')
-    let opts2 = {};
-    parent.crawlerScriptList.forEach((v)=>{
-        opts2[v] = v;
-    });
-    opts2["Other"] = "其他(自填)";
-    setSelect(opts2,select2,var1Select);
-    select2.style.maxWidth = "120px";
-    select2.onchange = function(){isSelectOther(select2)} 
-    var1.appendChild(select2)
-    let textarea = document.createElement('textarea');
-    if(select2.value == "Other"){
-        textarea.style.display = "block";
-        textarea.innerHTML = textareaValue1
-    }else{
-        textarea.style.display = "none";
-        textarea.innerHTML = "";
-    }
-    var1.appendChild(textarea)
-    ////
-    let select3 = document.createElement('select')
-    let opts3={
-        "IsEqualTo":"==",
-        "NotEqualTo":"!=",
-        "GreaterThan":">",
-        "GreaterThanOrEqualTo":">=",
-        "LessThan":"<",
-        "LessThanOrEqualTo":"<=",
-        "Include":"包含(Include)"
-    }
-    setSelect(opts3,select3,operatorSelect);
-    operator.appendChild(select3)
-    ////
-    let select4 = document.createElement('select')
-    setSelect(opts2,select4,var2Select);
-    select4.style.maxWidth = "120px";
-    select4.onchange = function(){isSelectOther(select4)} 
-    var2.appendChild(select4)
-    let textarea2 = document.createElement('textarea');
-    if(select4.value == "Other"){
-        textarea2.style.display = "block";
-        textarea2.innerHTML = textareaValue2
-    }else{
-        textarea2.style.display = "none";
-        textarea2.innerHTML = "";
-    }
-    var2.appendChild(textarea2)
-    //建立delBtn
-    let btn = document.createElement('Button')
-    let btnicon = document.createElement('i')
-    btn.className = "btn"
-    if(type == "if"){
-        id.rowSpan = "2";
-        delBtn.rowSpan = "2";
-    }
-    btnicon.className = "fas fa-trash-alt"
-    btn.appendChild(btnicon)
-    btn.onclick = function(){delRowFunction(btn)}
-    delBtn.appendChild(btn)
-    if(type == "then"){
-        id.remove();
-        delBtn.remove();   
-    }
-
-}
-
-function delRow2Function(btnHtml){
-    let delRowInd =$("#table2 tr").index(btnHtml.parentElement.parentElement);
-    table2.deleteRow(delRowInd)
-    Object.keys(table2.rows).forEach(function(ind){
-        var index = parseInt(ind);
-        var target = table2.rows[index].getElementsByTagName('td')[0]
-        target.innerHTML = String(index+1)
-    })
-}
-
-function delRowFunction(btnHtml){
-    let delRowInd =$("#table1 tr").index(btnHtml.parentElement.parentElement);
-    for(let i= delRowInd+1; i<table1.rows.length; i++){
-        let target = $("#table1 tr")[i].getElementsByTagName('td');
-        if(target.length == 5) {
-            target[0].innerHTML = String(parseInt(target[0].innerHTML)-1)
-        }
-        
-    }
-    
-    let netElement = btnHtml.parentElement.parentElement.nextElementSibling;
-    if(netElement != null){
-        if(netElement.getElementsByTagName("td").length != 5){
-            table1.deleteRow(delRowInd);
-        }
-    }
-        
-    table1.deleteRow(delRowInd);
-    
-}
-
-function selectOption(select){
-    let target = select.parentElement.parentElement.getElementsByTagName('td')[2].firstElementChild
-    target.disabled = true
-    target.value = "";
-    if(select.value == "initLoadedCheerio" || select.value == "LoadedCheerio" || select.value == "Index"){
-        target.disabled = false
-    }
-}
-
-function isSelectOther(select){
-    if(select.value == "Other"){
-        select.nextElementSibling.style.display = "block";
-    }else{
-        select.nextElementSibling.style.display = "none";
-    }
-}
-
+//爬蟲與驗證共用
 function setSelect(options,select,key){
     for (const [k, v] of Object.entries(options)) {
         let opt = document.createElement('option')
@@ -654,6 +634,16 @@ function setSelect(options,select,key){
         select.appendChild(opt)
     }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

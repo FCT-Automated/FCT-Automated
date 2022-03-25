@@ -1,20 +1,6 @@
 $(async function() {
-    var addTable = document.getElementById('addTable');
-    var showTable = document.getElementById("table");
-    var message = document.getElementById("message");
+    var showTable = document.getElementById("table").getElementsByTagName('tbody')[0];
     var DbTableName = document.title;
-    var assign = document.getElementById('assign');
-    var unassigned = document.getElementById('unassigned');
-    var defaultGameWindows = document.getElementById('defaultGameWindows');
-    var notDefaultGameWindows = document.getElementById('notDefaultGameWindows');
-    var gameWindows = document.getElementById('gameWindows');
-    
-
-    const addRowBtn = document.getElementById('addRowBtn');
-    const clickAddBtn = document.getElementById('clickAddBtn');
-    const defaultWindowSizeUpdate = document.getElementById('defaultWindowSizeUpdate');
-    const demoBtn = document.getElementById('demoBtn');
-    const addBtn = document.getElementById('addBtn');
     const exportBtn = document.getElementById("export");
     const filesInput = document.getElementById("files");
 
@@ -26,8 +12,7 @@ $(async function() {
     });
 
     demoBtn.addEventListener('click', function(event){
-        let DemoID = document.getElementById("DemoGameID").value;
-        runDemoAccount(DemoID,event);
+        runDemoAccount(DemoGameID.value,event);
     });
 
     addBtn.addEventListener('click',function(event){
@@ -341,15 +326,11 @@ $(async function() {
     
     async function addScript(event){
         if(await isAssign()){
-            if($("#name")[0].checkValidity() && $("#width")[0].checkValidity() && $("#height")[0].checkValidity()){
+            if(name.checkValidity() && width.checkValidity() && height.checkValidity()){
                 event.preventDefault();
                 let rowLength = addTable.rows.length;
                 if (rowLength !=0) {
                     let eleName = document.getElementById('name');
-                    let width = document.getElementById('width');
-                    let height = document.getElementById('height');
-                    let addMessage = document.getElementById("addMessage");
-                    let version = document.getElementById("version");
                     let data = {};
                     data[eleName.value] = {};
                     data[eleName.value]['width'] = width.value;
@@ -422,7 +403,7 @@ $(async function() {
     async function isAssign(){
         return new Promise((resv, rej) => {
             if($("#assign")[0].checked){
-                if($("#version")[0].checkValidity()){
+                if(version.checkValidity()){
                     resv(true);
                 }else{
                     resv(false);

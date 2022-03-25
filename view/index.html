@@ -45,9 +45,9 @@
             </div>
             <button type="button" style="margin-right: 20px;" class="btn btn-secondary" onclick = 'blankBrowser()'>空白瀏覽器</button>
             <ul class="nav justify-content-end">
-                <label for="env" style="margin: 0px; margin-top: 4px; color: white;">環境：</label>
+                <label for="currentEnv" style="margin: 0px; margin-top: 4px; color: white;">環境：</label>
                 <div style="display: inline-block;">
-                <select class="form-control" id="env" style="height: 33px; padding-top: 4px;">
+                <select class="form-control" id="currentEnv" style="height: 33px; padding-top: 4px;">
                     <option value="QA" selected="selected">QA</option>
                     <option value="Release">Release</option>
                     <option value="Live">Live</option>
@@ -68,18 +68,17 @@
         </div>
     </div>
     <script type="text/javascript">
-        var iframe = document.getElementById("myiframe");
-        iframe.onload = function(){
-            const iframeWin = iframe.contentWindow;
-            iframe.style.height = '515px';
+        myiframe.onload = function(){
+            const iframeWin = myiframe.contentWindow;
+            myiframe.style.height = '515px';
             iframeWin.require = window.require;
         }      
         function changeUrl(url){
-            iframe.src = url;
-            $("#env")[0].disabled = false;
+            myiframe.src = url;
+            $("#currentEnv")[0].disabled = false;
             if(url.includes("script_setup_page")){
-                document.getElementById("env").value = "QA";
-                $("#env")[0].disabled = true;
+                currentEnv.value = "QA";
+                $("#currentEnv")[0].disabled = true;
                 changePath("QA")
             }
         };

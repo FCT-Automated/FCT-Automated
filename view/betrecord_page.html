@@ -20,7 +20,7 @@
                 <span class="text-danger" style="font-size: 20px;">*</span><label for="SignInURL">SignInURL：</label> 
               </div>
               <div style="display: inline-block; width: 500px;">
-                <input class="form-control" placeholder="請輸入後台SignIn的URL(F12開Network查看)"id="SignInURL" aria-required="true" required>
+                <input class="form-control" placeholder="請輸入後台SignIn的URL(F12開Network查看)"  name="SignInURL" id="SignInURL" aria-required="true" required>
               </div>
             </div>
           </div>
@@ -30,7 +30,7 @@
                 <span class="text-danger" style="font-size: 20px;">*</span><label for="GetBetRecordListURL">GetBetRecordListURL：</label> 
               </div>
               <div style="display: inline-block; width: 500px;">
-                <input class="form-control" placeholder="請輸入後台投注紀錄GetBetRecordList的URL(F12開Network查看)" id="GetBetRecordListURL" aria-required="true" required>
+                <input class="form-control" placeholder="請輸入後台投注紀錄GetBetRecordList的URL(F12開Network查看)" name="GetBetRecordListURL" id="GetBetRecordListURL" aria-required="true" required>
               </div>
             </div>
           </div>
@@ -40,7 +40,7 @@
                 <span class="text-danger" style="font-size: 20px;">*</span><label for="GetDetailURL">GetDetailURL：</label> 
               </div>
               <div style="display: inline-block; width: 500px;">
-                <input class="form-control" placeholder="請輸入後台投注紀錄GetDetailURL的URL(F12開Network查看)" id="GetDetailURL" aria-required="true" required>
+                <input class="form-control" placeholder="請輸入後台投注紀錄單筆查詢GetDetailURL的URL(F12開Network查看)" name="GetDetailURL" id="GetDetailURL" aria-required="true" required>
               </div>
             </div>
           </div>
@@ -50,7 +50,7 @@
                 <span class="text-danger" style="font-size: 20px;">*</span><label for="IgnoreGameMode">IgnoreGameMode：</label> 
               </div>
               <div style="display: inline-block; width: 500px;">
-                <input class="form-control" placeholder="請輸入GameMode編號(用,分隔)" id="IgnoreGameMode" aria-required="true" required>
+                <input class="form-control" placeholder="請輸入GameMode編號(用,分隔)" name="IgnoreGameMode" id="IgnoreGameMode" aria-required="true" required>
               </div>
             </div>
           </div>
@@ -60,7 +60,7 @@
                 <span class="text-danger" style="font-size: 20px;">*</span><label for="account">後台帳號：</label> 
               </div>
               <div style="display: inline-block;">
-                <input class="form-control" style="width: 160px;" id="account" aria-required="true" required>
+                <input class="form-control" style="width: 160px;" name="account" id="account" aria-required="true" required>
               </div>
             </div>
             <div class="form-group" style="display: inline-block; margin-right: 15px;"> 
@@ -68,7 +68,7 @@
                 <span class="text-danger" style="font-size: 20px;">*</span><label for="password">後台密碼：</label> 
               </div>
               <div style="display: inline-block;" id="show_hide_password">
-                <input type="password" class="form-control" style="display: inline-block; width: 160px;"  id="password" aria-required="true" required>
+                <input type="password" class="form-control" style="display: inline-block; width: 160px;" name="password" id="password" aria-required="true" required>
                 <a href="" style="color:grey"><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
               </div>
             </div>             
@@ -79,17 +79,14 @@
               </label>
             </div>
           </div>
-
-        </form>
-        <hr>
-        <form>          
+          <hr>
           <div>
             <div class="form-group" style="display: inline-block; margin-right: 20px;"> 
               <div style="display: inline-block;">
                 <span class="text-danger" style="font-size: 20px;">*</span><label for="AccountMember">會員帳號：</label> 
               </div>
               <div style="display: inline-block;">
-                <input class="form-control" style="width: 200px;" id="AccountMember" aria-required="true" required>
+                <input class="form-control" style="width: 200px;" name="AccountMember" id="AccountMember" aria-required="true" required>
               </div>
             </div> 
 
@@ -98,7 +95,7 @@
                 <span class="text-danger" style="font-size: 20px;">*</span><label for="GameID">遊戲名稱：</label> 
               </div>
               <div style="display: inline-block;">
-                <select class="form-control GameID" style="width: 200px;" id="GameID"> </select> 
+                <select class="form-control GameID" style="width: 200px;" name="GameID" id="GameID"> </select> 
               </div>  
             </div>
             
@@ -106,14 +103,14 @@
 
           <div class="form-group field_SetPoints" style="margin-right: 20px;"> 
             <div style="display: inline-block;">
-              <span class="text-danger" style="font-size: 20px;">*</span><label for="datetimepicker">創建時間：</label> 
+              <span class="text-danger" style="font-size: 20px;">*</span><label for="datetimepicker">創建時間(美東時間)：</label> 
             </div>
             <div style="display: inline-block;">
-              <input type="text" id="datetimepicker">
+              <input type="text" name="fromDatetimepicker" id="fromDatetimepicker" required>
             </div>
             ~
             <div style="display: inline-block;">
-              <input type="text" id="datetimepicker2">
+              <input type="text" name="toDatetimepicker" id="toDatetimepicker" required>
             </div>
           </div>
              
@@ -122,22 +119,16 @@
               <span class="text-danger" style="font-size: 20px;">*</span><label for="betRecordScript">驗證腳本：</label> 
             </div>
             <div style="display: inline-block;">
-              <select class="form-control betRecordScript" style="width: 200px;" id="betRecordScript"> </select> 
+              <select class="form-control betRecordScript" style="width: 200px;" name="betRecordScript" id="betRecordScript"> </select> 
             </div>  
           </div> 
 
           <button type="submit" style="display: inline-block;" id="submit" class="btn btn-primary">送出</button>
+          <button type="button" style="display: none" id="exitBtn" class="btn btn-danger">強制結束</button>
         </form>
         <hr>
       </div>
-
     </div> 
-    <div class="row">
-      <div class="col">
-        <span id="message"></span>
-      </div>
-    </div>
-    <hr>
     <div class="row">
       <div class="col-sm">
         賽果總數：<span id="total"></span>
@@ -146,27 +137,39 @@
         完成： <span id="success"></span>
       </div>
       <div class="col-sm">
-        失敗(console會印賽果編號)：<span id="failed"></span>
+        失敗：<span id="failed"></span>
+        <span id="failedRecordID"></span>
       </div>
       <div class="col-sm">
         忽略：<span id="ignore"></span>
       </div>
+      <div class="col-sm">
+        非預期錯誤：<span id="exception"></span>
+      </div>
     </div>
+    <hr>
+    <div class="row">
+      <div class="col">
+        <span id="message"></span>
+      </div>
+    </div>
+    
+    
 
     <script type="text/javascript">
-        $('#datetimepicker').datetimepicker({
-            language: 'zh-TW', //語言
-            autoclose: true, //選擇後自動關閉
-            clearBtn: true,//清除按鈕
-            format: "yyyy-mm-dd hh:ii:ss",//日期格式
+        $('#fromDatetimepicker').datetimepicker({
+            language: 'zh-TW', 
+            autoclose: true,
+            clearBtn: true,
+            format: "yyyy-mm-dd hh:ii:ss",
             todayBtn : true,
             startView :2,
         });
-        $('#datetimepicker2').datetimepicker({
-            language: 'zh-TW', //語言
-            autoclose: true, //選擇後自動關閉
-            clearBtn: true,//清除按鈕
-            format: "yyyy-mm-dd hh:ii:ss",//日期格式
+        $('#toDatetimepicker').datetimepicker({
+            language: 'zh-TW', 
+            autoclose: true, 
+            clearBtn: true,
+            format: "yyyy-mm-dd hh:ii:ss",
             todayBtn : true,
             startView :2,
         });

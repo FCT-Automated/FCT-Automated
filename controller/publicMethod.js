@@ -1,14 +1,13 @@
 async function isAttendCheck(isCheck){
     let eventlist = document.getElementById('Event');
     let mes = urlAndPathCheck();
-    var AgentCode = document.getElementById("AgentCode").value;
-    var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode];       
+    var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode.value];       
     
     if (isCheck && mes.length === 0){
         eventlist.disabled=false
         let args ={
             API : 'GetEvents',
-            Currency : document.getElementById("Currency").value,
+            Currency : Currency.value,
             AgentCode : AgentCode,
             AgentKey : AgentKey
         }      
