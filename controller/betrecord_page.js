@@ -29,10 +29,9 @@ $(function() {
 
     submit.addEventListener('click',async function(event){
         if(SignInURL.checkValidity() && GetBetRecordListURL.checkValidity() && 
-        GetDetailURL.checkValidity() && IgnoreGameMode.checkValidity() && 
-        account.checkValidity() && password.checkValidity() &&
-        AccountMember.checkValidity() && fromDatetimepicker.checkValidity() &&
-        toDatetimepicker.checkValidity()){
+        GetDetailURL.checkValidity() && account.checkValidity() && 
+        password.checkValidity() && AccountMember.checkValidity() && 
+        fromDatetimepicker.checkValidity() && toDatetimepicker.checkValidity()){
             let form = $('form').serializeArray();
             let mes = "----完成----</br>";
             //lock

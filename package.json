@@ -14,7 +14,7 @@
         "zip"
       ]
     },
-    "mac":{
+    "mac": {
       "category": "your.app.category.type"
     }
   },
