@@ -112,7 +112,7 @@ async function run(event,formData){
     catch (e){
         submit.innerHTML = "送出";
         submit.disabled = false;
-        $("#message")[0].innerHTML = "請查看developer tools!</br>" + $("#message")[0].innerHTML;
+        $("#message")[0].innerHTML = "發生錯誤請查看developer tools console!</br>" + $("#message")[0].innerHTML;
         console.log(e);
     } 
     
@@ -142,39 +142,40 @@ async function Login(mes,MemberAccount,formData){
     let AgentCode = formData_find("AgentCode",formData);
     let AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode];       
     try{
-        let Other = formData_find("other",formData) != "" ? JSON.parse(formData_find("other",formData)) :"{}" ;
-        let args ={
-            API : "Login",
-            Currency : formData_find("Currency",formData),
-            GameID : formData_find("GameID",formData),
-            AgentCode : AgentCode,
-            AgentKey : AgentKey,
-            MemberAccount : MemberAccount,
-            LanguageID : formData_find("LanguageID",formData),
-            Other : Other
-        }
-        let code;
-        let response = await parent.apiJs.requestAPI(args,parent.apiUrl)
-        if(response){
-            code = response.Result;
-        }else{
-            code = 1;
-        }
-        if ( code == 0){
-            if(document.title == 'script'){
-                let data = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,$("#list option:selected").text()]);
-                data['user'] = args
-                await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Script',data),parent.apiUrl,parent.seamlessApiUrl);
-            }else{
-                await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Normal',{}),parent.apiUrl,parent.seamlessApiUrl);
-            }
-            mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入成功!! ]</br>"
-        }else{
-            mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入失敗 - Error："+code+"!! ]</br>";
-        }
+        var Other = formData_find("other",formData) != "" ? JSON.parse(formData_find("other",formData)) :"{}" ;
     }catch{
         mes = "其他參數請填寫JSON格式!</br>";
     }
+    let args ={
+        API : "Login",
+        Currency : formData_find("Currency",formData),
+        GameID : formData_find("GameID",formData),
+        AgentCode : AgentCode,
+        AgentKey : AgentKey,
+        MemberAccount : MemberAccount,
+        LanguageID : formData_find("LanguageID",formData),
+        Other : Other
+    }
+    let code;
+    let response = await parent.apiJs.requestAPI(args,parent.apiUrl)
+    if(response){
+        code = response.Result;
+    }else{
+        code = 1;
+    }
+    if ( code == 0){
+        if(document.title == 'script'){
+            let data = await parent.psotLocalhostApi('/getScript',[parent.hangUpDB,$("#list option:selected").text()]);
+            data['user'] = args
+            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Script',data),parent.apiUrl,parent.seamlessApiUrl);
+        }else{
+            await parent.browser.createBrowser(response.Url,await setUpBrowerArgs('Normal',{}),parent.apiUrl,parent.seamlessApiUrl);
+        }
+        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入成功!! ]</br>"
+    }else{
+        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 登入失敗 - Error："+code+"!! ]</br>";
+    }
+    
         
     return mes;
 }
@@ -191,53 +192,54 @@ async function SetPoints(mes,MemberAccount,formData){
     var AgentCode = formData_find("AgentCode",formData);
     var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode];   
     try{
-        let Other= formData_find("other",formData) != "" ? JSON.parse(formData_find("other",formData)) :"{}" ;
-        if (wallet === "單一錢包"){
-            args = {
-                API : 'SetJson',
-                Currency : formData_find("Currency",formData),
-                AgentCode : AgentCode,
-                AgentKey : AgentKey,
-                MemberAccount : MemberAccount,
-                Points : formData_find("Points",formData),
-                Other : Other
-            }
-            response = await parent.apiJs.requestSeamlessAPI(args,parent.seamlessApiUrl);
-            if(response){
-                code = response.Result;
-            }else{
-                code = 1;
-            }
-            if ( code == 0){
-                mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.Points+"]</br>"
-            }
-            
-        }else{
-            args = {
-                API : 'SetPoints',
-                Currency : formData_find("Currency",formData),
-                AgentCode : AgentCode,
-                AgentKey : AgentKey,
-                MemberAccount : MemberAccount,
-                Points : formData_find("Points",formData),
-                Other : Other
-            }
-            response = await parent.apiJs.requestAPI(args,parent.apiUrl);
-            if(response){
-                code = response.Result;
-            }else{
-                code = 1;
-            }
-            if ( code == 0){
-                mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.AfterPoint+"，BankID："+response.BankID+"]</br>"
-            }
-        }
-        if(code !=0){
-            mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 轉點失敗!! - Error"+code+"]</br>"
-        }
+        var Other= formData_find("other",formData) != "" ? JSON.parse(formData_find("other",formData)) :"{}" ;
     }catch{
         mes = "其他參數請填寫JSON格式!</br>";
     }
+    if (wallet === "單一錢包"){
+        args = {
+            API : 'SetJson',
+            Currency : formData_find("Currency",formData),
+            AgentCode : AgentCode,
+            AgentKey : AgentKey,
+            MemberAccount : MemberAccount,
+            Points : formData_find("Points",formData),
+            Other : Other
+        }
+        response = await parent.apiJs.requestSeamlessAPI(args,parent.seamlessApiUrl);
+        if(response){
+            code = response.Result;
+        }else{
+            code = 1;
+        }
+        if ( code == 0){
+            mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.Points+"]</br>"
+        }
+        
+    }else{
+        args = {
+            API : 'SetPoints',
+            Currency : formData_find("Currency",formData),
+            AgentCode : AgentCode,
+            AgentKey : AgentKey,
+            MemberAccount : MemberAccount,
+            Points : formData_find("Points",formData),
+            Other : Other
+        }
+        response = await parent.apiJs.requestAPI(args,parent.apiUrl);
+        if(response){
+            code = response.Result;
+        }else{
+            code = 1;
+        }
+        if ( code == 0){
+            mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args["MemberAccount"]+" 轉點成功!! 餘額："+response.AfterPoint+"，BankID："+response.BankID+"]</br>"
+        }
+    }
+    if(code !=0){
+        mes = "Log:[ SetPoints- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 轉點失敗!! - Error"+code+"]</br>"
+    }
+    
     
     return mes;
 }
@@ -246,31 +248,30 @@ async function KickOut(mes,MemberAccount,formData){
     var AgentCode = formData_find("AgentCode",formData);
     var AgentKey = parent[parent.env+"AgentKeyList"]["returnObject"][AgentCode];  
     try{
-        let Other= formData_find("other",formData) != "" ? JSON.parse(formData_find("other",formData)) :"{}" ;
-        let args ={
-            API : 'KickOut',
-            Currency : formData_find("Currency",formData),
-            AgentCode : AgentCode,
-            AgentKey : AgentKey,
-            MemberAccount : MemberAccount,
-            Other : Other
-        }
-        let code;
-        let response = await parent.apiJs.requestAPI(args,parent.apiUrl);
-        if(response){
-            code = response.Result;
-        }else{
-            code = 1;
-        }
-        if ( code == 0){
-            mes = "Log:[ KickOut- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出成功!! ]</br>"
-        }else{
-            mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出失敗 - Error："+code+"!! ]</br>"
-        }
+        var Other= formData_find("other",formData) != "" ? JSON.parse(formData_find("other",formData)) :"{}" ;
     }catch{
         mes = "其他參數請填寫JSON格式!</br>";
-    }     
-    
+    }  
+    let args ={
+        API : 'KickOut',
+        Currency : formData_find("Currency",formData),
+        AgentCode : AgentCode,
+        AgentKey : AgentKey,
+        MemberAccount : MemberAccount,
+        Other : Other
+    }
+    let code;
+    let response = await parent.apiJs.requestAPI(args,parent.apiUrl);
+    if(response){
+        code = response.Result;
+    }else{
+        code = 1;
+    }
+    if ( code == 0){
+        mes = "Log:[ KickOut- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出成功!! ]</br>"
+    }else{
+        mes = "Log:[ login- "+getCurrentDateTime()+" - "+AgentCode+"-"+args['MemberAccount']+" 踢出失敗 - Error："+code+"!! ]</br>"
+    }
 
     return mes;
     
