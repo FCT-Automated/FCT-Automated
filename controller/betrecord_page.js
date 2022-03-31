@@ -199,13 +199,37 @@ async function getBetRecordList(){
         "pageIndex":"1",
         "pageSize":"10"
     };
+    let totalRecord = {
+        "isSuccess" : true,
+        "errorMessage" :null,
+        "returnObject" :{
+            "betRecordList":[],
+            "total":0
+        }
+    }
     let result = await requestWebApi(GetBetRecordListURL.value,payload);
     if(result.data.returnObject.total != 0){
-        payload["pageSize"] = await result.data.returnObject.total.toString();
-        total.innerHTML = payload["pageSize"];
-        result = await requestWebApi(GetBetRecordListURL.value,payload);
+        let totalbet;
+        totalbet = await result.data.returnObject.total.toString();
+        total.innerHTML = totalbet;
+        totalRecord.returnObject.total = parseInt(totalbet);
+        if (parseInt(totalbet) > 1000){
+            payload["pageSize"] = "1000";
+            for(let i = 0; i < parseInt(parseInt(totalbet)/1000)+1 ;i++){
+                payload["pageIndex"] = (i+1).toString();
+                result = await requestWebApi(GetBetRecordListURL.value,payload);
+                if(result.data.isSuccess){
+                    totalRecord.returnObject.betRecordList = totalRecord.returnObject.betRecordList.concat(result.data.returnObject.betRecordList)
+                }else{
+                    totalRecord.isSuccess = false;
+                    totalRecord.errorMessage = result.data.errorMessage
+                    break
+                }
+            }
+        }
+        
     }
-    return(result.data);
+    return(totalRecord);
 }
 
 
